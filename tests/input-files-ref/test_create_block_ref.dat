@@ -7,7 +7,9 @@ created by pre_exodus
 //ELEMENTS    64
 //NODES       135
 DIM           3
-//stuff for head// other stuff for head
+
+
+
 ------------------------------------------------DESIGN DESCRIPTION
 NDPOINT 0
 NDLINE  0

@@ -220,6 +220,7 @@ class CubitPy(object):
         with open(head_path, 'w') as head_file:
             for line in self.head.split('\n'):
                 head_file.write(line.strip())
+                head_file.write('\n')
         
         with open(bc_path, 'w') as bc_file:
             bc_file.write('----------------------------------------BCSPECS\n\n')
@@ -255,8 +256,13 @@ class CubitPy(object):
             os.path.join(temp_dir, 'cubitpy.bc')
             )
         
+        # For debugging write the command to the temp folder.
+        with open(os.path.join(temp_dir, 'cmd.sh'), 'w') as cmd_file:
+            cmd_file.write(self.pre_exodus)
+            cmd_file.write(' --exo=cubitpy.exo --bc=cubitpy.bc --head=cubitpy.head')
+        
         # Run pre_exodus.
-        subprocess.check_output([
+        out = subprocess.check_output([
             self.pre_exodus,
             '--exo=cubitpy.exo',
             '--bc=cubitpy.bc',
