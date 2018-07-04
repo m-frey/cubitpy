@@ -1,0 +1,14 @@
+# general filetypes to ignore
+*.txt
+*.pyc
+
+# eclipse stuff
+*.project
+*.pydevproject
+*.settings*
+
+# testing folder
+*/testing-tmp
+
+# Python stuff
+*/__pycache__
