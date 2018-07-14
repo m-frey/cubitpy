@@ -23,12 +23,13 @@ def check_tmp_dir():
     if not os.path.exists(testing_temp):
         os.makedirs(testing_temp)
 
+
 def compare_strings(string_ref, string_compare):
     """
     Compare two stings. If they are not identical open kompare and show
     differences.
     """
-    
+
     # Check if the strings are equal, if not fail the test and show the
     # differences in the strings.
     name = 'cubitpy_testing'
@@ -51,44 +52,44 @@ def compare_strings(string_ref, string_compare):
 
 class TestCubitPy(unittest.TestCase):
     """This class tests the implementation of the CubitPy class."""
-     
+
     def test_create_block(self):
         """Create a block with cubit."""
-        
+
         # Initialize cubit.
         cubit = CubitPy()
-        
+
         # Set head
         cubit.head = '''
             //stuff for head
             // other stuff for head
             '''
-        
+
         # Dimensions of the block.
         lx, ly, lz = [0.1, 1, 10]
-        
+
         # Number of elements in the directions.
-        [nx, ny, nz] = [2,4,8]
-        
+        [nx, ny, nz] = [2, 4, 8]
+
         # Create the block.
-        block = cubit.brick(lx,ly,lz)
-        
+        block = cubit.brick(lx, ly, lz)
+
         # Move the block.
-        cubit.move(block, [0,0,block.bounding_box()[2]])
-        
+        cubit.move(block, [0, 0, block.bounding_box()[2]])
+
         # Set the meshing parameters for the curves.
         for line in block.curves():
             point_on_line = line.position_from_fraction(0.5)
             tangent = np.array(line.tangent(point_on_line))
-            if np.abs(np.dot(tangent, [1,0,0])) > 1e-5:
+            if np.abs(np.dot(tangent, [1, 0, 0])) > 1e-5:
                 cubit.set_line_interval(line, nx)
-            elif np.abs(np.dot(tangent, [0,1,0])) > 1e-5:
+            elif np.abs(np.dot(tangent, [0, 1, 0])) > 1e-5:
                 cubit.set_line_interval(line, ny)
-            elif np.abs(np.dot(tangent, [0,0,1])) > 1e-5:
+            elif np.abs(np.dot(tangent, [0, 0, 1])) > 1e-5:
                 cubit.set_line_interval(line, nz)
             else:
                 raise ArithmeticError('Error')
-        
+
         # Mesh the block.
         block.mesh()
         cubit.add_element_type(block.volumes()[0], 'HEX8', name='block',
@@ -96,16 +97,16 @@ class TestCubitPy(unittest.TestCase):
                 'MAT 1 KINEM nonlinear EAS none',
                 'SOLIDH8'
                 ])
-        
+
         # Create node sets.
         cubit.add_node_set(block.volumes()[0], name='all')
         for i, surf in enumerate(block.surfaces()):
             normal = np.array(surf.normal_at(cubit.get_surface_center(surf)))
-            if np.dot(normal, [0,0,-1]) == 1:
+            if np.dot(normal, [0, 0, -1]) == 1:
                 cubit.add_node_set(surf, name='fix', bc=[
                     'DESIGN SURF DIRICH CONDITIONS',
                     'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 FUNCT 0 0 0 0 0 0'])
-            elif np.dot(normal, [0,0,1]) == 1:
+            elif np.dot(normal, [0, 0, 1]) == 1:
                 cubit.add_node_set(surf, name='load', bc=[
                     'DESIGN SURF DIRICH CONDITIONS',
                     'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 FUNCT 0 0 0 0 0 0'])
@@ -113,12 +114,12 @@ class TestCubitPy(unittest.TestCase):
                 cubit.add_node_set(surf, name='load{}'.format(i), bc=[
                     'DESIGN SURF NEUMANN CONDITIONS',
                     'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 FUNCT 0 0 0 0 0 0'])
-        
+
         # Create the dat file for the solid.
         check_tmp_dir()
         dat_file = os.path.join(testing_temp, 'test_create_block_cubitpy.dat')
         cubit.create_dat(dat_file)
-        
+
         # Compare with the ref file.
         ref_file = os.path.join(testing_input, 'test_create_block_ref.dat')
         with open(dat_file, 'r') as text_file:
