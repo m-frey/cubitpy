@@ -1,87 +1,104 @@
-
+"""
+This script gets called with python2 and loads the cubit module. With the package execnet (in python3) a connection is established between the two different python interpreters and data and commands can be exchanged. The exchange happens in a serial matter, items are sent to this script, and results are sent back, until None is sent. If cubit creates a cubit object it is saved in a dictionary in this script, with the key beeing the id of the object. The python3 interpreter only knows the id of this object and can pass it to this script to call a function on it or use it as an argument.
+"""
 
 # Python modules.
 import sys
-
-
 import os
 
+
+# Cubit constants.
+cubit_vertex = 'cubitpy_vertex'
+cubit_curve = 'cubitpy_curve'
+cubit_surface = 'cubitpy_surface'
+cubit_volume = 'cubitpy_volume'
+
+
+
+
 def out(string):
-    os.system('echo "{}" > /dev/pts/20'.format(string))
-out('\n')
+    """The print version does over different interpreters, so this function prints strings to an active console. Insert the path of your console to get the right output."""
+    os.system('echo "{}" > /dev/pts/6'.format(string))
 
-def object_to_id(obj):
-    """Return a string id of obj."""
-    return 'cp2t3id_' + str(id(obj))
 
-def string_to_id(string):
-    """Return the id from a id string."""
-    if not isinstance(string, str):
-        return None
-    if string.startswith('cp2t3id_'):
-        return int(string[8:])
+
+
+def is_base_type(obj):
+    """Check if the object is of a base type that does not need conversion for the connection between python2 and python3."""
+    if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float) or isinstance(obj, type(None)):
+        return True
     else:
-        return None
+        return False
 
 
-# Dictionary with all objects created by cubit and cubit itself.
+def is_cubit_type(obj):
+    """Check if the object is of a cubit base."""
+    if isinstance(obj, cubit.Body) or isinstance(obj, cubit.Vertex) or isinstance(obj, cubit.Curve) or isinstance(obj, cubit.Surface) or isinstance(obj, cubit.Volume):
+        return True
+    else:
+        return False
+
+
+# All cubit items that are created are stored in this dictionary. The keys are the unique object ids. For now no items are deleted if the GC deletes them in python3, there is a check that not too many items are in this dictionary.
 cubit_objects = {}
 
-# First receive is the initialization of cubit.
+
+
+
+
+
+# The first call are parameters needed in this script.
+parameters = channel.receive()
+if not isinstance(parameters, dict):
+    raise TypeError('The first item should be a dictionary. Got {}!\nparameters={}'.format(type(parameters), parameters))
+
+# Add paths to sys and load utility functions.
+dir_name = os.path.dirname(parameters['__file__'])
+sys.path.append(dir_name)
+sys.path.append(parameters['cubit_path'])
+
+from cubit_wrapper_utility import object_to_id, string_to_id
+import cubit
+
+
+# The second call is the initialization call for cubit.
 # init = ['init', cubit_path, [args]]
 init = channel.receive()
 if not init[0] == 'init':
-    raise ValueError('First call must be init!')
-if not len(init) == 3:
-    raise ValueError('Three arguments must be given to init!')
-
-# Load cubit.
-sys.path.append(init[1])
-import cubit
-cubit.init(init[2])
+    raise ValueError('The second call must be init!')
+if not len(init) == 2:
+    raise ValueError('Two arguments must be given to init!')
+cubit.init(init[1])
 cubit_objects[id(cubit)] = cubit
 channel.send(object_to_id(cubit))
 
-# Wait for input.
+
+# Now start an endless loop (until None is sent) and perform the cubit functions.
 while 1:
 
     # Get input from python3.
     receive = channel.receive()
 
-    # Break the connection.
+    # If None is sent, break the connection and exit.
     if receive is None:
         break
 
+    # The first (string) argument decides that functionality will be performed.
+    # object_id: call a method on a cubit object, with parameters
+    #       ['object_id', 'method', ['parameters']]
+    # isinstance: Check if the cubit object is of a cerain instance.
+    
+    if not isinstance(receive[0], str):
+        raise TypeError('The first item given to python2 must be of type str! Got {}!'.format(type(receive[0])))
 
-    # Input must always be of length 3.
-    if not len(receive) == 3:
-        raise ValueError('Input given not of length 3!')
+    elif string_to_id(receive[0]) is not None:
+        # The first item is an id for a cubit object. Call a method on this object.
 
-    # Check if object given is valid cubit object.
-    if receive[0] == 'isinstance':
-
-        compare_object = cubit_objects[string_to_id(receive[1])]
-        
-        if (receive[2] == 'vertex'):
-            channel.send(isinstance(compare_object, cubit.Vertex))
-        elif (receive[2] == 'curve'):
-            channel.send(isinstance(compare_object, cubit.Curve))
-        elif (receive[2] == 'surface'):
-            channel.send(isinstance(compare_object, cubit.Surface))
-        elif (receive[2] == 'volume'):
-            channel.send(isinstance(compare_object, cubit.Volume))
-        else:
-            raise TypeError('Wrong type {} given!'.format(receive[2]))
-        
-        
-    elif string_to_id(receive[0]) in cubit_objects.keys():
+        # Get object and function name.
         call_object = cubit_objects[string_to_id(receive[0])]
-        
-        
-        # Function name for cubit.
         function = receive[1]
 
-        # Get the function arguments.
+        # Get the function arguments. It is checked if one of the arguments is an cubit object.
         args = []
         for item in receive[2]:
             item_id = string_to_id(item)
@@ -89,32 +106,53 @@ while 1:
                 args.append(item)
             else:
                 args.append(cubit_objects[item_id])
-        
+
         # Call the function.
-        obj = call_object.__getattribute__(function)(*args)
+        cubit_return = call_object.__getattribute__(function)(*args)
 
-        # Return the objects.
-        if (obj is None) or isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float):
-            channel.send(obj)
-        else:
+        # Check what to return.
+        if is_base_type(cubit_return):
+            # The return item is a string, integer or float.
+            channel.send(cubit_return)
+
+        elif isinstance(cubit_return, tuple):
+            # A tuple was returned, loop over each entry and check its type.
+            return_list = []
+            for item in cubit_return:
+                if is_base_type(item):
+                    return_list.append(item)
+                elif is_cubit_type(item):
+                    cubit_objects[id(item)] = item
+                    return_list.append(object_to_id(item)) 
+                else:
+                    raise TypeError('Expected string, int, float or cubit object! Got {}!'.format(item))
+            channel.send(return_list)
+
+        elif is_cubit_type(cubit_return):
             # Store the object locally and return the id.
-            if isinstance(obj, tuple):
-                return_obj = []
-                for item in obj:
-                    if (item is None) or isinstance(item, str) or isinstance(item, int) or isinstance(item, float):
-                        return_obj.append(item)
-                    else:
-                        cubit_objects[id(item)] = item
-                        return_obj.append(object_to_id(item))
-            else:
-                cubit_objects[id(obj)] = obj
-                return_obj = object_to_id(obj)
-            channel.send(return_obj)
+            cubit_objects[id(cubit_return)] = cubit_return
+            channel.send(object_to_id(cubit_return))
 
-        
-        
+        else:
+            raise TypeError('Expected string, int, float, cubit object or tuple! Got {}!'.format(cubit_return))
+
+    elif receive[0] == 'isinstance':
+        # Compare the second item with a predefined cubit class.
+        compare_object = cubit_objects[string_to_id(receive[1])]
+
+        if (receive[2] == cubit_vertex):
+            channel.send(isinstance(compare_object, cubit.Vertex))
+        elif (receive[2] == cubit_curve):
+            channel.send(isinstance(compare_object, cubit.Curve))
+        elif (receive[2] == cubit_surface):
+            channel.send(isinstance(compare_object, cubit.Surface))
+        elif (receive[2] == cubit_volume):
+            channel.send(isinstance(compare_object, cubit.Volume))
+        else:
+            raise TypeError('Wrong compare type given! Expected vertex, curve, surface or volume, got{}'.format(receive[2]))
+
     else:
-        raise ValueError('Wrong cubit object given!')
+        raise NotImplemented('The case of "{}" is not implemented!'.format(receive[0]))
 
 
 # Send EOF.

@@ -1,28 +1,18 @@
-
+# -*- coding: utf-8 -*-
+"""
+TODO
+"""
 
 
 # Import python modules.
 import execnet
-
-
 import sys
 
+# Import utility functions for cubitpy.
+from .cubit_wrapper_utility import object_to_id, string_to_id
 
 
-def object_to_id(obj):
-    """Return a string id of obj."""
-    return 'cp2t3id_' + str(id(obj))
-
-def string_to_id(string):
-    """Return the id from a id string."""
-    if not isinstance(string, str):
-        return None
-    if string.startswith('cp2t3id_'):
-        return int(string[8:])
-    else:
-        return None
-
-
+print(__file__)
 
 def get_cubit_function(cubit_id):
 
@@ -51,11 +41,18 @@ class CubitConnect(object):
 
         # Set up the connection channel.
         self.channel = self.gw.remote_exec(data)
+        
+        # Send parameters to the python2 interpreter
+        parameters = {
+            '__file__':  __file__,
+            'cubit_path': cubit_path
+            }
+        self.channel.send(parameters)
 
     def init_cubit(self, arguments):
 
         # Initialize cubit.
-        self.channel.send(['init', self.cubit_path, arguments])
+        self.channel.send(['init', arguments])
         cubit_id = self.channel.receive()
         return CubitObject(self, cubit_id)
     
@@ -97,22 +94,6 @@ class CubitConnect(object):
                 print(type(cubit_return))
             return cubit_return
         
-        
-        
-        
-                ## Send the call to cubit.
-        #channel.send([self.cubit_id, key, [1,2,3]])
-        #obj = channel.receive()
-        #print(obj)
-        
-        
-        #channel.send([obj, 'curves', []])
-        #obj = channel.receive()
-        #print(obj)
-        
-        
-        
-        
         return function
 
 
@@ -127,76 +108,16 @@ class CubitObject(object):
 
     
     def __getattribute__(self, key, *args, **kwargs):
-        
+        print(key)
         try:
             return object.__getattribute__(self, key, *args, **kwargs)
         except AttributeError:
             # pass to cubit connection
             return self.cubit_connect.get_function(self, key)
-            
-
-
-class Cubit(object):
-
-    def init(self, args, cubit_path=None):
-
-        # Get the cubit path from sys.path.
-        if cubit_path is None:
-            # Check if cubit is in one system path.
-            for path in sys.path:
-                if 'cubit' in path:
-                    cubit_path = path
-
-        # Set up the python2 interpreter.
-        self.gw = execnet.makegateway("popen//python=python2.7")
-        self.gw.reconfigure(py3str_as_py2str=True)
-
-        # Load the python2 code.
-        with open('/home/ivo/dev/cubitpy/cubitpy/cubit_wrapper2.py', 'r') as myfile:
-            data = myfile.read()
-
-
-
-    def get_cubit_function(self, key):
-        
-        
-        def cubit_function(*args, **kwargs):
-            print(args)
-            print()
-            self.channel.send([self.cubit_id, key, args])
-            obj = self.channel.receive()
-            return obj
-        
-        return cubit_function
-
-    def __getattribute__(self, key, *args, **kwargs):
-        print(key)
-        object.__getattribute__(self, key)
-        print(self.gw)
-        return None
-
-    def __getattr__(self, key, *args, **kwargs):
-        """
-        All calls to methods and attributes that are not in this object get
-        passed to cubit.
-        """
-        
-        ## Send the call to cubit.
-        #channel.send([self.cubit_id, key, [1,2,3]])
-        #obj = channel.receive()
-        #print(obj)
-        
-        
-        #channel.send([obj, 'curves', []])
-        #obj = channel.receive()
-        #print(obj)
-        
-        print(key)
-        return self.get_cubit_function(key)
-        print(args)
-        #print(key)
-        ##return self.cubit.__getattribute__(key, *args, **kwargs)
-
+    
+    
+    def __dir__(self):
+        return [1]
 
 def print_arg(obj):
 
@@ -207,49 +128,5 @@ def print_arg(obj):
 
     for item in list:
         print(item)
-
-
-
-
-if False:
-
-    gw = execnet.makegateway("popen//python=python2.7")
-    gw.reconfigure(py3str_as_py2str=True)
-
-    with open('/home/ivo/dev/cubitpy/cubitpy/cubit_wrapper2.py', 'r') as myfile:
-        data = myfile.read()
-
-
-    channel = gw.remote_exec(data)
-
-
-    #print(channel.send(['init', '/opt/cubit-13.2/bin', ['cubit', '-noecho', '-nojournal','-log=aaa.txt']]))
-    channel.send(['init', '/opt/cubit-13.2/bin', ['cubit', '-log=aaa.txt']])
-    cubit_tt = channel.receive()
-
-    for i in range(1):
-        
-        channel.send([cubit_tt, 'brick', [1,2,3]])
-        obj = channel.receive()
-        print(obj)
-        
-        
-        channel.send([obj, 'curves', []])
-        obj = channel.receive()
-        print(obj)
-        
-        
-        
-        
-
-    print(channel.send(None))
-
-
-
-
-    print(channel.receive())
-
-
-
 
 

@@ -46,10 +46,11 @@ class CubitPy(object):
             for arg in cubit_args:
                 arguments.appen(arg)
 
-        # Load cubit.
+        # Depending on the python version, load the cubit default wrapper (python2)
+        # or the modified wraper for python3.
         if (sys.version_info > (3, 0)):
             # Python 3.
-            from .cubit_wrapper3 import CubitConnect, CubitObject, Cubit
+            from .cubit_wrapper3 import CubitConnect, CubitObject
             cubit_connect = CubitConnect()
             self.cubit = cubit_connect.init_cubit(arguments)
         else:
@@ -87,13 +88,13 @@ class CubitPy(object):
         """Return the type of item. It is expected to be a cubit geom item."""
         if (sys.version_info > (3, 0)):
             # Python 3.
-            if self.cubit.cubit_connect.isinstance(item, 'vertex'):
+            if self.cubit.cubit_connect.isinstance(item, cupy.vertex):
                 return cupy.vertex
-            elif self.cubit.cubit_connect.isinstance(item, 'curve'):
+            elif self.cubit.cubit_connect.isinstance(item, cupy.curve):
                 return cupy.curve
-            elif self.cubit.cubit_connect.isinstance(item, 'surface'):
+            elif self.cubit.cubit_connect.isinstance(item, cupy.surface):
                 return cupy.surface
-            elif self.cubit.cubit_connect.isinstance(item, 'volume'):
+            elif self.cubit.cubit_connect.isinstance(item, cupy.volume):
                 return cupy.volume
         else:
             if isinstance(item, self.cubit.Vertex):
