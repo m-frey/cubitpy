@@ -118,7 +118,7 @@ class CubitPy(object):
         """
 
         if self.block_counter == 0:
-            self.cubit.cmp('reset block')
+            self.cubit.cmd('reset block')
         print('block {} {} {}'.format(
             self.block_counter,
             self._get_type_string(item),
