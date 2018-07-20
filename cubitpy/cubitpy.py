@@ -38,18 +38,26 @@ class CubitPy(object):
             Path to the cubit executables.
         """
 
-        # Load cubit.
-        sys.path.append(cubit_path)
-        import cubit  # @UnresolvedImport
-        self.cubit = cubit
-
-        # Initialize cubit.
+        # Arguments for cubit.
         if cubit_args is None:
-            self.cubit.init(['cubit', '-noecho', '-nojournal'])
+            arguments = ['cubit', '-noecho', '-nojournal']
         else:
             arguments = ['cubit']
             for arg in cubit_args:
                 arguments.appen(arg)
+
+        # Load cubit.
+        if (sys.version_info > (3, 0)):
+            # Python 3.
+            from .cubit_wrapper3 import CubitConnect, CubitObject, Cubit
+            cubit_connect = CubitConnect()
+            self.cubit = cubit_connect.init_cubit(arguments)
+        else:
+            # Python 2.
+            sys.path.append(cubit_path)
+            import cubit  # @UnresolvedImport
+            self.cubit = cubit
+            # Initialize cubit.
             self.cubit.init(arguments)
 
         # Reset cubit.
@@ -77,16 +85,26 @@ class CubitPy(object):
 
     def _get_type(self, item):
         """Return the type of item. It is expected to be a cubit geom item."""
-        if isinstance(item, self.cubit.Vertex):
-            return cupy.vertex
-        elif isinstance(item, self.cubit.Curve):
-            return cupy.curve
-        elif isinstance(item, self.cubit.Surface):
-            return cupy.surface
-        elif isinstance(item, self.cubit.Volume):
-            return cupy.volume
+        if (sys.version_info > (3, 0)):
+            # Python 3.
+            if self.cubit.cubit_connect.isinstance(item, 'vertex'):
+                return cupy.vertex
+            elif self.cubit.cubit_connect.isinstance(item, 'curve'):
+                return cupy.curve
+            elif self.cubit.cubit_connect.isinstance(item, 'surface'):
+                return cupy.surface
+            elif self.cubit.cubit_connect.isinstance(item, 'volume'):
+                return cupy.volume
         else:
-            raise TypeError('Got {}!'.format(type(item)))
+            if isinstance(item, self.cubit.Vertex):
+                return cupy.vertex
+            elif isinstance(item, self.cubit.Curve):
+                return cupy.curve
+            elif isinstance(item, self.cubit.Surface):
+                return cupy.surface
+            elif isinstance(item, self.cubit.Volume):
+                return cupy.volume
+        raise TypeError('Got {}!'.format(type(item)))
 
     def _get_type_string(self, item):
         """Return the string for the item in cubit commands."""
