@@ -49,16 +49,17 @@ class CubitConnect(object):
         # but the path to a other console should be explicitly given if needed.
         eclipse = True
         if eclipse:
-            python_path = os.environ['PYTHONPATH']
-            del os.environ['PYTHONPATH']
+            python_path_old = os.environ['PYTHONPATH']
+            python_path_new_list = []
+            for item in python_path_old.split(':'):
+                if (('/input' in item) or ('/cubitpy' in item)
+                        or ('/meshpy' in item)):
+                    python_path_new_list.append(item)
+            os.environ['PYTHONPATH'] = ':'.join(python_path_new_list)
 
         # Set up the python2 interpreter.
         self.gw = execnet.makegateway(interpreter)
         self.gw.reconfigure(py3str_as_py2str=True)
-
-        # Set old python path again.
-        if eclipse:
-            os.environ['PYTHONPATH'] = python_path
 
         # Load the python2 code.
         python2_file = os.path.join(

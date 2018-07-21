@@ -373,5 +373,6 @@ class CubitPy(object):
         subprocess.call([
             '/opt/cubit-13.2/cubit',
             '-nojournal',
+            '-information=Off',
             '-input', 'open_state.jou'
             ], cwd=temp_path)
