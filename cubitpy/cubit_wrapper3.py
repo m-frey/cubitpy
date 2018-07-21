@@ -41,9 +41,24 @@ class CubitConnect(object):
             and the output from there will be redirected to the console.
         """
 
+        # Flag if the script is run with eclipse or not. This will temporary
+        # delete the python path so that the python2 interpreter does not look
+        # in the wrong directories.
+        # https://stackoverflow.com/questions/3248271/eclipse-using-multiple-python-interpreters-with-execnet
+        # Also the console output will not be redirected to the eclipse console
+        # but the path to a other console should be explicitly given if needed.
+        eclipse = True
+        if eclipse:
+            python_path = os.environ['PYTHONPATH']
+            del os.environ['PYTHONPATH']
+
         # Set up the python2 interpreter.
         self.gw = execnet.makegateway(interpreter)
         self.gw.reconfigure(py3str_as_py2str=True)
+
+        # Set old python path again.
+        if eclipse:
+            os.environ['PYTHONPATH'] = python_path
 
         # Load the python2 code.
         python2_file = os.path.join(
@@ -60,7 +75,7 @@ class CubitConnect(object):
         parameters['__file__'] = __file__
         parameters['cubit_path'] = cubit_path
 
-        if debug:
+        if debug and not eclipse:
             # Get the current terminal path.
             import subprocess
             run = subprocess.run(['tty'], check=True, stdout=subprocess.PIPE)

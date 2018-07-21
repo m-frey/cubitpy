@@ -22,7 +22,7 @@ cubit_volume = 'cubitpy_volume'
 
 
 # Default parameters
-parameters = {'tty': '/dev/pts/18'}
+parameters = {}
 
 
 def out(string):
@@ -34,7 +34,10 @@ def out(string):
     """
 
     if 'tty' in parameters.keys():
-        os.system('echo "{}" > {}'.format(string, parameters['tty']))
+        out_console = parameters['tty']
+    else:
+        out_console = '/dev/pts/18'
+    os.system('echo "{}" > {}'.format(string, out_console))
 
 
 def is_base_type(obj):
