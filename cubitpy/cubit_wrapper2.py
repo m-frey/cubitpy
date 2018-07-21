@@ -21,6 +21,10 @@ cubit_surface = 'cubitpy_surface'
 cubit_volume = 'cubitpy_volume'
 
 
+# Default parameters
+parameters = {'tty': '/dev/pts/18'}
+
+
 def out(string):
     """
     The print version does over different interpreters, so this function prints
@@ -28,7 +32,9 @@ def out(string):
     right output.
     To get the current path of your console type: tty
     """
-    os.system('echo "{}" > /dev/pts/2'.format(string))
+
+    if 'tty' in parameters.keys():
+        os.system('echo "{}" > {}'.format(string, parameters['tty']))
 
 
 def is_base_type(obj):

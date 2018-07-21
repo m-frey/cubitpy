@@ -23,7 +23,7 @@ class CubitConnect(object):
     """
 
     def __init__(self, cubit_arguments, interpreter='popen//python=python2.7',
-            cubit_path='/opt/cubit-13.2/bin'):
+            cubit_path='/opt/cubit-13.2/bin', debug=True):
         """
         Initialize the connection between python2 and python3. And load the
         cubit module in python2.
@@ -36,6 +36,9 @@ class CubitConnect(object):
             Interpreter for python2 that will be used.
         cubit_path: str
             Path to the cubit executable.
+        debug: bool
+            If True, the path of the current console will be given to python2
+            and the output from there will be redirected to the console.
         """
 
         # Set up the python2 interpreter.
@@ -53,10 +56,17 @@ class CubitConnect(object):
         self.channel = self.gw.remote_exec(data)
 
         # Send parameters to the python2 interpreter
-        parameters = {
-            '__file__': __file__,
-            'cubit_path': cubit_path
-            }
+        parameters = {}
+        parameters['__file__'] = __file__
+        parameters['cubit_path'] = cubit_path
+
+        if debug:
+            # Get the current terminal path.
+            import subprocess
+            run = subprocess.run(['tty'], check=True, stdout=subprocess.PIPE)
+            parameters['tty'] = run.stdout.decode('utf-8')
+
+        # Send the parameters to python2
         self.send_and_return(parameters)
 
         # Initialize cubit.

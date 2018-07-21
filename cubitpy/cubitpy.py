@@ -291,6 +291,11 @@ class CubitPy(object):
         dat_path.
         """
 
+        # Check if output path exists.
+        dat_dir = os.path.dirname(dat_path)
+        if not os.path.exists(dat_dir):
+            raise ValueError('Path {} does not exist!'.format(dat_dir))
+
         temp_dir = '/tmp/cubitpy'
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
@@ -315,11 +320,6 @@ class CubitPy(object):
             '--bc=cubitpy.bc',
             '--head=cubitpy.head'
             ], cwd=temp_dir)
-
-        # Check if path exists.
-        dat_dir = os.path.abspath(os.path.join(dat_path, os.pardir))
-        if not os.path.exists(dat_dir):
-            raise ValueError('Path {} does not exist!'.format(dat_dir))
 
         # Copy dat file.
         shutil.copyfile(
