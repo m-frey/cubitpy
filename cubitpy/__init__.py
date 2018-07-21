@@ -11,12 +11,14 @@ if (sys.version_info > (3, 0)):
     from .cubit_wrapper3 import CubitConnect, CubitObject
 
 # Global object.
-from .cubitpy import cupy, CubitPy
+from .cubitpy import cupy, CubitPy, get_methods
 
 # Define the itCouplingems that will be exported by default.
 __all__ = [
     # cubit options.
     'cupy',
     # Cubit object.
-    'CubitPy'
+    'CubitPy',
+    # Utility functions,
+    'get_methods'
     ]

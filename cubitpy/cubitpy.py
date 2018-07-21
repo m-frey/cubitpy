@@ -1,10 +1,29 @@
 # -*- coding: utf-8 -*-
+"""
+Implements a class that helps create meshes with cubit. Since the cubit
+interface works only with Python2, if Python3 is used, a wrapper for the cubit
+methods is used.
+"""
+
 
 # Python modules.
 import os
 import shutil
 import sys
 import subprocess
+
+
+def get_methods(cubit_object):
+    """Return a list of all callable methods in object."""
+    if (sys.version_info > (3, 0)):
+        return cubit_object.cubit_connect.send_and_return(
+            ['get_methods', cubit_object.cubit_id]
+            )
+    else:
+        return [
+            method_name for method_name in dir(cubit_object)
+            if callable(getattr(cubit_object, method_name))
+            ]
 
 
 class CubitOptions(object):
@@ -26,7 +45,8 @@ class CubitPy(object):
     """A wrapper class for cubit."""
 
     def __init__(self, cubit_args=None, cubit_path='/opt/cubit-13.2/bin',
-            pre_exodus='/home/ivo/baci/work/release/pre_exodus'):
+            pre_exodus='/home/ivo/baci/work/release/pre_exodus'
+            ):
         """
         Initialize cubit.
 
@@ -36,23 +56,33 @@ class CubitPy(object):
             List of arguments to pass to cubit.init.
         cubit_path: str
             Path to the cubit executables.
+        cubit_log: str
+            Path of the file where to write the cubit output to. The default
+            value of /dev/null discards all output.
+        pre_exodus: str
+            Path to the pre_exodus pre-processor of baci.
         """
 
         # Arguments for cubit.
         if cubit_args is None:
-            arguments = ['cubit', '-noecho', '-nojournal']
+            arguments = ['cubit',
+                '-log=/dev/null',    # Write the log to a file.
+                '-information=Off',  # Do not output information of cubit.
+                '-nojournal',        # Do write a journal file.
+                '-noecho'            # Do not output commands used in cubit.
+                ]
         else:
             arguments = ['cubit']
             for arg in cubit_args:
                 arguments.appen(arg)
 
-        # Depending on the python version, load the cubit default wrapper (python2)
-        # or the modified wraper for python3.
+        # Depending on the python version, load the cubit default wrapper
+        # (python2) or the modified wrapper for python3.
         if (sys.version_info > (3, 0)):
             # Python 3.
             from .cubit_wrapper3 import CubitConnect, CubitObject
-            cubit_connect = CubitConnect()
-            self.cubit = cubit_connect.init_cubit(arguments)
+            cubit_connect = CubitConnect(arguments)
+            self.cubit = cubit_connect.cubit
         else:
             # Python 2.
             sys.path.append(cubit_path)
@@ -138,11 +168,7 @@ class CubitPy(object):
 
         if self.block_counter == 0:
             self.cubit.cmd('reset block')
-        print('block {} {} {}'.format(
-            self.block_counter,
-            self._get_type_string(item),
-            item.id()
-            ))
+
         self.cubit.cmd('block {} {} {}'.format(
             self.block_counter,
             self._get_type_string(item),
@@ -243,7 +269,7 @@ class CubitPy(object):
                 head_file.write('\n')
 
         with open(bc_path, 'w') as bc_file:
-            bc_file.write('----------------------------------------BCSPECS\n\n')
+            bc_file.write('---------------------------------------BCSPECS\n\n')
             for block in self.blocks:
                 bc_file.write((
                     '*eb{}="ELEMENT"\nsectionname="{}"\n'
@@ -260,8 +286,8 @@ class CubitPy(object):
     def create_dat(self, dat_path):
         """
         This function creates a finished baci input *.dat file. First the mesh,
-        head and bc files are written to a temp directory and then pre_exodus is
-        called to create the *.dat file. The final input file is copied to
+        head and bc files are written to a temp directory and then pre_exodus
+        is called to create the *.dat file. The final input file is copied to
         dat_path.
         """
 
@@ -279,7 +305,8 @@ class CubitPy(object):
         # For debugging write the command to the temp folder.
         with open(os.path.join(temp_dir, 'cmd.sh'), 'w') as cmd_file:
             cmd_file.write(self.pre_exodus)
-            cmd_file.write(' --exo=cubitpy.exo --bc=cubitpy.bc --head=cubitpy.head')
+            cmd_file.write(' --exo=cubitpy.exo --bc=cubitpy.bc '
+                + '--head=cubitpy.head')
 
         # Run pre_exodus.
         out = subprocess.check_output([

@@ -1,5 +1,12 @@
 """
-This script gets called with python2 and loads the cubit module. With the package execnet (in python3) a connection is established between the two different python interpreters and data and commands can be exchanged. The exchange happens in a serial matter, items are sent to this script, and results are sent back, until None is sent. If cubit creates a cubit object it is saved in a dictionary in this script, with the key beeing the id of the object. The python3 interpreter only knows the id of this object and can pass it to this script to call a function on it or use it as an argument.
+This script gets called with python2 and loads the cubit module. With the
+package execnet (in python3) a connection is established between the two
+different python interpreters and data and commands can be exchanged. The
+exchange happens in a serial matter, items are sent to this script, and results
+are sent back, until None is sent. If cubit creates a cubit object it is saved
+in a dictionary in this script, with the key beeing the id of the object. The
+python3 interpreter only knows the id of this object and can pass it to this
+script to call a function on it or use it as an argument.
 """
 
 # Python modules.
@@ -14,18 +21,24 @@ cubit_surface = 'cubitpy_surface'
 cubit_volume = 'cubitpy_volume'
 
 
-
-
 def out(string):
-    """The print version does over different interpreters, so this function prints strings to an active console. Insert the path of your console to get the right output."""
-    os.system('echo "{}" > /dev/pts/6'.format(string))
-
-
+    """
+    The print version does over different interpreters, so this function prints
+    strings to an active console. Insert the path of your console to get the
+    right output.
+    To get the current path of your console type: tty
+    """
+    os.system('echo "{}" > /dev/pts/2'.format(string))
 
 
 def is_base_type(obj):
-    """Check if the object is of a base type that does not need conversion for the connection between python2 and python3."""
-    if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float) or isinstance(obj, type(None)):
+    """
+    Check if the object is of a base type that does not need conversion for the
+    connection between python2 and python3.
+    """
+    if (isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float)
+            or isinstance(obj, type(None))
+            ):
         return True
     else:
         return False
@@ -33,26 +46,29 @@ def is_base_type(obj):
 
 def is_cubit_type(obj):
     """Check if the object is of a cubit base."""
-    if isinstance(obj, cubit.Body) or isinstance(obj, cubit.Vertex) or isinstance(obj, cubit.Curve) or isinstance(obj, cubit.Surface) or isinstance(obj, cubit.Volume):
+    if (isinstance(obj, cubit.Body) or isinstance(obj, cubit.Vertex)
+            or isinstance(obj, cubit.Curve) or isinstance(obj, cubit.Surface)
+            or isinstance(obj, cubit.Volume)
+            ):
         return True
     else:
         return False
 
 
-# All cubit items that are created are stored in this dictionary. The keys are the unique object ids. For now no items are deleted if the GC deletes them in python3, there is a check that not too many items are in this dictionary.
+# All cubit items that are created are stored in this dictionary. The keys are
+# the unique object ids. For now no items are deleted if the GC deletes them in
+# python3, there is a check that not too many items are in this dictionary.
 cubit_objects = {}
-
-
-
-
 
 
 # The first call are parameters needed in this script.
 parameters = channel.receive()
+channel.send(None)
 if not isinstance(parameters, dict):
-    raise TypeError('The first item should be a dictionary. Got {}!\nparameters={}'.format(type(parameters), parameters))
+    raise TypeError('The first item should be a dictionary. '
+        + 'Got {}!\nparameters={}'.format(type(parameters), parameters))
 
-# Add paths to sys and load utility functions.
+# Add paths to sys and load utility functions and cubit.
 dir_name = os.path.dirname(parameters['__file__'])
 sys.path.append(dir_name)
 sys.path.append(parameters['cubit_path'])
@@ -73,7 +89,8 @@ cubit_objects[id(cubit)] = cubit
 channel.send(object_to_id(cubit))
 
 
-# Now start an endless loop (until None is sent) and perform the cubit functions.
+# Now start an endless loop (until None is sent) and perform the cubit
+# functions.
 while 1:
 
     # Get input from python3.
@@ -87,18 +104,29 @@ while 1:
     # object_id: call a method on a cubit object, with parameters
     #       ['object_id', 'method', ['parameters']]
     # isinstance: Check if the cubit object is of a cerain instance.
-    
+
     if not isinstance(receive[0], str):
-        raise TypeError('The first item given to python2 must be of type str! Got {}!'.format(type(receive[0])))
+        raise TypeError('The first item given to python2 must be of type str! '
+            + 'Got {}!'.format(type(receive[0])))
 
     elif string_to_id(receive[0]) is not None:
-        # The first item is an id for a cubit object. Call a method on this object.
+        # The first item is an id for a cubit object. Call a method on this
+        # object.
+
+        # Check the length of the cubit_objects dictionary and return an error
+        # if it gets very long. Then maybe think about passing delete functions
+        # from python3.
+        if len(cubit_objects) > 10000:
+            raise OverflowError(
+                'The cubit_objects has {} items, that is too much!'.format(
+                    len(cubit_objects)))
 
         # Get object and function name.
         call_object = cubit_objects[string_to_id(receive[0])]
         function = receive[1]
 
-        # Get the function arguments. It is checked if one of the arguments is an cubit object.
+        # Get the function arguments. It is checked if one of the arguments is
+        # an cubit object.
         args = []
         for item in receive[2]:
             item_id = string_to_id(item)
@@ -125,7 +153,8 @@ while 1:
                     cubit_objects[id(item)] = item
                     return_list.append(object_to_id(item)) 
                 else:
-                    raise TypeError('Expected string, int, float or cubit object! Got {}!'.format(item))
+                    raise TypeError('Expected string, int, float or cubit '
+                        + 'object! Got {}!'.format(item))
             channel.send(return_list)
 
         elif is_cubit_type(cubit_return):
@@ -134,7 +163,8 @@ while 1:
             channel.send(object_to_id(cubit_return))
 
         else:
-            raise TypeError('Expected string, int, float, cubit object or tuple! Got {}!'.format(cubit_return))
+            raise TypeError('Expected string, int, float, cubit object or '
+                + 'tuple! Got {}!'.format(cubit_return))
 
     elif receive[0] == 'isinstance':
         # Compare the second item with a predefined cubit class.
@@ -149,24 +179,21 @@ while 1:
         elif (receive[2] == cubit_volume):
             channel.send(isinstance(compare_object, cubit.Volume))
         else:
-            raise TypeError('Wrong compare type given! Expected vertex, curve, surface or volume, got{}'.format(receive[2]))
+            raise ValueError('Wrong compare type given! Expected vertex, '
+                + 'curve, surface or volume, got{}'.format(receive[2]))
+
+    elif receive[0] == 'get_methods':
+        # Return a list with all callable methods of this object.
+        cubit_object = cubit_objects[string_to_id(receive[1])]
+        channel.send([
+            method_name for method_name in dir(cubit_object)
+            if callable(getattr(cubit_object, method_name))
+            ])
 
     else:
-        raise NotImplemented('The case of "{}" is not implemented!'.format(receive[0]))
+        raise ValueError('The case of "{}" is not implemented!'.format(
+            receive[0]))
 
 
 # Send EOF.
 channel.send('EOF')
-
-
-
-
-
-
-
-
-
-
-
-
-
