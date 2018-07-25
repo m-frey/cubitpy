@@ -216,4 +216,4 @@ class CubitObject(object):
 
     def __str__(self):
         """Return the string from python2."""
-        return '<CubitObject>"' + self.cubit_id + '"'
+        return '<CubitObject>"' + self.cubit_id[1] + '"'
