@@ -213,3 +213,7 @@ class CubitObject(object):
         except AttributeError:
             # Create a callable function in python2.
             return self.cubit_connect.get_function(self, name)
+
+    def __str__(self):
+        """Return the string from python2."""
+        return '<CubitObject>"' + self.cubit_id + '"'

@@ -5,8 +5,13 @@ Utility functions that can be used in python2 and python3.
 
 
 def object_to_id(obj):
-    """Return a string id of obj."""
-    return ['cp2t3id_' + str(id(obj))]
+    """
+    Return list representing the cubit object. The first entry is the id of
+    the object, the second entry is the string representation."""
+    return [
+        'cp2t3id_' + str(id(obj)),
+        str(obj)
+        ]
 
 
 def cubit_item_to_id(cubit_data_list):
