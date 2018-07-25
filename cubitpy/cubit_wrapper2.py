@@ -40,19 +40,6 @@ def out(string):
     os.system('echo "{}" > {}'.format(string, out_console))
 
 
-def is_base_type(obj):
-    """
-    Check if the object is of a base type that does not need conversion for the
-    connection between python2 and python3.
-    """
-    if (isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float)
-            or isinstance(obj, type(None))
-            ):
-        return True
-    else:
-        return False
-
-
 def is_cubit_type(obj):
     """Check if the object is of a cubit base."""
     if (isinstance(obj, cubit.Body) or isinstance(obj, cubit.Vertex)
@@ -82,7 +69,7 @@ dir_name = os.path.dirname(parameters['__file__'])
 sys.path.append(dir_name)
 sys.path.append(parameters['cubit_path'])
 
-from cubit_wrapper_utility import object_to_id, string_to_id
+from cubit_wrapper_utility import object_to_id, cubit_item_to_id, is_base_type
 import cubit
 
 
@@ -109,16 +96,13 @@ while 1:
     if receive is None:
         break
 
-    # The first (string) argument decides that functionality will be performed.
-    # object_id: call a method on a cubit object, with parameters
-    #       ['object_id', 'method', ['parameters']]
-    # isinstance: Check if the cubit object is of a cerain instance.
+    # The first argument decides that functionality will be performed.
+    # cubit_object: call a method on a cubit object, with parameters
+    #       [[cubit_object], 'method', ['parameters']]
+    # isinstance:  Check if the cubit object is of a cerain instance.
+    # get_methods: Return the callable methods in the cubit_object.
 
-    if not isinstance(receive[0], str):
-        raise TypeError('The first item given to python2 must be of type str! '
-            + 'Got {}!'.format(type(receive[0])))
-
-    elif string_to_id(receive[0]) is not None:
+    if cubit_item_to_id(receive[0]) is not None:
         # The first item is an id for a cubit object. Call a method on this
         # object.
 
@@ -131,14 +115,14 @@ while 1:
                     len(cubit_objects)))
 
         # Get object and function name.
-        call_object = cubit_objects[string_to_id(receive[0])]
+        call_object = cubit_objects[cubit_item_to_id(receive[0])]
         function = receive[1]
 
         # Get the function arguments. It is checked if one of the arguments is
         # an cubit object.
         args = []
         for item in receive[2]:
-            item_id = string_to_id(item)
+            item_id = cubit_item_to_id(item)
             if item_id is None:
                 args.append(item)
             else:
@@ -177,7 +161,7 @@ while 1:
 
     elif receive[0] == 'isinstance':
         # Compare the second item with a predefined cubit class.
-        compare_object = cubit_objects[string_to_id(receive[1])]
+        compare_object = cubit_objects[cubit_item_to_id(receive[1])]
 
         if (receive[2] == cubit_vertex):
             channel.send(isinstance(compare_object, cubit.Vertex))
@@ -193,7 +177,7 @@ while 1:
 
     elif receive[0] == 'get_methods':
         # Return a list with all callable methods of this object.
-        cubit_object = cubit_objects[string_to_id(receive[1])]
+        cubit_object = cubit_objects[cubit_item_to_id(receive[1])]
         channel.send([
             method_name for method_name in dir(cubit_object)
             if callable(getattr(cubit_object, method_name))

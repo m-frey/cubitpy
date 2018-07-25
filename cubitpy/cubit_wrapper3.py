@@ -12,7 +12,7 @@ import os
 
 
 # Import utility functions for cubitpy.
-from .cubit_wrapper_utility import object_to_id, string_to_id
+from .cubit_wrapper_utility import cubit_item_to_id, is_base_type
 
 
 class CubitConnect(object):
@@ -47,7 +47,7 @@ class CubitConnect(object):
         # https://stackoverflow.com/questions/3248271/eclipse-using-multiple-python-interpreters-with-execnet
         # Also the console output will not be redirected to the eclipse console
         # but the path to a other console should be explicitly given if needed.
-        eclipse = True
+        eclipse = False
         if eclipse:
             python_path_old = os.environ['PYTHONPATH']
             python_path_new_list = []
@@ -143,18 +143,27 @@ class CubitConnect(object):
             cubit_return = self.send_and_return(
                 [cubit_object.cubit_id, name, arguments])
 
-            # Check if the return value contains cubit objects.
-            if isinstance(cubit_return, str):
-                if string_to_id(cubit_return) is not None:
-                    return CubitObject(self, cubit_return)
+            # Check if the return value is a cubit object.
+            if cubit_item_to_id(cubit_return) is not None:
+                return CubitObject(self, cubit_return)
             elif isinstance(cubit_return, list):
+                # If the return value is a list, check if any entry of the list
+                # is a cubit object.
                 return_list = []
                 for item in cubit_return:
-                    if string_to_id(item) is not None:
+                    if cubit_item_to_id(item) is not None:
                         return_list.append(CubitObject(self, item))
-                    else:
+                    elif is_base_type(item):
                         return_list.append(item)
+                    else:
+                        raise TypeError('Expected cubit object, or base_type, '
+                            + 'got {}!'.format(item))
                 return return_list
+            elif is_base_type(cubit_return):
+                return cubit_return
+            else:
+                raise TypeError('Expected cubit object, or base_type, '
+                    + 'got {}!'.format(cubit_return))
 
             return cubit_return
 
@@ -167,7 +176,7 @@ class CubitObject(object):
     called on this class will 'really' be called in python2.
     """
 
-    def __init__(self, cubit_connect, cubit_id):
+    def __init__(self, cubit_connect, cubit_data_list):
         """
         Initialize the object.
 
@@ -176,16 +185,17 @@ class CubitObject(object):
         cubit_connect: CubitConnect
             A link to the cubit_connec object that will be used to call
             methods.
-        cubit_id: str
-            The id of this object in python2.
+        cubit_data_list: []
+            A list of strings that contains info about the cubit object.
+            The first item is the id of this object in python2.
         """
 
         # Check formating of cubit_id.
-        if string_to_id(cubit_id) is None:
-            raise TypeError('Wrong type {}'.format(cubit_id))
+        if cubit_item_to_id(cubit_data_list) is None:
+            raise TypeError('Wrong type {}'.format(cubit_data_list))
 
         self.cubit_connect = cubit_connect
-        self.cubit_id = cubit_id
+        self.cubit_id = cubit_data_list
 
     def __getattribute__(self, name, *args, **kwargs):
         """

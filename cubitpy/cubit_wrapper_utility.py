@@ -6,14 +6,29 @@ Utility functions that can be used in python2 and python3.
 
 def object_to_id(obj):
     """Return a string id of obj."""
-    return 'cp2t3id_' + str(id(obj))
+    return ['cp2t3id_' + str(id(obj))]
 
 
-def string_to_id(string):
-    """Return the id from a id string."""
-    if not isinstance(string, str):
+def cubit_item_to_id(cubit_data_list):
+    """Return the id from a cubit data list."""
+    if not isinstance(cubit_data_list, list):
         return None
-    if string.startswith('cp2t3id_'):
-        return int(string[8:])
+    if not isinstance(cubit_data_list[0], str):
+        return None
+    if cubit_data_list[0].startswith('cp2t3id_'):
+        return int(cubit_data_list[0][8:])
     else:
         return None
+
+
+def is_base_type(obj):
+    """
+    Check if the object is of a base type that does not need conversion for the
+    connection between python2 and python3.
+    """
+    if (isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float)
+            or isinstance(obj, type(None))
+            ):
+        return True
+    else:
+        return False
