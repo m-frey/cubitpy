@@ -10,6 +10,8 @@ import execnet
 import sys
 import os
 
+# Import global options.
+from . import cupy
 
 # Import utility functions for cubitpy.
 from .cubit_wrapper_utility import cubit_item_to_id, is_base_type
@@ -23,7 +25,7 @@ class CubitConnect(object):
     """
 
     def __init__(self, cubit_arguments, interpreter='popen//python=python2.7',
-            cubit_path='/opt/cubit-13.2/bin', debug=True):
+            cubit_path='/opt/cubit-13.2/bin'):
         """
         Initialize the connection between python2 and python3. And load the
         cubit module in python2.
@@ -36,9 +38,6 @@ class CubitConnect(object):
             Interpreter for python2 that will be used.
         cubit_path: str
             Path to the cubit executable.
-        debug: bool
-            If True, the path of the current console will be given to python2
-            and the output from there will be redirected to the console.
         """
 
         # Flag if the script is run with eclipse or not. This will temporary
@@ -47,7 +46,8 @@ class CubitConnect(object):
         # https://stackoverflow.com/questions/3248271/eclipse-using-multiple-python-interpreters-with-execnet
         # Also the console output will not be redirected to the eclipse console
         # but the path to a other console should be explicitly given if needed.
-        eclipse = False
+        eclipse = 'pydev' in os.environ['PYTHONPATH']
+
         if eclipse:
             python_path_old = os.environ['PYTHONPATH']
             python_path_new_list = []
@@ -76,11 +76,31 @@ class CubitConnect(object):
         parameters['__file__'] = __file__
         parameters['cubit_path'] = cubit_path
 
-        if debug and not eclipse:
+        # Check if a log file was given in the cubit arguments.
+        for arg in cubit_arguments:
+            if arg.startswith('-log='):
+                log_given = True
+                break
+        else:
+            log_given = False
+
+        self.log_check = False
+        if not eclipse:
             # Get the current terminal path.
             import subprocess
             run = subprocess.run(['tty'], check=True, stdout=subprocess.PIPE)
-            parameters['tty'] = run.stdout.decode('utf-8')
+            parameters['tty'] = tty = run.stdout.decode('utf-8').strip()
+
+            if not log_given:
+                # No log file was given.
+                cubit_arguments.append('-log={}'.format(tty))
+
+        elif not log_given:
+            # Eclipse and no log given -> write the log to a temporary file and
+            # check the contents after each call to cubit.
+            cubit_arguments.append('-log={}'.format(cupy.temp_log))
+            parameters['tty'] = cupy.temp_log
+            self.log_check = True
 
         # Send the parameters to python2
         self.send_and_return(parameters)
@@ -131,6 +151,12 @@ class CubitConnect(object):
         def function(*args, **kwargs):
             """This function gets returned from the parent method."""
 
+            if self.log_check:
+                # Check if the log file is empty. If it is not, empty it.
+                if os.stat(cupy.temp_log).st_size != 0:
+                    with open(cupy.temp_log, 'w'):
+                        pass
+
             # Check if there are cubit objects in the arguments.
             arguments = []
             for item in (args):
@@ -142,6 +168,11 @@ class CubitConnect(object):
             # Call the method on the cubit object.
             cubit_return = self.send_and_return(
                 [cubit_object.cubit_id, name, arguments])
+
+            if self.log_check:
+                # Print the content of the log file.
+                with open(cupy.temp_log, 'r') as log_file:
+                    print(log_file.read(), end='')
 
             # Check if the return value is a cubit object.
             if cubit_item_to_id(cubit_return) is not None:

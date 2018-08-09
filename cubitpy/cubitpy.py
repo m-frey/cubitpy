@@ -12,6 +12,9 @@ import shutil
 import sys
 import subprocess
 
+# Cubitpy modules.
+from . import cupy
+
 
 def get_methods(cubit_object):
     """Return a list of all callable methods in object."""
@@ -24,21 +27,6 @@ def get_methods(cubit_object):
             method_name for method_name in dir(cubit_object)
             if callable(getattr(cubit_object, method_name))
             ]
-
-
-class CubitOptions(object):
-    """Object for types in cubitpy."""
-    def __init__(self):
-
-        # Element types
-        self.vertex = 'cubitpy_vertex'
-        self.curve = 'cubitpy_curve'
-        self.surface = 'cubitpy_surface'
-        self.volume = 'cubitpy_volume'
-
-
-# Global object with options for cubitpy.
-cupy = CubitOptions()
 
 
 class CubitPy(object):
@@ -66,7 +54,7 @@ class CubitPy(object):
         # Arguments for cubit.
         if cubit_args is None:
             arguments = ['cubit',
-                '-log=/dev/null',    # Write the log to a file.
+                #'-log=/dev/null',    # Write the log to a file.
                 '-information=Off',  # Do not output information of cubit.
                 '-nojournal',        # Do write a journal file.
                 '-noecho'            # Do not output commands used in cubit.
@@ -80,7 +68,7 @@ class CubitPy(object):
         # (python2) or the modified wrapper for python3.
         if (sys.version_info > (3, 0)):
             # Python 3.
-            from .cubit_wrapper3 import CubitConnect, CubitObject
+            from .cubit_wrapper3 import CubitConnect
             cubit_connect = CubitConnect(arguments)
             self.cubit = cubit_connect.cubit
         else:
@@ -296,19 +284,18 @@ class CubitPy(object):
         if not os.path.exists(dat_dir):
             raise ValueError('Path {} does not exist!'.format(dat_dir))
 
-        temp_dir = '/tmp/cubitpy'
-        if not os.path.exists(temp_dir):
-            os.makedirs(temp_dir)
+        if not os.path.exists(cupy.temp_dir):
+            os.makedirs(cupy.temp_dir)
 
         # Create files
-        self.export_exo(os.path.join(temp_dir, 'cubitpy.exo'))
+        self.export_exo(os.path.join(cupy.temp_dir, 'cubitpy.exo'))
         self.write_head_bc(
-            os.path.join(temp_dir, 'cubitpy.head'),
-            os.path.join(temp_dir, 'cubitpy.bc')
+            os.path.join(cupy.temp_dir, 'cubitpy.head'),
+            os.path.join(cupy.temp_dir, 'cubitpy.bc')
             )
 
         # For debugging write the command to the temp folder.
-        with open(os.path.join(temp_dir, 'cmd.sh'), 'w') as cmd_file:
+        with open(os.path.join(cupy.temp_dir, 'cmd.sh'), 'w') as cmd_file:
             cmd_file.write(self.pre_exodus)
             cmd_file.write(' --exo=cubitpy.exo --bc=cubitpy.bc '
                 + '--head=cubitpy.head')
@@ -319,11 +306,11 @@ class CubitPy(object):
             '--exo=cubitpy.exo',
             '--bc=cubitpy.bc',
             '--head=cubitpy.head'
-            ], cwd=temp_dir)
+            ], cwd=cupy.temp_dir)
 
         # Copy dat file.
         shutil.copyfile(
-            os.path.join(temp_dir, 'cubitpy.dat'),
+            os.path.join(cupy.temp_dir, 'cubitpy.dat'),
             dat_path
             )
 
@@ -340,14 +327,13 @@ class CubitPy(object):
             vol).
         """
 
-        temp_path = '/tmp/cubitpy'
-        if not os.path.exists(temp_path):
-            os.makedirs(temp_path)
-        state_path = os.path.join(temp_path, 'state.cub')
+        if not os.path.exists(cupy.temp_dir):
+            os.makedirs(cupy.temp_dir)
+        state_path = os.path.join(cupy.temp_dir, 'state.cub')
         self.export_cub(state_path)
 
         # Write file that opens the state in cubit.
-        journal_path = os.path.join(temp_path, 'open_state.jou')
+        journal_path = os.path.join(cupy.temp_dir, 'open_state.jou')
         with open(journal_path, 'w') as journal:
             journal.write('open "{}"\n'.format(state_path))
 
@@ -375,4 +361,4 @@ class CubitPy(object):
             '-nojournal',
             '-information=Off',
             '-input', 'open_state.jou'
-            ], cwd=temp_path)
+            ], cwd=cupy.temp_dir)
