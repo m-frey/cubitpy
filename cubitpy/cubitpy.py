@@ -32,6 +32,9 @@ def get_methods(cubit_object):
 class CubitPy(object):
     """A wrapper class for cubit."""
 
+    # Count the number of instances.
+    _number_of_instances = 0
+
     def __init__(self, cubit_args=None, cubit_path='/opt/cubit-13.2/bin',
             pre_exodus='/home/ivo/baci/work/release/pre_exodus'
             ):
@@ -50,6 +53,9 @@ class CubitPy(object):
         pre_exodus: str
             Path to the pre_exodus pre-processor of baci.
         """
+
+        # Advance the instance counter.
+        CubitPy._number_of_instances += 1
 
         # Arguments for cubit.
         if cubit_args is None:
@@ -84,10 +90,7 @@ class CubitPy(object):
         self.cubit.cmd('set geometry engine acis')
 
         # Set lists and counters for blocks and sets.
-        self.node_sets = []
-        self.blocks = []
-        self.node_set_counter = 1
-        self.block_counter = 1
+        self._default_cubit_variables()
 
         # Content of head file.
         self.head = ''
@@ -95,11 +98,34 @@ class CubitPy(object):
         # Other parameters.
         self.pre_exodus = pre_exodus
 
+    def _default_cubit_variables(self):
+        """
+        Set the default values for the lists and counters used in cubit.
+        """
+        self.node_sets = []
+        self.blocks = []
+        self.node_set_counter = 1
+        self.block_counter = 1
+
+    def __del__(self):
+        """
+        When this object is deleted, remove the flag that an instance exitst.
+        """
+        CubitPy._number_of_instances -= 1
+
     def __getattr__(self, key, *args, **kwargs):
         """
         All calls to methods and attributes that are not in this object get
-        passed to cubit.
+        passed to cubit. This function can only be used when there is a single
+        instance of CubitPy.
         """
+
+        # Check if more than one instance exits:
+        if CubitPy._number_of_instances > 1:
+            raise ValueError('There should be no other active instance of '
+                + 'CubitPy! Check the CubitPy.reset() function to '
+                + 'create multiple meshes with one script, or delete the'
+                + 'existing CubitPy item (or let it run out of scope).')
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
     def _get_type(self, item):
@@ -313,6 +339,15 @@ class CubitPy(object):
             os.path.join(cupy.temp_dir, 'cubitpy.dat'),
             dat_path
             )
+
+    def reset(self):
+        """
+        Reset all objects in cubit and the created BCs and blocks and node
+        sets.
+        """
+
+        self.cubit.reset()
+        self._default_cubit_variables()
 
     def display_in_cubit(self, label=''):
         """

@@ -53,11 +53,8 @@ def compare_strings(string_ref, string_compare):
 class TestCubitPy(unittest.TestCase):
     """This class tests the implementation of the CubitPy class."""
 
-    def test_create_block(self):
+    def create_block(self, cubit):
         """Create a block with cubit."""
-
-        # Initialize cubit.
-        cubit = CubitPy()
 
         # Set head
         cubit.head = '''
@@ -131,7 +128,31 @@ class TestCubitPy(unittest.TestCase):
             'test_create_block'
             )
 
+    def test_create_block(self):
+        """
+        Test the creation of a cubit block
+        """
+
+        # Initialize cubit.
+        cubit = CubitPy()
+        self.create_block(cubit)
+
+    def test_create_block_multiple(self):
+        """
+        Test the creation of a cubit block multiple time to check that cubit
+        can be reset.
+        """
+
+        # Initialize cubit.
+        cubit = CubitPy()
+        self.create_block(cubit)
+
+        # Delete the old cubit object and run the function twice on the new.
+        cubit = CubitPy()
+        for i in range(2):
+            self.create_block(cubit)
+            cubit.reset()
+
 
 if __name__ == '__main__':
     unittest.main()
-    pass

@@ -109,6 +109,9 @@ class CubitConnect(object):
         cubit_id = self.send_and_return(['init', cubit_arguments])
         self.cubit = CubitObject(self, cubit_id)
 
+        if eclipse:
+            os.environ['PYTHONPATH'] = python_path_old
+
     def isinstance(self, cubit_object, geom_type):
         """
         Check if cubit_object is of geom_type.
