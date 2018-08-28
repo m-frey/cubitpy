@@ -13,7 +13,7 @@ import numpy as np
 from cubitpy import cupy, CubitPy
 
 # Define the testing paths.
-testing_path = '/home/ivo/dev/cubitpy/tests'
+testing_path = os.path.abspath(os.path.dirname(__file__))
 testing_input = os.path.join(testing_path, 'input-files-ref')
 testing_temp = os.path.join(testing_path, 'testing-tmp')
 
