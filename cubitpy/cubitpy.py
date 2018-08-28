@@ -35,9 +35,7 @@ class CubitPy(object):
     # Count the number of instances.
     _number_of_instances = 0
 
-    def __init__(self, cubit_args=None, cubit_path='/opt/cubit-13.2/bin',
-            pre_exodus='/home/ivo/baci/work/release/pre_exodus'
-            ):
+    def __init__(self, cubit_args=None, cubit_path=None, pre_exodus=None):
         """
         Initialize cubit.
 
@@ -53,6 +51,12 @@ class CubitPy(object):
         pre_exodus: str
             Path to the pre_exodus pre-processor of baci.
         """
+
+        # Get filepaths.
+        if cubit_path is None:
+            cubit_path = cupy.get_default_paths('cubit')
+        if pre_exodus is None:
+            pre_exodus = cupy.get_default_paths('pre_exodus')
 
         # Advance the instance counter.
         CubitPy._number_of_instances += 1
@@ -96,6 +100,7 @@ class CubitPy(object):
         self.head = ''
 
         # Other parameters.
+        self.cubit_path = cubit_path
         self.pre_exodus = pre_exodus
 
     def _default_cubit_variables(self):
@@ -392,7 +397,7 @@ class CubitPy(object):
 
         # Open the state in cubit.
         subprocess.call([
-            '/opt/cubit-13.2/cubit',
+            self.cubit_path,
             '-nojournal',
             '-information=Off',
             '-input', 'open_state.jou'

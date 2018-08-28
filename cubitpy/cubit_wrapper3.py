@@ -25,7 +25,7 @@ class CubitConnect(object):
     """
 
     def __init__(self, cubit_arguments, interpreter='popen//python=python2.7',
-            cubit_path='/opt/cubit-13.2/bin'):
+            cubit_path=None):
         """
         Initialize the connection between python2 and python3. And load the
         cubit module in python2.
@@ -39,6 +39,9 @@ class CubitConnect(object):
         cubit_path: str
             Path to the cubit executable.
         """
+
+        if cubit_path is None:
+            cubit_path = cupy.get_default_paths('cubit')
 
         # Flag if the script is run with eclipse or not. This will temporary
         # delete the python path so that the python2 interpreter does not look
@@ -85,17 +88,8 @@ class CubitConnect(object):
             log_given = False
 
         self.log_check = False
-        if not eclipse:
-            # Get the current terminal path.
-            import subprocess
-            run = subprocess.run(['tty'], check=True, stdout=subprocess.PIPE)
-            parameters['tty'] = tty = run.stdout.decode('utf-8').strip()
 
-            if not log_given:
-                # No log file was given.
-                cubit_arguments.append('-log={}'.format(tty))
-
-        elif not log_given:
+        if not log_given:
             # Eclipse and no log given -> write the log to a temporary file and
             # check the contents after each call to cubit.
             cubit_arguments.append('-log={}'.format(cupy.temp_log))

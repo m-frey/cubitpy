@@ -1,0 +1,11 @@
+# Test cubitpy.
+test:
+    script:
+        - "pwd"
+        - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+        # Copy baci.
+        - "rsync -a ../../../../fe5bc0dd/0/baci/baci-build/ ../../../baci/"
+        - "cd tests"
+        - "./test_configurations.sh"
+    tags:
+        - "imcs-all"

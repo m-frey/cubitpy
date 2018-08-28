@@ -26,6 +26,33 @@ class CubitOptions(object):
         self.surface = 'cubitpy_surface'
         self.volume = 'cubitpy_volume'
 
+    @staticmethod
+    def get_default_paths(name, throw_error=True):
+        """Look for and return a path to cubit or pre_exodus."""
+
+        if name == 'cubit':
+            default_paths = [
+                ['/opt/cubit-13.2/bin', os.path.isdir],
+                ['/rzhome/nas/compsim/opt/cubit-13.2/bin', os.path.isdir]
+                ]
+        elif name == 'pre_exodus':
+            default_paths = [
+                ['/home/ivo/baci/work/release/pre_exodus', os.path.isfile],
+                ['/hdd/gitlab-runner/cc603775/baci/pre_exodus', os.path.isfile]
+                ]
+        else:
+            raise ValueError('Type {} not implemented!'.format(name))
+
+        # Check which path exists.
+        for [path, function] in default_paths:
+            if function(path):
+                return path
+        else:
+            if throw_error:
+                raise ValueError('Path for {} not found!'.format(name))
+            else:
+                return None
+
 
 # Global object with options for cubitpy.
 cupy = CubitOptions()
