@@ -38,7 +38,7 @@ class CubitOptions(object):
         elif name == 'pre_exodus':
             default_paths = [
                 ['/home/ivo/baci/work/release/pre_exodus', os.path.isfile],
-                ['/hdd/gitlab-runner/cc603775/baci/pre_exodus', os.path.isfile]
+                ['/hdd/gitlab-runner/lib/baci-release/pre_exodus', os.path.isfile]
                 ]
         else:
             raise ValueError('Type {} not implemented!'.format(name))
