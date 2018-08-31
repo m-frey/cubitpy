@@ -7,7 +7,6 @@ and python3.
 
 # Import python modules.
 import execnet
-import sys
 import os
 
 # Import global options.
@@ -145,7 +144,7 @@ class CubitConnect(object):
             Name of the method.
         """
 
-        def function(*args, **kwargs):
+        def function(*args):
             """This function gets returned from the parent method."""
 
             if self.log_check:
@@ -164,7 +163,8 @@ class CubitConnect(object):
 
             # Call the method on the cubit object.
             cubit_return = self.send_and_return(
-                [cubit_object.cubit_id, name, arguments])
+                [cubit_object.cubit_id, name, arguments]
+                )
 
             if self.log_check:
                 # Print the content of the log file.

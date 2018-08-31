@@ -144,7 +144,7 @@ while 1:
                     return_list.append(item)
                 elif is_cubit_type(item):
                     cubit_objects[id(item)] = item
-                    return_list.append(object_to_id(item)) 
+                    return_list.append(object_to_id(item))
                 else:
                     raise TypeError('Expected string, int, float or cubit '
                         + 'object! Got {}!'.format(item))

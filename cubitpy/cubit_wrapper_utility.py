@@ -32,8 +32,7 @@ def is_base_type(obj):
     connection between python2 and python3.
     """
     if (isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, float)
-            or isinstance(obj, type(None))
-            ):
+            or isinstance(obj, type(None))):
         return True
     else:
         return False

@@ -64,7 +64,7 @@ class CubitPy(object):
         # Arguments for cubit.
         if cubit_args is None:
             arguments = ['cubit',
-                #'-log=/dev/null',    # Write the log to a file.
+#                '-log=/dev/null',    # Write the log to a file.
                 '-information=Off',  # Do not output information of cubit.
                 '-nojournal',        # Do write a journal file.
                 '-noecho'            # Do not output commands used in cubit.
@@ -332,7 +332,7 @@ class CubitPy(object):
                 + '--head=cubitpy.head')
 
         # Run pre_exodus.
-        out = subprocess.check_output([
+        _out = subprocess.check_output([
             self.pre_exodus,
             '--exo=cubitpy.exo',
             '--bc=cubitpy.bc',

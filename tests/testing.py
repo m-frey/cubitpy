@@ -10,7 +10,7 @@ import subprocess
 import numpy as np
 
 # Cubitpy imports.
-from cubitpy import cupy, CubitPy
+from cubitpy import CubitPy
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -102,15 +102,18 @@ class TestCubitPy(unittest.TestCase):
             if np.dot(normal, [0, 0, -1]) == 1:
                 cubit.add_node_set(surf, name='fix', bc=[
                     'DESIGN SURF DIRICH CONDITIONS',
-                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 FUNCT 0 0 0 0 0 0'])
+                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 '
+                    + 'FUNCT 0 0 0 0 0 0'])
             elif np.dot(normal, [0, 0, 1]) == 1:
                 cubit.add_node_set(surf, name='load', bc=[
                     'DESIGN SURF DIRICH CONDITIONS',
-                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 FUNCT 0 0 0 0 0 0'])
+                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 '
+                    + 'FUNCT 0 0 0 0 0 0'])
             else:
                 cubit.add_node_set(surf, name='load{}'.format(i), bc=[
                     'DESIGN SURF NEUMANN CONDITIONS',
-                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 FUNCT 0 0 0 0 0 0'])
+                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 ' +
+                    'FUNCT 0 0 0 0 0 0'])
 
         # Create the dat file for the solid.
         check_tmp_dir()
@@ -149,7 +152,7 @@ class TestCubitPy(unittest.TestCase):
 
         # Delete the old cubit object and run the function twice on the new.
         cubit = CubitPy()
-        for i in range(2):
+        for _i in range(2):
             self.create_block(cubit)
             cubit.reset()
 
