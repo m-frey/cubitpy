@@ -58,8 +58,7 @@ class TestCubitPy(unittest.TestCase):
 
         # Set head
         cubit.head = '''
-            //stuff for head
-            // other stuff for head
+            // Header processed by cubit.
             '''
 
         # Dimensions of the block.
