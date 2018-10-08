@@ -35,7 +35,7 @@ class CubitOptions(object):
             default_paths = [
                 ['/opt/cubit-13.2/bin', os.path.isdir],
                 [
-                    '/rzhome/nas/compsim/public/opt/cubit-13.2/bin',
+                    '/nfs/rzhome/nas/compsim/public/opt/cubit-13.2/bin',
                     os.path.isdir]
                 ]
         elif name == 'pre_exodus':
