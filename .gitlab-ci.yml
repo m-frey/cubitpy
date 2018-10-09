@@ -1,6 +1,7 @@
 # Test cubitpy.
 cubitpy-testing:
     script:
+        - "whoami"
         - "pwd"
         - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         # Run tests.
