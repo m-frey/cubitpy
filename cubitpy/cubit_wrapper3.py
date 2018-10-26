@@ -13,7 +13,8 @@ import os
 from . import cupy
 
 # Import utility functions for cubitpy.
-from .cubit_wrapper_utility import cubit_item_to_id, is_base_type
+from .cubit_wrapper_utility import cubit_item_to_id, is_base_type, \
+    check_environment_eclipse
 
 
 class CubitConnect(object):
@@ -42,25 +43,8 @@ class CubitConnect(object):
         if cubit_bin_path is None:
             raise ValueError('Path to cubit was not given!')
 
-        # Flag if the script is run with eclipse or not. This will temporary
-        # delete the python path so that the python2 interpreter does not look
-        # in the wrong directories.
-        # https://stackoverflow.com/questions/3248271/eclipse-using-multiple-python-interpreters-with-execnet
-        # Also the console output will not be redirected to the eclipse console
-        # but the path to a other console should be explicitly given if needed.
-        if 'PYTHONPATH' in os.environ.keys():
-            eclipse = 'pydev' in os.environ['PYTHONPATH']
-        else:
-            eclipse = False
-
-        if eclipse:
-            python_path_old = os.environ['PYTHONPATH']
-            python_path_new_list = []
-            for item in python_path_old.split(':'):
-                if (('/input' in item) or ('/cubitpy' in item)
-                        or ('/meshpy' in item)):
-                    python_path_new_list.append(item)
-            os.environ['PYTHONPATH'] = ':'.join(python_path_new_list)
+        # Adapt the environment if needed.
+        is_eclipse, python_path_old = check_environment_eclipse()
 
         # Set up the python2 interpreter.
         self.gw = execnet.makegateway(interpreter)
@@ -105,7 +89,8 @@ class CubitConnect(object):
         cubit_id = self.send_and_return(['init', cubit_arguments])
         self.cubit = CubitObject(self, cubit_id)
 
-        if eclipse:
+        # Restore environment path.
+        if is_eclipse:
             os.environ['PYTHONPATH'] = python_path_old
 
     def isinstance(self, cubit_object, geom_type):

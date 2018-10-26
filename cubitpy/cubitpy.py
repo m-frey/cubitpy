@@ -14,6 +14,7 @@ import subprocess
 
 # Cubitpy modules.
 from . import cupy
+from .cubit_wrapper_utility import check_environment_eclipse
 
 
 def get_methods(cubit_object):
@@ -396,6 +397,9 @@ class CubitPy(object):
             if is_label:
                 journal.write('display')
 
+        # Adapt the environment if needed.
+        is_eclipse, python_path_old = check_environment_eclipse()
+
         # Open the state in cubit.
         subprocess.call([
             os.path.join(self.cubit_path, 'cubit'),
@@ -403,3 +407,7 @@ class CubitPy(object):
             '-information=Off',
             '-input', 'open_state.jou'
             ], cwd=cupy.temp_dir)
+
+        # Restore environment path.
+        if is_eclipse:
+            os.environ['PYTHONPATH'] = python_path_old
