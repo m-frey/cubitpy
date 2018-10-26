@@ -67,7 +67,7 @@ if not isinstance(parameters, dict):
 # Add paths to sys and load utility functions and cubit.
 dir_name = os.path.dirname(parameters['__file__'])
 sys.path.append(dir_name)
-sys.path.append(parameters['cubit_path'])
+sys.path.append(parameters['cubit_bin_path'])
 
 from cubit_wrapper_utility import object_to_id, cubit_item_to_id, is_base_type
 import cubit

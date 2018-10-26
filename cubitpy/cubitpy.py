@@ -72,18 +72,19 @@ class CubitPy(object):
         else:
             arguments = ['cubit']
             for arg in cubit_args:
-                arguments.appen(arg)
+                arguments.append(arg)
 
         # Depending on the python version, load the cubit default wrapper
         # (python2) or the modified wrapper for python3.
         if (sys.version_info > (3, 0)):
             # Python 3.
             from .cubit_wrapper3 import CubitConnect
-            cubit_connect = CubitConnect(arguments)
+            cubit_connect = CubitConnect(arguments,
+                cubit_bin_path=os.path.join(cubit_path, 'bin'))
             self.cubit = cubit_connect.cubit
         else:
             # Python 2.
-            sys.path.append(cubit_path)
+            sys.path.append(os.path.join(cubit_path, 'bin'))
             import cubit  # @UnresolvedImport
             self.cubit = cubit
             # Initialize cubit.
@@ -397,7 +398,7 @@ class CubitPy(object):
 
         # Open the state in cubit.
         subprocess.call([
-            self.cubit_path,
+            os.path.join(self.cubit_path, 'cubit'),
             '-nojournal',
             '-information=Off',
             '-input', 'open_state.jou'
