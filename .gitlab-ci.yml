@@ -3,7 +3,6 @@ cubitpy-testing:
     script:
         - "whoami"
         - "pwd"
-        - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         # Run tests.
         - "cd tests"
         - "./test_configurations.sh"

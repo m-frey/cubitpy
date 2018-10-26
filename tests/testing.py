@@ -6,16 +6,20 @@ This script is used to test the functionality of the cubitpy module.
 # Python imports.
 import unittest
 import os
+import sys
 import subprocess
 import numpy as np
-
-# Cubitpy imports.
-from cubitpy import CubitPy
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
 testing_input = os.path.join(testing_path, 'input-files-ref')
 testing_temp = os.path.join(testing_path, 'testing-tmp')
+
+# Set path to find cubitpy.
+sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
+
+# Cubitpy imports.
+from cubitpy import CubitPy
 
 
 def check_tmp_dir():

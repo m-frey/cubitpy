@@ -48,7 +48,10 @@ class CubitConnect(object):
         # https://stackoverflow.com/questions/3248271/eclipse-using-multiple-python-interpreters-with-execnet
         # Also the console output will not be redirected to the eclipse console
         # but the path to a other console should be explicitly given if needed.
-        eclipse = 'pydev' in os.environ['PYTHONPATH']
+        if 'PYTHONPATH' in os.environ.keys():
+            eclipse = 'pydev' in os.environ['PYTHONPATH']
+        else:
+            eclipse = False
 
         if eclipse:
             python_path_old = os.environ['PYTHONPATH']
