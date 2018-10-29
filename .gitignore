@@ -12,3 +12,6 @@
 
 # Python stuff
 */__pycache__
+
+# Test file
+test.py
