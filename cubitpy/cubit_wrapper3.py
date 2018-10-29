@@ -93,7 +93,7 @@ class CubitConnect(object):
         if is_eclipse:
             os.environ['PYTHONPATH'] = python_path_old
 
-    def isinstance(self, cubit_object, geom_type):
+    def isinstance(self, cubit_object, geom_type, raise_error=True):
         """
         Check if cubit_object is of geom_type.
 
@@ -107,8 +107,11 @@ class CubitConnect(object):
 
         # Check if the object is a Cubit Object.
         if not isinstance(cubit_object, CubitObject):
-            raise TypeError('Expected CubitObject, got {}!'.format(
-                type(cubit_object)))
+            if raise_error:
+                raise TypeError('Expected CubitObject, got {}!'.format(
+                    type(cubit_object)))
+            else:
+                return False
 
         # Compare in python2.
         return self.send_and_return(

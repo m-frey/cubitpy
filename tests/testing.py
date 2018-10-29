@@ -19,7 +19,7 @@ testing_temp = os.path.join(testing_path, 'testing-tmp')
 sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
 
 # Cubitpy imports.
-from cubitpy import CubitPy
+from cubitpy import CubitPy, cupy
 
 
 def check_tmp_dir():
@@ -158,6 +158,110 @@ class TestCubitPy(unittest.TestCase):
         for _i in range(2):
             self.create_block(cubit)
             cubit.reset()
+
+    def test_element_types(self):
+        """Create a curved solid in a curved solid."""
+
+        # Initialize cubit.
+        cubit = CubitPy()
+
+        def add_arc(radius, angle):
+            """Add a arc segment."""
+            cubit.cmd(('create curve arc radius {} center location 0 0 0 '
+                + 'normal 0 0 1 start angle 0 stop angle {}').format(
+                    radius, angle))
+
+        mesh_types = [
+            ['Tetmesh', 'TETRA4', 'SOLIDT4', ''],
+            ['Auto', 'HEX8', 'SOLIDH8', 'EAS none'],
+            ['Tetmesh', 'TETRA10', 'SOLIDT10', ''],
+            ['Auto', 'HEX20', 'SOLIDH20', ''],
+            ['Auto', 'HEX27', 'SOLIDH27', '']
+            ]
+        for i, [scheme, string1, string2, dat_string] in enumerate(mesh_types):
+
+            # Offset for the next volume.
+            offset_point = i * 12
+            offset_curve = i * 12
+            offset_surface = i * 6
+            offset_volume = i
+
+            # Add two arcs.
+            add_arc(1.1, 60)
+            add_arc(0.9, 60)
+
+            # Add the closing lines.
+            cubit.cmd('create curve vertex {} {}'.format(2 + offset_point,
+                4 + offset_point))
+            cubit.cmd('create curve vertex {} {}'.format(1 + offset_point,
+                3 + offset_point))
+
+            # Create the surface.
+            cubit.cmd('create surface curve {} {} {} {}'.format(
+                1 + offset_curve,
+                2 + offset_curve,
+                3 + offset_curve,
+                4 + offset_curve))
+
+            # Create the volume.
+            cubit.cmd('sweep surface {} perpendicular distance 0.2'.format(
+                1 + offset_surface
+                ))
+
+            # Move the volume.
+            cubit.cmd('move Volume {} x 0 y 0 z {}'.format(1 + offset_volume,
+                i * 0.4))
+
+            # Set the size and type of the elements.
+            cubit.cmd('volume {} scheme {}'.format(1 + offset_volume, scheme))
+
+            # Set mesh properties.
+            cubit.cmd('volume {} size auto factor 7'.format(1 + offset_volume))
+            cubit.cmd('mesh volume {}'.format(1 + offset_volume))
+
+            # Set the element type.
+            cubit.add_element_type([1 + offset_volume, cupy.volume], string1,
+                name='block_' + str(i),
+                bc=['STRUCTURE',
+                    'MAT 1 KINEM nonlinear {}'.format(dat_string),
+                    string2
+                    ])
+
+            # Add the node sets.
+            cubit.add_node_set([5 + offset_surface, cupy.surface],
+                name='fix_' + str(i),
+                bc=['DESIGN SURF DIRICH CONDITIONS',
+                    'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])
+
+        # Set the head string.
+        cubit.head = '''
+            -------------------------------------------------------------FUNCT1
+            COMPONENT 0 FUNCTION t
+            ----------------------------------------------------------MATERIALS
+            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 1.0e+09 NUE 0.3 DENS 0.0
+            ------------------------------------IO/RUNTIME VTK OUTPUT/STRUCTURE
+            OUTPUT_STRUCTURE                Yes
+            DISPLACEMENT                    Yes
+            '''
+
+        # Create the solid input file.
+        check_tmp_dir()
+        dat_file = os.path.join(testing_temp, 'test_element_types.dat')
+
+        # Set output to single precision so the dat file can be compared.
+        cubit.cmd('set exodus single precision on')
+        cubit.create_dat(dat_file)
+
+        # Compare with the ref file.
+        ref_file = os.path.join(testing_input, 'test_element_types_ref.dat')
+        with open(dat_file, 'r') as text_file:
+            string1 = text_file.read()
+        with open(ref_file, 'r') as text_file:
+            string2 = text_file.read()
+        self.assertTrue(
+            compare_strings(string1, string2),
+            'test_element_types'
+            )
 
 
 if __name__ == '__main__':

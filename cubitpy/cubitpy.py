@@ -135,17 +135,29 @@ class CubitPy(object):
                 + 'existing CubitPy item (or let it run out of scope).')
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
-    def _get_type(self, item):
-        """Return the type of item. It is expected to be a cubit geom item."""
+    def _get_type(self, item, raise_error=True):
+        """
+        Return the type of item.
+
+        If raise_error is True, an error is thrown when the object is not a
+        cubit type.
+        If raise_error is False, None is returned when the object is not a
+        cubit type.
+        """
+
         if (sys.version_info > (3, 0)):
             # Python 3.
-            if self.cubit.cubit_connect.isinstance(item, cupy.vertex):
+            if self.cubit.cubit_connect.isinstance(item, cupy.vertex,
+                    raise_error=raise_error):
                 return cupy.vertex
-            elif self.cubit.cubit_connect.isinstance(item, cupy.curve):
+            elif self.cubit.cubit_connect.isinstance(item, cupy.curve,
+                    raise_error=raise_error):
                 return cupy.curve
-            elif self.cubit.cubit_connect.isinstance(item, cupy.surface):
+            elif self.cubit.cubit_connect.isinstance(item, cupy.surface,
+                    raise_error=raise_error):
                 return cupy.surface
-            elif self.cubit.cubit_connect.isinstance(item, cupy.volume):
+            elif self.cubit.cubit_connect.isinstance(item, cupy.volume,
+                    raise_error=raise_error):
                 return cupy.volume
         else:
             if isinstance(item, self.cubit.Vertex):
@@ -156,11 +168,24 @@ class CubitPy(object):
                 return cupy.surface
             elif isinstance(item, self.cubit.Volume):
                 return cupy.volume
-        raise TypeError('Got {}!'.format(type(item)))
+
+        if raise_error:
+            raise TypeError('Got {}!'.format(type(item)))
+        else:
+            return None
 
     def _get_type_string(self, item):
-        """Return the string for the item in cubit commands."""
-        item_type = self._get_type(item)
+        """
+        Return the string for the item in cubit commands.
+
+        item: cubit object, cubitpy geom type
+        """
+
+        if not isinstance(item, str):
+            item_type = self._get_type(item)
+        else:
+            item_type = item
+
         if item_type == cupy.vertex:
             return 'vertex'
         elif item_type == cupy.curve:
@@ -169,6 +194,8 @@ class CubitPy(object):
             return 'surface'
         elif item_type == cupy.volume:
             return 'volume'
+        else:
+            return None
 
     def add_element_type(self, item, el_type, name=None, bc=None):
         """
@@ -177,8 +204,11 @@ class CubitPy(object):
 
         Args
         ----
-        item: cubit.geom
+        item: cubit.geom, [item_id, item_type]
             Geometry to set the element type for.
+            If a list is given, the first entry is an integer with the id of
+            the item. The second entry is a string with the cubit geometry
+            type.
         el_type: str
             Cubit element type.
         name: str
@@ -190,10 +220,23 @@ class CubitPy(object):
         if self.block_counter == 0:
             self.cubit.cmd('reset block')
 
+        # Check what type of input is given.
+        if isinstance(item, list):
+            # The input was given via a list -> The id of the item is an
+            # integer.
+            id_string = str(item[0])
+            type_string = self._get_type_string(item[1])
+        else:
+            # The input is given via a cubitpy object.
+            # Check if the item is a cubit object.
+            id_string = str(item.id())
+            type_string = self._get_type_string(item)
+
+        # Execute the block commands in cubit.
         self.cubit.cmd('block {} {} {}'.format(
             self.block_counter,
-            self._get_type_string(item),
-            item.id()
+            type_string,
+            id_string
             ))
         self.cubit.cmd('block {} element type {}'.format(
             self.block_counter,
@@ -214,19 +257,34 @@ class CubitPy(object):
 
         Args
         ----
-        item: cubit.geom
+        item: cubit.geom, [item_id, item_type]
             Geometry to set the element type for.
+            If a list is given, the first entry is an integer with the id of
+            the item. The second entry is a string with the cubit geometry
+            type.
         name: str
             Name of the node set.
         bc: [str]
             Data for the *.bc file that will be used with pre_exodus.
         """
 
-        item_string = self._get_type_string(item)
+        # Check what type of input is given.
+        if isinstance(item, list):
+            # The input was given via a list -> The id of the item is an
+            # integer.
+            id_string = str(item[0])
+            type_string = self._get_type_string(item[1])
+        else:
+            # The input is given via a cubitpy object.
+            # Check if the item is a cubit object.
+            id_string = str(item.id())
+            type_string = self._get_type_string(item)
+
+        # Add the node set to cubit.
         self.cubit.cmd('nodeset {} {} {}'.format(
             self.node_set_counter,
-            item_string,
-            item.id()
+            type_string,
+            id_string
             ))
         if name is not None:
             self.cubit.cmd('nodeset {} name "{}"'.format(
