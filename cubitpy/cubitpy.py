@@ -57,7 +57,7 @@ class CubitPy(object):
         if cubit_path is None:
             cubit_path = cupy.get_default_paths('cubit')
         if pre_exodus is None:
-            pre_exodus = cupy.get_default_paths('pre_exodus')
+            pre_exodus = cupy.get_default_paths('pre_exodus', False)
 
         # Advance the instance counter.
         CubitPy._number_of_instances += 1
@@ -369,6 +369,10 @@ class CubitPy(object):
         is called to create the *.dat file. The final input file is copied to
         dat_path.
         """
+
+        # Check if the path to pre_exodus is valid.
+        if self.pre_exodus is None:
+            raise ValueError('The path to pre_exodus is None!')
 
         # Check if output path exists.
         dat_dir = os.path.dirname(dat_path)
