@@ -442,21 +442,31 @@ class CubitPy(object):
             journal.write('open "{}"\n'.format(state_path))
 
             # Label items in cubit.
-            is_label = False
-            if cupy.vertex in label:
-                journal.write('label vertex On\n')
-                is_label = True
-            if cupy.curve in label:
-                journal.write('label curve On\n')
-                is_label = True
-            if cupy.surface in label:
-                journal.write('label surface On\n')
-                is_label = True
-            if cupy.volume in label:
-                journal.write('label volume On\n')
-                is_label = True
+            for item in label:
+                if item == cupy.vertex:
+                    journal.write('label vertex On\n')
+                elif item == cupy.curve:
+                    journal.write('label curve On\n')
+                elif item == cupy.surface:
+                    journal.write('label surface On\n')
+                elif item == cupy.volume:
+                    journal.write('label volume On\n')
+                elif item == cupy.hex_elements:
+                    journal.write('label hex On\n')
+                elif item == cupy.tet_elements:
+                    journal.write('label tet On\n')
+                elif item == cupy.face:
+                    journal.write('label face On\n')
+                elif item == cupy.triangle:
+                    journal.write('label tri On\n')
+                elif item == cupy.edge:
+                    journal.write('label edge On\n')
+                elif item == cupy.node:
+                    journal.write('label node On\n')
+                else:
+                    raise ValueError('Did not expect {}!'.format(item))
 
-            if is_label:
+            if len(label) > 0:
                 journal.write('display')
 
         # Adapt the environment if needed.

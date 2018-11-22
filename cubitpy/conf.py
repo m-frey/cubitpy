@@ -21,11 +21,19 @@ class CubitOptions(object):
         if not os.path.isdir(self.temp_dir):
             os.makedirs(self.temp_dir)
 
-        # Element types
+        # Geometry types.
         self.vertex = 'cubitpy_vertex'
         self.curve = 'cubitpy_curve'
         self.surface = 'cubitpy_surface'
         self.volume = 'cubitpy_volume'
+
+        # Element types.
+        self.hex_elements = 'cubitpy_hex'
+        self.tet_elements = 'cubitpy_tet'
+        self.face = 'cubitpy_face'
+        self.triangle = 'cubitpy_triangle'
+        self.edge = 'cubitpy_edge'
+        self.node = 'cubitpy_node'
 
     @staticmethod
     def get_default_paths(name, throw_error=True):
