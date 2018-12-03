@@ -217,7 +217,7 @@ class CubitPy(object):
             Data for the *.bc file that will be used with pre_exodus.
         """
 
-        if self.block_counter == 0:
+        if self.block_counter == 1:
             self.cubit.cmd('reset block')
 
         # Check what type of input is given.
