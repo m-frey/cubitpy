@@ -50,7 +50,7 @@ class CubitOptions(object):
             default_paths = [
                 ['/home/ivo/workspace/baci/master/release/pre_exodus',
                     os.path.isfile],
-                ['/hdd/gitlab-runner/lib/baci-release/pre_exodus',
+                ['/hdd/gitlab-runner/lib/baci-master/release/pre_exodus',
                     os.path.isfile]
             ]
         else:
