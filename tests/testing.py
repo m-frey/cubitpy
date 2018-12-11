@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
 
 # Cubitpy imports.
 from cubitpy import CubitPy, cupy
+from cubitpy.mesh_creation_functions import create_brick
 
 
 def check_tmp_dir():
@@ -261,6 +262,51 @@ class TestCubitPy(unittest.TestCase):
         self.assertTrue(
             compare_strings(string1, string2),
             'test_element_types'
+            )
+
+    def test_block_function(self):
+        """Create a solid block with different element types."""
+
+        # Initialize cubit.
+        cubit = CubitPy()
+
+        for i, element_type in enumerate(['HEX8', 'HEX20', 'HEX27', 'TETRA4',
+                'TETRA10']):
+            # Create the cube with factor as mesh size.
+            cube = create_brick(cubit, 0.5, 0.8, 1.1,
+                element_type=element_type, mesh_size=['factor', 9],
+                name=element_type + str(i), mesh=False,
+                material='test material string')
+            cubit.move(cube, [i, 0, 0])
+            cube.volumes()[0].mesh()
+
+        for i, element_type in enumerate(['HEX8', 'HEX20', 'HEX27', 'TETRA4',
+                'TETRA10']):
+            # Create the cube with intervals as mesh size.
+            cube = create_brick(cubit, 0.5, 0.8, 1.1,
+                element_type=element_type, mesh_size=['interval', 3, 2, 1],
+                name=element_type + str(i + 5), mesh=False,
+                material='test material string')
+            cubit.move(cube, [i + 5, 0, 0])
+            cube.volumes()[0].mesh()
+
+        # Create the solid input file.
+        check_tmp_dir()
+        dat_file = os.path.join(testing_temp, 'test_block_function.dat')
+
+        # Set output to single precision so the dat file can be compared.
+        cubit.cmd('set exodus single precision on')
+        cubit.create_dat(dat_file)
+
+        # Compare with the ref file.
+        ref_file = os.path.join(testing_input, 'test_block_function_ref.dat')
+        with open(dat_file, 'r') as text_file:
+            string1 = text_file.read()
+        with open(ref_file, 'r') as text_file:
+            string2 = text_file.read()
+        self.assertTrue(
+            string1 == string2,
+            'test_block_function'
             )
 
 

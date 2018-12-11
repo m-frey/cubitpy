@@ -207,8 +207,8 @@ class CubitPy(object):
         item: cubit.geom, [item_id, item_type]
             Geometry to set the element type for.
             If a list is given, the first entry is an integer with the id of
-            the item. The second entry is a string with the cubit geometry
-            type.
+            the item. The id is 1 based. The second entry is a string with the
+            cubit geometry type.
         el_type: str
             Cubit element type.
         name: str
@@ -260,8 +260,8 @@ class CubitPy(object):
         item: cubit.geom, [item_id, item_type]
             Geometry to set the element type for.
             If a list is given, the first entry is an integer with the id of
-            the item. The second entry is a string with the cubit geometry
-            type.
+            the item. The id is 1 based. The second entry is a string with the
+            cubit geometry type.
         name: str
             Name of the node set.
         bc: [str]
