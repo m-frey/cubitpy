@@ -1,33 +1,18 @@
 # -*- coding: utf-8 -*-
 """
 Implements a class that helps create meshes with cubit. Since the cubit
-interface works only with Python2, if Python3 is used, a wrapper for the cubit
-methods is used.
+interface works only with Python2, a wrapper for the cubit methods is used.
 """
 
 
 # Python modules.
 import os
 import shutil
-import sys
 import subprocess
 
 # Cubitpy modules.
 from . import cupy
-from .cubit_wrapper_utility import check_environment_eclipse
-
-
-def get_methods(cubit_object):
-    """Return a list of all callable methods in object."""
-    if (sys.version_info > (3, 0)):
-        return cubit_object.cubit_connect.send_and_return(
-            ['get_methods', cubit_object.cubit_id]
-            )
-    else:
-        return [
-            method_name for method_name in dir(cubit_object)
-            if callable(getattr(cubit_object, method_name))
-            ]
+from cubitpy.utility_functions import check_environment_eclipse
 
 
 class CubitPy(object):
@@ -36,7 +21,7 @@ class CubitPy(object):
     # Count the number of instances.
     _number_of_instances = 0
 
-    def __init__(self, cubit_args=None, cubit_path=None, pre_exodus=None):
+    def __init__(self, *, cubit_args=None, cubit_path=None, pre_exodus=None):
         """
         Initialize cubit.
 
@@ -75,21 +60,11 @@ class CubitPy(object):
             for arg in cubit_args:
                 arguments.append(arg)
 
-        # Depending on the python version, load the cubit default wrapper
-        # (python2) or the modified wrapper for python3.
-        if (sys.version_info > (3, 0)):
-            # Python 3.
-            from .cubit_wrapper3 import CubitConnect
-            cubit_connect = CubitConnect(arguments,
-                cubit_bin_path=os.path.join(cubit_path, 'bin'))
-            self.cubit = cubit_connect.cubit
-        else:
-            # Python 2.
-            sys.path.append(os.path.join(cubit_path, 'bin'))
-            import cubit  # @UnresolvedImport
-            self.cubit = cubit
-            # Initialize cubit.
-            self.cubit.init(arguments)
+        # Load the cubit wrapper.
+        from .cubit_wrapper3 import CubitConnect
+        cubit_connect = CubitConnect(arguments,
+            cubit_bin_path=os.path.join(cubit_path, 'bin'))
+        self.cubit = cubit_connect.cubit
 
         # Reset cubit.
         self.cubit.cmd('reset')
@@ -145,29 +120,14 @@ class CubitPy(object):
         cubit type.
         """
 
-        if (sys.version_info > (3, 0)):
-            # Python 3.
-            if self.cubit.cubit_connect.isinstance(item, cupy.vertex,
-                    raise_error=raise_error):
-                return cupy.vertex
-            elif self.cubit.cubit_connect.isinstance(item, cupy.curve,
-                    raise_error=raise_error):
-                return cupy.curve
-            elif self.cubit.cubit_connect.isinstance(item, cupy.surface,
-                    raise_error=raise_error):
-                return cupy.surface
-            elif self.cubit.cubit_connect.isinstance(item, cupy.volume,
-                    raise_error=raise_error):
-                return cupy.volume
-        else:
-            if isinstance(item, self.cubit.Vertex):
-                return cupy.vertex
-            elif isinstance(item, self.cubit.Curve):
-                return cupy.curve
-            elif isinstance(item, self.cubit.Surface):
-                return cupy.surface
-            elif isinstance(item, self.cubit.Volume):
-                return cupy.volume
+        if item.isinstance(cupy.vertex):
+            return cupy.vertex
+        elif item.isinstance(cupy.curve):
+            return cupy.curve
+        elif item.isinstance(cupy.surface):
+            return cupy.surface
+        elif item.isinstance(cupy.volume):
+            return cupy.volume
 
         if raise_error:
             raise TypeError('Got {}!'.format(type(item)))

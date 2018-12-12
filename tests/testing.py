@@ -25,8 +25,7 @@ from cubitpy.mesh_creation_functions import create_brick
 
 def check_tmp_dir():
     """Check if the temp directory exists, if not create it."""
-    if not os.path.exists(testing_temp):
-        os.makedirs(testing_temp)
+    os.makedirs(testing_temp, exist_ok=True)
 
 
 def compare_strings(string_ref, string_compare):

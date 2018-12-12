@@ -13,8 +13,8 @@ import os
 from . import cupy
 
 # Import utility functions for cubitpy.
-from .cubit_wrapper_utility import cubit_item_to_id, is_base_type, \
-    check_environment_eclipse
+from .cubit_wrapper_utility import cubit_item_to_id, is_base_type
+from .utility_functions import check_environment_eclipse
 
 
 class CubitConnect(object):
@@ -92,30 +92,6 @@ class CubitConnect(object):
         # Restore environment path.
         if is_eclipse:
             os.environ['PYTHONPATH'] = python_path_old
-
-    def isinstance(self, cubit_object, geom_type, raise_error=True):
-        """
-        Check if cubit_object is of geom_type.
-
-        Args
-        ----
-        cubit_object: CubitObject
-            Object to compare.
-        geom_type: str
-            Name of the geometry to compare (vertex, curve, surface, volume).
-        """
-
-        # Check if the object is a Cubit Object.
-        if not isinstance(cubit_object, CubitObject):
-            if raise_error:
-                raise TypeError('Expected CubitObject, got {}!'.format(
-                    type(cubit_object)))
-            else:
-                return False
-
-        # Compare in python2.
-        return self.send_and_return(
-            ['isinstance', cubit_object.cubit_id, geom_type])
 
     def send_and_return(self, argument_list):
         """Send arguments to python2 and collect the return values."""
@@ -236,3 +212,23 @@ class CubitObject(object):
     def __str__(self):
         """Return the string from python2."""
         return '<CubitObject>"' + self.cubit_id[1] + '"'
+
+    def isinstance(self, geom_type):
+        """
+        Check if this object is of geom_type.
+
+        Args
+        ----
+        geom_type: str
+            Name of the geometry to compare (vertex, curve, surface, volume).
+        """
+
+        # Compare in python2.
+        return self.cubit_connect.send_and_return(
+            ['isinstance', self.cubit_id, geom_type])
+
+    def get_methods(self):
+        """Return a list of all callable cubit methods for this object."""
+        return self.cubit_connect.send_and_return(
+            ['get_methods', self.cubit_id]
+            )
