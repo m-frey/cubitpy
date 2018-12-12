@@ -120,14 +120,14 @@ class CubitPy(object):
         cubit type.
         """
 
-        if item.isinstance(cupy.vertex):
-            return cupy.vertex
-        elif item.isinstance(cupy.curve):
-            return cupy.curve
-        elif item.isinstance(cupy.surface):
-            return cupy.surface
-        elif item.isinstance(cupy.volume):
-            return cupy.volume
+        if item.isinstance('cubitpy_vertex'):
+            return cupy.geometry.vertex
+        elif item.isinstance('cubitpy_curve'):
+            return cupy.geometry.curve
+        elif item.isinstance('cubitpy_surface'):
+            return cupy.geometry.surface
+        elif item.isinstance('cubitpy_volume'):
+            return cupy.geometry.volume
 
         if raise_error:
             raise TypeError('Got {}!'.format(type(item)))
@@ -141,18 +141,18 @@ class CubitPy(object):
         item: cubit object, cubitpy geom type
         """
 
-        if not isinstance(item, str):
+        if not isinstance(item, cupy.geometry):
             item_type = self._get_type(item)
         else:
             item_type = item
 
-        if item_type == cupy.vertex:
+        if item_type == cupy.geometry.vertex:
             return 'vertex'
-        elif item_type == cupy.curve:
+        elif item_type == cupy.geometry.curve:
             return 'curve'
-        elif item_type == cupy.surface:
+        elif item_type == cupy.geometry.surface:
             return 'surface'
-        elif item_type == cupy.volume:
+        elif item_type == cupy.geometry.volume:
             return 'volume'
         else:
             return None
@@ -261,7 +261,7 @@ class CubitPy(object):
         (parameter space ([-1,1],[-1,1])).
         """
 
-        if not self._get_type(surf) == cupy.surface:
+        if not self._get_type(surf) == cupy.geometry.surface:
             raise TypeError('Did not expect {}'.format(type(surf)))
 
         range_u = surf.get_param_range_U()
@@ -284,7 +284,7 @@ class CubitPy(object):
 
         # Check if item is line.
         item_type = self._get_type(item)
-        if not item_type == cupy.curve:
+        if not item_type == cupy.geometry.curve:
             raise TypeError('Expected line, got {}'.format(type(item)))
         self.cubit.cmd('curve {} interval {} scheme equal'.format(
             item.id(),
@@ -339,8 +339,7 @@ class CubitPy(object):
         if not os.path.exists(dat_dir):
             raise ValueError('Path {} does not exist!'.format(dat_dir))
 
-        if not os.path.exists(cupy.temp_dir):
-            os.makedirs(cupy.temp_dir)
+        os.makedirs(cupy.temp_dir, exist_ok=True)
 
         # Create files
         self.export_exo(os.path.join(cupy.temp_dir, 'cubitpy.exo'))
@@ -391,8 +390,7 @@ class CubitPy(object):
             vol).
         """
 
-        if not os.path.exists(cupy.temp_dir):
-            os.makedirs(cupy.temp_dir)
+        os.makedirs(cupy.temp_dir, exist_ok=True)
         state_path = os.path.join(cupy.temp_dir, 'state.cub')
         self.export_cub(state_path)
 
@@ -403,25 +401,25 @@ class CubitPy(object):
 
             # Label items in cubit.
             for item in label:
-                if item == cupy.vertex:
+                if item == cupy.geometry.vertex:
                     journal.write('label vertex On\n')
-                elif item == cupy.curve:
+                elif item == cupy.geometry.curve:
                     journal.write('label curve On\n')
-                elif item == cupy.surface:
+                elif item == cupy.geometry.surface:
                     journal.write('label surface On\n')
-                elif item == cupy.volume:
+                elif item == cupy.geometry.volume:
                     journal.write('label volume On\n')
-                elif item == cupy.hex_elements:
+                elif item == cupy.finite_element_objects.hex_elements:
                     journal.write('label hex On\n')
-                elif item == cupy.tet_elements:
+                elif item == cupy.finite_element_objects.tet_elements:
                     journal.write('label tet On\n')
-                elif item == cupy.face:
+                elif item == cupy.finite_element_objects.face:
                     journal.write('label face On\n')
-                elif item == cupy.triangle:
+                elif item == cupy.finite_element_objects.triangle:
                     journal.write('label tri On\n')
-                elif item == cupy.edge:
+                elif item == cupy.finite_element_objects.edge:
                     journal.write('label edge On\n')
-                elif item == cupy.node:
+                elif item == cupy.finite_element_objects.node:
                     journal.write('label node On\n')
                 else:
                     raise ValueError('Did not expect {}!'.format(item))

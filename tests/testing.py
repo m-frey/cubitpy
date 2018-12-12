@@ -220,7 +220,9 @@ class TestCubitPy(unittest.TestCase):
             cubit.cmd('mesh volume {}'.format(1 + offset_volume))
 
             # Set the element type.
-            cubit.add_element_type([1 + offset_volume, cupy.volume], string1,
+            cubit.add_element_type(
+                [1 + offset_volume, cupy.geometry.volume],
+                string1,
                 name='block_' + str(i),
                 bc=['STRUCTURE',
                     'MAT 1 KINEM nonlinear {}'.format(dat_string),
@@ -228,7 +230,7 @@ class TestCubitPy(unittest.TestCase):
                     ])
 
             # Add the node sets.
-            cubit.add_node_set([5 + offset_surface, cupy.surface],
+            cubit.add_node_set([5 + offset_surface, cupy.geometry.surface],
                 name='fix_' + str(i),
                 bc=['DESIGN SURF DIRICH CONDITIONS',
                     'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])

@@ -7,6 +7,9 @@ cubitpy.
 # Python imports.
 import os
 
+# Cubitpy imports.
+from .cubitpy_types import FiniteElementObjects, GeometryType
+
 
 class CubitOptions(object):
     """Object for types in cubitpy."""
@@ -16,24 +19,14 @@ class CubitOptions(object):
         self.temp_dir = '/tmp/cubitpy'
         self.temp_log = os.path.join(self.temp_dir, 'cubitpy.log')
 
-        # Check if temp path exits, if not create it. In python3 use the option
-        # exist_ok=True in os.makedir.
-        if not os.path.isdir(self.temp_dir):
-            os.makedirs(self.temp_dir)
+        # Check if temp path exits, if not create it.
+        os.makedirs(self.temp_dir, exist_ok=True)
 
         # Geometry types.
-        self.vertex = 'cubitpy_vertex'
-        self.curve = 'cubitpy_curve'
-        self.surface = 'cubitpy_surface'
-        self.volume = 'cubitpy_volume'
+        self.geometry = GeometryType
 
-        # Element types.
-        self.hex_elements = 'cubitpy_hex'
-        self.tet_elements = 'cubitpy_tet'
-        self.face = 'cubitpy_face'
-        self.triangle = 'cubitpy_triangle'
-        self.edge = 'cubitpy_edge'
-        self.node = 'cubitpy_node'
+        # Finite element types.
+        self.finite_element_objects = FiniteElementObjects
 
     @staticmethod
     def get_default_paths(name, throw_error=True):
