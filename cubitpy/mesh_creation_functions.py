@@ -4,7 +4,11 @@ Implements functions that create basic meshes in cubit.
 """
 
 
-def create_brick(cubit, h_x, h_y, h_z, *, element_type='HEX8', mesh_size=None,
+# Import cubitpy stuff.
+from . import cupy
+
+
+def create_brick(cubit, h_x, h_y, h_z, *, element_type=None, mesh_size=None,
         name=None, mesh=True, material='MAT 1 KINEM nonlinear'):
     """
     Create a cube in cubit.
@@ -32,38 +36,17 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type='HEX8', mesh_size=None,
             Material string in baci.
     """
 
+    # Check if default value has to be set for element_type.
+    if element_type is None:
+        element_type = cupy.element_type.hex8
+
     # Check the input parameters.
     if h_x < 0 or h_y < 0 or h_z < 0:
         raise ValueError('Only positive lengths are possible!')
 
     # Get the element type parameters.
-    if element_type == 'HEX8':
-        cubit_scheme = 'Auto'
-        cubit_element_type = 'HEX8'
-        baci_element_type = 'SOLIDH8'
-        baci_dat_string = 'EAS none'
-    elif element_type == 'HEX20':
-        cubit_scheme = 'Auto'
-        cubit_element_type = 'HEX20'
-        baci_element_type = 'SOLIDH20'
-        baci_dat_string = ''
-    elif element_type == 'HEX27':
-        cubit_scheme = 'Auto'
-        cubit_element_type = 'HEX27'
-        baci_element_type = 'SOLIDH27'
-        baci_dat_string = ''
-    elif element_type == 'TETRA4':
-        cubit_scheme = 'Tetmesh'
-        cubit_element_type = 'TETRA4'
-        baci_element_type = 'SOLIDT4'
-        baci_dat_string = ''
-    elif element_type == 'TETRA10':
-        cubit_scheme = 'Tetmesh'
-        cubit_element_type = 'TETRA10'
-        baci_element_type = 'SOLIDT10'
-        baci_dat_string = ''
-    else:
-        raise ValueError('Unknown element_type {}!'.format(element_type))
+    cubit_scheme, cubit_element_type, baci_element_type, baci_dat_string = \
+        element_type.get_element_type_strings()
 
     # Create the block in cubit.
     solid = cubit.brick(h_x, h_y, h_z)

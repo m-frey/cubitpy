@@ -122,20 +122,12 @@ class CubitPy(object):
         """
 
         if not isinstance(item, cupy.geometry):
+            # In the case of a cubit object, we first have to get the type from
+            # python2.
             item_type = self._get_type(item)
         else:
             item_type = item
-
-        if item_type == cupy.geometry.vertex:
-            return 'vertex'
-        elif item_type == cupy.geometry.curve:
-            return 'curve'
-        elif item_type == cupy.geometry.surface:
-            return 'surface'
-        elif item_type == cupy.geometry.volume:
-            return 'volume'
-        else:
-            return None
+        return item_type.get_cubit_string()
 
     def add_element_type(self, item, el_type, name=None, bc=None):
         """
@@ -381,28 +373,7 @@ class CubitPy(object):
 
             # Label items in cubit.
             for item in label:
-                if item == cupy.geometry.vertex:
-                    journal.write('label vertex On\n')
-                elif item == cupy.geometry.curve:
-                    journal.write('label curve On\n')
-                elif item == cupy.geometry.surface:
-                    journal.write('label surface On\n')
-                elif item == cupy.geometry.volume:
-                    journal.write('label volume On\n')
-                elif item == cupy.finite_element_objects.hex_elements:
-                    journal.write('label hex On\n')
-                elif item == cupy.finite_element_objects.tet_elements:
-                    journal.write('label tet On\n')
-                elif item == cupy.finite_element_objects.face:
-                    journal.write('label face On\n')
-                elif item == cupy.finite_element_objects.triangle:
-                    journal.write('label tri On\n')
-                elif item == cupy.finite_element_objects.edge:
-                    journal.write('label edge On\n')
-                elif item == cupy.finite_element_objects.node:
-                    journal.write('label node On\n')
-                else:
-                    raise ValueError('Did not expect {}!'.format(item))
+                journal.write('label {} On\n'.format(item.get_cubit_string()))
 
             if len(label) > 0:
                 journal.write('display')

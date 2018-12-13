@@ -277,22 +277,28 @@ class TestCubitPy(unittest.TestCase):
         # Initialize cubit.
         cubit = CubitPy()
 
-        for i, element_type in enumerate(['HEX8', 'HEX20', 'HEX27', 'TETRA4',
-                'TETRA10']):
+        element_type_list = [
+            cupy.element_type.hex8,
+            cupy.element_type.hex20,
+            cupy.element_type.hex27,
+            cupy.element_type.tet4,
+            cupy.element_type.tet10
+            ]
+
+        for i, element_type in enumerate(element_type_list):
             # Create the cube with factor as mesh size.
             cube = create_brick(cubit, 0.5, 0.8, 1.1,
                 element_type=element_type, mesh_size=['factor', 9],
-                name=element_type + str(i), mesh=False,
+                name=str(element_type) + str(i), mesh=False,
                 material='test material string')
             cubit.move(cube, [i, 0, 0])
             cube.volumes()[0].mesh()
 
-        for i, element_type in enumerate(['HEX8', 'HEX20', 'HEX27', 'TETRA4',
-                'TETRA10']):
+        for i, element_type in enumerate(element_type_list):
             # Create the cube with intervals as mesh size.
             cube = create_brick(cubit, 0.5, 0.8, 1.1,
                 element_type=element_type, mesh_size=['interval', 3, 2, 1],
-                name=element_type + str(i + 5), mesh=False,
+                name=str(element_type) + str(i + 5), mesh=False,
                 material='test material string')
             cubit.move(cube, [i + 5, 0, 0])
             cube.volumes()[0].mesh()

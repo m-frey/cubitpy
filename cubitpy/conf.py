@@ -8,7 +8,7 @@ cubitpy.
 import os
 
 # Cubitpy imports.
-from .cubitpy_types import FiniteElementObjects, GeometryType
+from .cubitpy_types import FiniteElementObject, GeometryType, ElementType
 
 
 class CubitOptions(object):
@@ -26,7 +26,10 @@ class CubitOptions(object):
         self.geometry = GeometryType
 
         # Finite element types.
-        self.finite_element_objects = FiniteElementObjects
+        self.finite_element_object = FiniteElementObject
+
+        # Element shape types.
+        self.element_type = ElementType
 
     @staticmethod
     def get_default_paths(name, throw_error=True):
