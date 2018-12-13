@@ -52,8 +52,8 @@ def is_cubit_type(obj):
 
 
 # All cubit items that are created are stored in this dictionary. The keys are
-# the unique object ids. For now no items are deleted if the GC deletes them in
-# python3, there is a check that not too many items are in this dictionary.
+# the unique object ids. The items are deleted once they run out of scope in 
+# python3.
 cubit_objects = {}
 
 
@@ -101,6 +101,7 @@ while 1:
     #       [[cubit_object], 'method', ['parameters']]
     # isinstance:  Check if the cubit object is of a cerain instance.
     # get_methods: Return the callable methods in the cubit_object.
+    # delete: Delete the cubit pbject from the dictionary.
 
     if cubit_item_to_id(receive[0]) is not None:
         # The first item is an id for a cubit object. Call a method on this
@@ -182,6 +183,23 @@ while 1:
             method_name for method_name in dir(cubit_object)
             if callable(getattr(cubit_object, method_name))
             ])
+
+    elif receive[0] == 'delete':
+        # Get the id of the object to delete.
+        cubit_id = cubit_item_to_id(receive[1])
+        if cubit_id is None:
+            raise TypeError('Expected cubit object! Got {}!'.format(item))
+ 
+        # Delete the object from the dictionary.
+        if cubit_id in cubit_objects.keys():
+            del cubit_objects[cubit_id]
+        else:
+            raise ValueError('The id {} is not in the cubit_objects '
+                + 'dictionary'.format(cubit_id))
+
+        # Return to python3.
+        channel.send(None)
+        
 
     else:
         raise ValueError('The case of "{}" is not implemented!'.format(

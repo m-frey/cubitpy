@@ -306,7 +306,7 @@ class TestCubitPy(unittest.TestCase):
         with open(ref_file, 'r') as text_file:
             string2 = text_file.read()
         self.assertTrue(
-            string1 == string2,
+            compare_strings(string1, string2),
             'test_block_function'
             )
 

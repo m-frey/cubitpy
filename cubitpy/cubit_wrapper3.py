@@ -87,14 +87,32 @@ class CubitConnect(object):
 
         # Initialize cubit.
         cubit_id = self.send_and_return(['init', cubit_arguments])
-        self.cubit = CubitObject(self, cubit_id)
+        self.cubit = CubitObjectMain(self, cubit_id)
 
         # Restore environment path.
         if is_eclipse:
             os.environ['PYTHONPATH'] = python_path_old
 
-    def send_and_return(self, argument_list):
-        """Send arguments to python2 and collect the return values."""
+    def send_and_return(self, argument_list, check_number_of_channels=False):
+        """
+        Send arguments to python2 and collect the return values.
+
+        Args
+        ----
+        argument_list: list
+            First item is either a string with the action, or a cubit item id.
+            In the second case a method will be called on the item, with the
+            arguments stored in the seciont entry in argument_list.
+        check_number_of_channels: bool
+            If true it is checked if the channel still exists. This is
+            neccesary in cases where we delete items after the connection has
+            been closed.
+        """
+
+        if check_number_of_channels:
+            if len(self.gw._channelfactory.channels()) == 0:
+                return None
+
         self.channel.send(argument_list)
         return self.channel.receive()
 
@@ -209,6 +227,14 @@ class CubitObject(object):
             # Create a callable function in python2.
             return self.cubit_connect.get_function(self, name)
 
+    def __del__(self):
+        """
+        When this object is deleted, the object in the wraper can also be
+        deleted.
+        """
+        self.cubit_connect.send_and_return(['delete', self.cubit_id],
+            check_number_of_channels=True)
+
     def __str__(self):
         """Return the string from python2."""
         return '<CubitObject>"' + self.cubit_id[1] + '"'
@@ -232,3 +258,10 @@ class CubitObject(object):
         return self.cubit_connect.send_and_return(
             ['get_methods', self.cubit_id]
             )
+
+class CubitObjectMain(CubitObject):
+    """
+    The main cubit object will be of this type, it can not delete itself.
+    """
+    def __del__(self):
+        pass
