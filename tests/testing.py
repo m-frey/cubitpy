@@ -159,6 +159,12 @@ class TestCubitPy(unittest.TestCase):
             self.create_block(cubit)
             cubit.reset()
 
+        # Create two object and keep them in parallel.
+        cubit = CubitPy()
+        cubit_2 = CubitPy()
+        self.create_block(cubit)
+        self.create_block(cubit_2)
+
     def test_element_types(self):
         """Create a curved solid in a curved solid."""
 

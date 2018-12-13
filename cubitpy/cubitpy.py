@@ -18,9 +18,6 @@ from cubitpy.utility_functions import check_environment_eclipse
 class CubitPy(object):
     """A wrapper class for cubit."""
 
-    # Count the number of instances.
-    _number_of_instances = 0
-
     def __init__(self, *, cubit_args=None, cubit_path=None, pre_exodus=None):
         """
         Initialize cubit.
@@ -43,9 +40,6 @@ class CubitPy(object):
             cubit_path = cupy.get_default_paths('cubit')
         if pre_exodus is None:
             pre_exodus = cupy.get_default_paths('pre_exodus', False)
-
-        # Advance the instance counter.
-        CubitPy._number_of_instances += 1
 
         # Arguments for cubit.
         if cubit_args is None:
@@ -89,25 +83,11 @@ class CubitPy(object):
         self.node_set_counter = 1
         self.block_counter = 1
 
-    def __del__(self):
-        """
-        When this object is deleted, remove the flag that an instance exitst.
-        """
-        CubitPy._number_of_instances -= 1
-
     def __getattr__(self, key, *args, **kwargs):
         """
         All calls to methods and attributes that are not in this object get
-        passed to cubit. This function can only be used when there is a single
-        instance of CubitPy.
+        passed to cubit.
         """
-
-        # Check if more than one instance exits:
-        if CubitPy._number_of_instances > 1:
-            raise ValueError('There should be no other active instance of '
-                + 'CubitPy! Check the CubitPy.reset() function to '
-                + 'create multiple meshes with one script, or delete the'
-                + 'existing CubitPy item (or let it run out of scope).')
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
     def _get_type(self, item, raise_error=True):
