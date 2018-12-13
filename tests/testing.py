@@ -25,8 +25,7 @@ from cubitpy.mesh_creation_functions import create_brick
 
 def check_tmp_dir():
     """Check if the temp directory exists, if not create it."""
-    if not os.path.exists(testing_temp):
-        os.makedirs(testing_temp)
+    os.makedirs(testing_temp, exist_ok=True)
 
 
 def compare_strings(string_ref, string_compare):
@@ -160,6 +159,12 @@ class TestCubitPy(unittest.TestCase):
             self.create_block(cubit)
             cubit.reset()
 
+        # Create two object and keep them in parallel.
+        cubit = CubitPy()
+        cubit_2 = CubitPy()
+        self.create_block(cubit)
+        self.create_block(cubit_2)
+
     def test_element_types(self):
         """Create a curved solid in a curved solid."""
 
@@ -221,7 +226,9 @@ class TestCubitPy(unittest.TestCase):
             cubit.cmd('mesh volume {}'.format(1 + offset_volume))
 
             # Set the element type.
-            cubit.add_element_type([1 + offset_volume, cupy.volume], string1,
+            cubit.add_element_type(
+                [1 + offset_volume, cupy.geometry.volume],
+                string1,
                 name='block_' + str(i),
                 bc=['STRUCTURE',
                     'MAT 1 KINEM nonlinear {}'.format(dat_string),
@@ -229,7 +236,7 @@ class TestCubitPy(unittest.TestCase):
                     ])
 
             # Add the node sets.
-            cubit.add_node_set([5 + offset_surface, cupy.surface],
+            cubit.add_node_set([5 + offset_surface, cupy.geometry.surface],
                 name='fix_' + str(i),
                 bc=['DESIGN SURF DIRICH CONDITIONS',
                     'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])
@@ -270,22 +277,28 @@ class TestCubitPy(unittest.TestCase):
         # Initialize cubit.
         cubit = CubitPy()
 
-        for i, element_type in enumerate(['HEX8', 'HEX20', 'HEX27', 'TETRA4',
-                'TETRA10']):
+        element_type_list = [
+            cupy.element_type.hex8,
+            cupy.element_type.hex20,
+            cupy.element_type.hex27,
+            cupy.element_type.tet4,
+            cupy.element_type.tet10
+            ]
+
+        for i, element_type in enumerate(element_type_list):
             # Create the cube with factor as mesh size.
             cube = create_brick(cubit, 0.5, 0.8, 1.1,
                 element_type=element_type, mesh_size=['factor', 9],
-                name=element_type + str(i), mesh=False,
+                name=str(element_type) + str(i), mesh=False,
                 material='test material string')
             cubit.move(cube, [i, 0, 0])
             cube.volumes()[0].mesh()
 
-        for i, element_type in enumerate(['HEX8', 'HEX20', 'HEX27', 'TETRA4',
-                'TETRA10']):
+        for i, element_type in enumerate(element_type_list):
             # Create the cube with intervals as mesh size.
             cube = create_brick(cubit, 0.5, 0.8, 1.1,
                 element_type=element_type, mesh_size=['interval', 3, 2, 1],
-                name=element_type + str(i + 5), mesh=False,
+                name=str(element_type) + str(i + 5), mesh=False,
                 material='test material string')
             cubit.move(cube, [i + 5, 0, 0])
             cube.volumes()[0].mesh()
@@ -305,7 +318,7 @@ class TestCubitPy(unittest.TestCase):
         with open(ref_file, 'r') as text_file:
             string2 = text_file.read()
         self.assertTrue(
-            string1 == string2,
+            compare_strings(string1, string2),
             'test_block_function'
             )
 

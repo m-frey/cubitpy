@@ -1,42 +1,24 @@
 # -*- coding: utf-8 -*-
 """
 Implements a class that helps create meshes with cubit. Since the cubit
-interface works only with Python2, if Python3 is used, a wrapper for the cubit
-methods is used.
+interface works only with Python2, a wrapper for the cubit methods is used.
 """
 
 
 # Python modules.
 import os
 import shutil
-import sys
 import subprocess
 
 # Cubitpy modules.
 from . import cupy
-from .cubit_wrapper_utility import check_environment_eclipse
-
-
-def get_methods(cubit_object):
-    """Return a list of all callable methods in object."""
-    if (sys.version_info > (3, 0)):
-        return cubit_object.cubit_connect.send_and_return(
-            ['get_methods', cubit_object.cubit_id]
-            )
-    else:
-        return [
-            method_name for method_name in dir(cubit_object)
-            if callable(getattr(cubit_object, method_name))
-            ]
+from cubitpy.utility_functions import check_environment_eclipse
 
 
 class CubitPy(object):
     """A wrapper class for cubit."""
 
-    # Count the number of instances.
-    _number_of_instances = 0
-
-    def __init__(self, cubit_args=None, cubit_path=None, pre_exodus=None):
+    def __init__(self, *, cubit_args=None, cubit_path=None, pre_exodus=None):
         """
         Initialize cubit.
 
@@ -59,9 +41,6 @@ class CubitPy(object):
         if pre_exodus is None:
             pre_exodus = cupy.get_default_paths('pre_exodus', False)
 
-        # Advance the instance counter.
-        CubitPy._number_of_instances += 1
-
         # Arguments for cubit.
         if cubit_args is None:
             arguments = ['cubit',
@@ -75,21 +54,11 @@ class CubitPy(object):
             for arg in cubit_args:
                 arguments.append(arg)
 
-        # Depending on the python version, load the cubit default wrapper
-        # (python2) or the modified wrapper for python3.
-        if (sys.version_info > (3, 0)):
-            # Python 3.
-            from .cubit_wrapper3 import CubitConnect
-            cubit_connect = CubitConnect(arguments,
-                cubit_bin_path=os.path.join(cubit_path, 'bin'))
-            self.cubit = cubit_connect.cubit
-        else:
-            # Python 2.
-            sys.path.append(os.path.join(cubit_path, 'bin'))
-            import cubit  # @UnresolvedImport
-            self.cubit = cubit
-            # Initialize cubit.
-            self.cubit.init(arguments)
+        # Load the cubit wrapper.
+        from .cubit_wrapper3 import CubitConnect
+        cubit_connect = CubitConnect(arguments,
+            cubit_bin_path=os.path.join(cubit_path, 'bin'))
+        self.cubit = cubit_connect.cubit
 
         # Reset cubit.
         self.cubit.cmd('reset')
@@ -114,25 +83,11 @@ class CubitPy(object):
         self.node_set_counter = 1
         self.block_counter = 1
 
-    def __del__(self):
-        """
-        When this object is deleted, remove the flag that an instance exitst.
-        """
-        CubitPy._number_of_instances -= 1
-
     def __getattr__(self, key, *args, **kwargs):
         """
         All calls to methods and attributes that are not in this object get
-        passed to cubit. This function can only be used when there is a single
-        instance of CubitPy.
+        passed to cubit.
         """
-
-        # Check if more than one instance exits:
-        if CubitPy._number_of_instances > 1:
-            raise ValueError('There should be no other active instance of '
-                + 'CubitPy! Check the CubitPy.reset() function to '
-                + 'create multiple meshes with one script, or delete the'
-                + 'existing CubitPy item (or let it run out of scope).')
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
     def _get_type(self, item, raise_error=True):
@@ -145,29 +100,14 @@ class CubitPy(object):
         cubit type.
         """
 
-        if (sys.version_info > (3, 0)):
-            # Python 3.
-            if self.cubit.cubit_connect.isinstance(item, cupy.vertex,
-                    raise_error=raise_error):
-                return cupy.vertex
-            elif self.cubit.cubit_connect.isinstance(item, cupy.curve,
-                    raise_error=raise_error):
-                return cupy.curve
-            elif self.cubit.cubit_connect.isinstance(item, cupy.surface,
-                    raise_error=raise_error):
-                return cupy.surface
-            elif self.cubit.cubit_connect.isinstance(item, cupy.volume,
-                    raise_error=raise_error):
-                return cupy.volume
-        else:
-            if isinstance(item, self.cubit.Vertex):
-                return cupy.vertex
-            elif isinstance(item, self.cubit.Curve):
-                return cupy.curve
-            elif isinstance(item, self.cubit.Surface):
-                return cupy.surface
-            elif isinstance(item, self.cubit.Volume):
-                return cupy.volume
+        if item.isinstance('cubitpy_vertex'):
+            return cupy.geometry.vertex
+        elif item.isinstance('cubitpy_curve'):
+            return cupy.geometry.curve
+        elif item.isinstance('cubitpy_surface'):
+            return cupy.geometry.surface
+        elif item.isinstance('cubitpy_volume'):
+            return cupy.geometry.volume
 
         if raise_error:
             raise TypeError('Got {}!'.format(type(item)))
@@ -181,21 +121,13 @@ class CubitPy(object):
         item: cubit object, cubitpy geom type
         """
 
-        if not isinstance(item, str):
+        if not isinstance(item, cupy.geometry):
+            # In the case of a cubit object, we first have to get the type from
+            # python2.
             item_type = self._get_type(item)
         else:
             item_type = item
-
-        if item_type == cupy.vertex:
-            return 'vertex'
-        elif item_type == cupy.curve:
-            return 'curve'
-        elif item_type == cupy.surface:
-            return 'surface'
-        elif item_type == cupy.volume:
-            return 'volume'
-        else:
-            return None
+        return item_type.get_cubit_string()
 
     def add_element_type(self, item, el_type, name=None, bc=None):
         """
@@ -301,7 +233,7 @@ class CubitPy(object):
         (parameter space ([-1,1],[-1,1])).
         """
 
-        if not self._get_type(surf) == cupy.surface:
+        if not self._get_type(surf) == cupy.geometry.surface:
             raise TypeError('Did not expect {}'.format(type(surf)))
 
         range_u = surf.get_param_range_U()
@@ -324,7 +256,7 @@ class CubitPy(object):
 
         # Check if item is line.
         item_type = self._get_type(item)
-        if not item_type == cupy.curve:
+        if not item_type == cupy.geometry.curve:
             raise TypeError('Expected line, got {}'.format(type(item)))
         self.cubit.cmd('curve {} interval {} scheme equal'.format(
             item.id(),
@@ -379,8 +311,7 @@ class CubitPy(object):
         if not os.path.exists(dat_dir):
             raise ValueError('Path {} does not exist!'.format(dat_dir))
 
-        if not os.path.exists(cupy.temp_dir):
-            os.makedirs(cupy.temp_dir)
+        os.makedirs(cupy.temp_dir, exist_ok=True)
 
         # Create files
         self.export_exo(os.path.join(cupy.temp_dir, 'cubitpy.exo'))
@@ -431,8 +362,7 @@ class CubitPy(object):
             vol).
         """
 
-        if not os.path.exists(cupy.temp_dir):
-            os.makedirs(cupy.temp_dir)
+        os.makedirs(cupy.temp_dir, exist_ok=True)
         state_path = os.path.join(cupy.temp_dir, 'state.cub')
         self.export_cub(state_path)
 
@@ -443,28 +373,7 @@ class CubitPy(object):
 
             # Label items in cubit.
             for item in label:
-                if item == cupy.vertex:
-                    journal.write('label vertex On\n')
-                elif item == cupy.curve:
-                    journal.write('label curve On\n')
-                elif item == cupy.surface:
-                    journal.write('label surface On\n')
-                elif item == cupy.volume:
-                    journal.write('label volume On\n')
-                elif item == cupy.hex_elements:
-                    journal.write('label hex On\n')
-                elif item == cupy.tet_elements:
-                    journal.write('label tet On\n')
-                elif item == cupy.face:
-                    journal.write('label face On\n')
-                elif item == cupy.triangle:
-                    journal.write('label tri On\n')
-                elif item == cupy.edge:
-                    journal.write('label edge On\n')
-                elif item == cupy.node:
-                    journal.write('label node On\n')
-                else:
-                    raise ValueError('Did not expect {}!'.format(item))
+                journal.write('label {} On\n'.format(item.get_cubit_string()))
 
             if len(label) > 0:
                 journal.write('display')
