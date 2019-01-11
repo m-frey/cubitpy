@@ -27,6 +27,20 @@ class GeometryType(IntEnum):
         elif self.value == self.volume:
             return 'volume'
 
+    def get_dat_bc_section_string(self):
+        """
+        Return the string that represents this item in a dat file section.
+        """
+
+        if self.value == self.vertex:
+            return 'POINT'
+        elif self.value == self.curve:
+            return 'LINE'
+        elif self.value == self.surface:
+            return 'SURF'
+        elif self.value == self.volume:
+            return 'VOL'
+
 
 class FiniteElementObject(IntEnum):
     """Enum for finite element objects."""
@@ -96,3 +110,25 @@ class ElementType(IntEnum):
 
         return cubit_scheme, cubit_element_type, baci_element_type, \
             baci_dat_string
+
+
+class BoundaryConditionType(IntEnum):
+    """Enum for boundary conditions types."""
+    dirichlet = 1
+    neumann = 2
+
+    def get_dat_bc_section_header(self, geometry_type):
+        """
+        Get the header string for the boundary condition input section in the
+        dat file.
+        """
+
+        if self.value == self.dirichlet:
+            self_string = 'DIRICH'
+        else:
+            self_string = 'NEUMANN'
+
+        return 'DESIGN {} {} CONDITIONS'.format(
+            geometry_type.get_dat_bc_section_string(),
+            self_string
+            )

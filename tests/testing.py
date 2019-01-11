@@ -322,6 +322,67 @@ class TestCubitPy(unittest.TestCase):
             'test_block_function'
             )
 
+    def test_node_set_geometry_type(self):
+        """Create the boundary conditions via the bc_type enum."""
+
+        # First create the solid mesh.
+        cubit = CubitPy()
+        solid = create_brick(cubit, 1, 1, 1, mesh_size=['interval', 1, 1, 1])
+        cubit.add_node_set(
+            solid.vertices()[0],
+            name='vertex',
+            bc=[
+                cupy.bc_type.dirichlet,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 1'
+                ])
+        cubit.add_node_set(
+            solid.curves()[0],
+            name='curve',
+            bc=[
+                cupy.bc_type.neumann,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 2'
+                ])
+        cubit.add_node_set(
+            solid.surfaces()[0],
+            name='surface',
+            bc=[
+                cupy.bc_type.dirichlet,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 3'
+                ])
+        cubit.add_node_set(
+            solid.volumes()[0],
+            name='volume',
+            bc=[
+                cupy.bc_type.neumann,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4'
+                ])
+
+        # Set the head string.
+        cubit.head = '''
+            ----------------------------------------------------------MATERIALS
+            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0'''
+
+        # Create the solid input file.
+        check_tmp_dir()
+        dat_file = os.path.join(testing_temp,
+            'test_node_set_geometry_type.dat')
+
+        # Set output to single precision so the dat file can be compared.
+        cubit.cmd('set exodus single precision on')
+        cubit.create_dat(dat_file)
+
+        # Compare with the ref file.
+        ref_file = os.path.join(testing_input,
+            'test_node_set_geometry_type_ref.dat')
+        with open(dat_file, 'r') as text_file:
+            string1 = text_file.read()
+        with open(ref_file, 'r') as text_file:
+            string2 = text_file.read()
+        self.assertTrue(
+            compare_strings(string1, string2),
+            'test_node_set_geometry_type'
+            )
+
 
 if __name__ == '__main__':
     unittest.main()
