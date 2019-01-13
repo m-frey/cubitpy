@@ -245,7 +245,7 @@ class TestCubitPy(unittest.TestCase):
 
             # Set the element type.
             cubit.add_element_type(
-                [1 + offset_volume, cupy.geometry.volume],
+                cubit.volume(1 + offset_volume),
                 string1,
                 name='block_' + str(i),
                 bc=['STRUCTURE',
@@ -254,7 +254,8 @@ class TestCubitPy(unittest.TestCase):
                     ])
 
             # Add the node sets.
-            cubit.add_node_set([5 + offset_surface, cupy.geometry.surface],
+            cubit.add_node_set(
+                cubit.surface(5 + offset_surface),
                 name='fix_' + str(i),
                 bc=['DESIGN SURF DIRICH CONDITIONS',
                     'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])

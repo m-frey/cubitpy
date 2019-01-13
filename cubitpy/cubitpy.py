@@ -90,56 +90,6 @@ class CubitPy(object):
         """
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
-    def _get_type(self, item):
-        """
-        Return the type of item.
-
-        Args
-        ----
-        item: CubitObject
-            The corresponding GeometryType is returned.
-        """
-
-        if item.isinstance('cubitpy_vertex'):
-            return cupy.geometry.vertex
-        elif item.isinstance('cubitpy_curve'):
-            return cupy.geometry.curve
-        elif item.isinstance('cubitpy_surface'):
-            return cupy.geometry.surface
-        elif item.isinstance('cubitpy_volume'):
-            return cupy.geometry.volume
-
-        # Default value -> not a valid geometry.
-        return None
-
-    def get_item_id_type(self, item):
-        """
-        Get the geometry type of the item, as well as the id in cubit. See the
-        args section for a detailed description of the data structure.
-
-        Args
-        ----
-        item: cubit.geom, [item_id, item_type]
-            Geometry to set the element type for.
-            If a list is given, the first entry is an integer with the id of
-            the item. The id is 1 based. The second entry is a string with the
-            cubit geometry type.
-        """
-
-        # Check what type of input is given.
-        if isinstance(item, list):
-            # The input was given via a list -> The id of the item is an
-            # integer.
-            item_id = item[0]
-            geometry_type = item[1]
-        else:
-            # The input is given via a cubitpy object.
-            # Check if the item is a cubit object.
-            item_id = item.id()
-            geometry_type = self._get_type(item)
-
-        return item_id, geometry_type
-
     def add_element_type(self, item, el_type, name=None, bc=None):
         """
         Add a block to cubit that contains the geometry in item. Also set the
@@ -160,8 +110,8 @@ class CubitPy(object):
         if self.block_counter == 1:
             self.cubit.cmd('reset block')
 
-        # Get id and element type of item.
-        item_id, geometry_type = self.get_item_id_type(item)
+        # Get element type of item.
+        geometry_type = item.get_geometry_type()
 
         # For now only 3D elements are allowed.
         if geometry_type is not cupy.geometry.volume:
@@ -172,7 +122,7 @@ class CubitPy(object):
         self.cubit.cmd('block {} {} {}'.format(
             self.block_counter,
             geometry_type.get_cubit_string(),
-            item_id
+            item.id()
             ))
         self.cubit.cmd('block {} element type {}'.format(
             self.block_counter,
@@ -205,14 +155,14 @@ class CubitPy(object):
             - str2: Line with the concret definition of the boundary condition.
         """
 
-        # Get id and element type of item.
-        item_id, geometry_type = self.get_item_id_type(item)
+        # Get element type of item.
+        geometry_type = item.get_geometry_type()
 
         # Add the node set to cubit.
         self.cubit.cmd('nodeset {} {} {}'.format(
             self.node_set_counter,
             geometry_type.get_cubit_string(),
-            item_id
+            item.id()
             ))
         if name is not None:
             self.cubit.cmd('nodeset {} name "{}"'.format(
@@ -234,7 +184,7 @@ class CubitPy(object):
         (parameter space ([-1,1],[-1,1])).
         """
 
-        if not self._get_type(surf) == cupy.geometry.surface:
+        if not surf.get_geometry_type() == cupy.geometry.surface:
             raise TypeError('Did not expect {}'.format(type(surf)))
 
         range_u = surf.get_param_range_U()
@@ -256,8 +206,7 @@ class CubitPy(object):
         """
 
         # Check if item is line.
-        item_type = self._get_type(item)
-        if not item_type == cupy.geometry.curve:
+        if not item.get_geometry_type() == cupy.geometry.curve:
             raise TypeError('Expected line, got {}'.format(type(item)))
         self.cubit.cmd('curve {} interval {} scheme equal'.format(
             item.id(),
