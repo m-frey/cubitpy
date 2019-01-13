@@ -259,6 +259,7 @@ class CubitObject(object):
             ['get_methods', self.cubit_id]
             )
 
+
 class CubitObjectMain(CubitObject):
     """
     The main cubit object will be of this type, it can not delete itself.
