@@ -259,6 +259,22 @@ class CubitObject(object):
             ['get_methods', self.cubit_id]
             )
 
+    def get_geometry_type(self):
+        """Return the type of this item."""
+
+        if self.isinstance('cubitpy_vertex'):
+            return cupy.geometry.vertex
+        elif self.isinstance('cubitpy_curve'):
+            return cupy.geometry.curve
+        elif self.isinstance('cubitpy_surface'):
+            return cupy.geometry.surface
+        elif self.isinstance('cubitpy_volume'):
+            return cupy.geometry.volume
+
+        # Default value -> not a valid geometry.
+        raise TypeError('The item is not a valid geometry!')
+
+
 class CubitObjectMain(CubitObject):
     """
     The main cubit object will be of this type, it can not delete itself.

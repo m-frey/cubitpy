@@ -57,6 +57,37 @@ def compare_strings(string_ref, string_compare):
 class TestCubitPy(unittest.TestCase):
     """This class tests the implementation of the CubitPy class."""
 
+    def compare(self, cubit, name, single_precision=False):
+        """
+        Write create the dat file from the cubit mesh and compare to a
+        reference file.
+
+        Args
+        ----
+        cubit: Cubit object.
+        name: str
+            Name of the test case. A reference file 'name' + '_ref.dat' must
+            exits in the reference file folder.
+        single_precision: bool
+            If the output of cubit is single or double precision.
+        """
+
+        # Create the dat file for the solid.
+        check_tmp_dir()
+        dat_file = os.path.join(testing_temp, name + '.dat')
+        if single_precision:
+            cubit.cmd('set exodus single precision on')
+        cubit.create_dat(dat_file)
+
+        # Compare with the ref file.
+        ref_file = os.path.join(testing_input, name + '_ref.dat')
+        with open(dat_file, 'r') as text_file:
+            string1 = text_file.read()
+        with open(ref_file, 'r') as text_file:
+            string2 = text_file.read()
+        self.assertTrue(
+            compare_strings(string1, string2), name)
+
     def create_block(self, cubit):
         """Create a block with cubit."""
 
@@ -118,21 +149,8 @@ class TestCubitPy(unittest.TestCase):
                     'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 ' +
                     'FUNCT 0 0 0 0 0 0'])
 
-        # Create the dat file for the solid.
-        check_tmp_dir()
-        dat_file = os.path.join(testing_temp, 'test_create_block_cubitpy.dat')
-        cubit.create_dat(dat_file)
-
-        # Compare with the ref file.
-        ref_file = os.path.join(testing_input, 'test_create_block_ref.dat')
-        with open(dat_file, 'r') as text_file:
-            string1 = text_file.read()
-        with open(ref_file, 'r') as text_file:
-            string2 = text_file.read()
-        self.assertTrue(
-            compare_strings(string1, string2),
-            'test_create_block'
-            )
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_create_block')
 
     def test_create_block(self):
         """
@@ -227,7 +245,7 @@ class TestCubitPy(unittest.TestCase):
 
             # Set the element type.
             cubit.add_element_type(
-                [1 + offset_volume, cupy.geometry.volume],
+                cubit.volume(1 + offset_volume),
                 string1,
                 name='block_' + str(i),
                 bc=['STRUCTURE',
@@ -236,7 +254,8 @@ class TestCubitPy(unittest.TestCase):
                     ])
 
             # Add the node sets.
-            cubit.add_node_set([5 + offset_surface, cupy.geometry.surface],
+            cubit.add_node_set(
+                cubit.surface(5 + offset_surface),
                 name='fix_' + str(i),
                 bc=['DESIGN SURF DIRICH CONDITIONS',
                     'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])
@@ -252,24 +271,8 @@ class TestCubitPy(unittest.TestCase):
             DISPLACEMENT                    Yes
             '''
 
-        # Create the solid input file.
-        check_tmp_dir()
-        dat_file = os.path.join(testing_temp, 'test_element_types.dat')
-
-        # Set output to single precision so the dat file can be compared.
-        cubit.cmd('set exodus single precision on')
-        cubit.create_dat(dat_file)
-
-        # Compare with the ref file.
-        ref_file = os.path.join(testing_input, 'test_element_types_ref.dat')
-        with open(dat_file, 'r') as text_file:
-            string1 = text_file.read()
-        with open(ref_file, 'r') as text_file:
-            string2 = text_file.read()
-        self.assertTrue(
-            compare_strings(string1, string2),
-            'test_element_types'
-            )
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_element_types', single_precision=True)
 
     def test_block_function(self):
         """Create a solid block with different element types."""
@@ -303,24 +306,51 @@ class TestCubitPy(unittest.TestCase):
             cubit.move(cube, [i + 5, 0, 0])
             cube.volumes()[0].mesh()
 
-        # Create the solid input file.
-        check_tmp_dir()
-        dat_file = os.path.join(testing_temp, 'test_block_function.dat')
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_block_function', single_precision=True)
 
-        # Set output to single precision so the dat file can be compared.
-        cubit.cmd('set exodus single precision on')
-        cubit.create_dat(dat_file)
+    def test_node_set_geometry_type(self):
+        """Create the boundary conditions via the bc_type enum."""
 
-        # Compare with the ref file.
-        ref_file = os.path.join(testing_input, 'test_block_function_ref.dat')
-        with open(dat_file, 'r') as text_file:
-            string1 = text_file.read()
-        with open(ref_file, 'r') as text_file:
-            string2 = text_file.read()
-        self.assertTrue(
-            compare_strings(string1, string2),
-            'test_block_function'
-            )
+        # First create the solid mesh.
+        cubit = CubitPy()
+        solid = create_brick(cubit, 1, 1, 1, mesh_size=['interval', 1, 1, 1])
+        cubit.add_node_set(
+            solid.vertices()[0],
+            name='vertex',
+            bc=[
+                cupy.bc_type.dirichlet,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 1'
+                ])
+        cubit.add_node_set(
+            solid.curves()[0],
+            name='curve',
+            bc=[
+                cupy.bc_type.neumann,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 2'
+                ])
+        cubit.add_node_set(
+            solid.surfaces()[0],
+            name='surface',
+            bc=[
+                cupy.bc_type.dirichlet,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 3'
+                ])
+        cubit.add_node_set(
+            solid.volumes()[0],
+            name='volume',
+            bc=[
+                cupy.bc_type.neumann,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4'
+                ])
+
+        # Set the head string.
+        cubit.head = '''
+            ----------------------------------------------------------MATERIALS
+            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0'''
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_node_set_geometry_type')
 
 
 if __name__ == '__main__':

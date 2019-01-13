@@ -90,45 +90,6 @@ class CubitPy(object):
         """
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
-    def _get_type(self, item, raise_error=True):
-        """
-        Return the type of item.
-
-        If raise_error is True, an error is thrown when the object is not a
-        cubit type.
-        If raise_error is False, None is returned when the object is not a
-        cubit type.
-        """
-
-        if item.isinstance('cubitpy_vertex'):
-            return cupy.geometry.vertex
-        elif item.isinstance('cubitpy_curve'):
-            return cupy.geometry.curve
-        elif item.isinstance('cubitpy_surface'):
-            return cupy.geometry.surface
-        elif item.isinstance('cubitpy_volume'):
-            return cupy.geometry.volume
-
-        if raise_error:
-            raise TypeError('Got {}!'.format(type(item)))
-        else:
-            return None
-
-    def _get_type_string(self, item):
-        """
-        Return the string for the item in cubit commands.
-
-        item: cubit object, cubitpy geom type
-        """
-
-        if not isinstance(item, cupy.geometry):
-            # In the case of a cubit object, we first have to get the type from
-            # python2.
-            item_type = self._get_type(item)
-        else:
-            item_type = item
-        return item_type.get_cubit_string()
-
     def add_element_type(self, item, el_type, name=None, bc=None):
         """
         Add a block to cubit that contains the geometry in item. Also set the
@@ -136,11 +97,8 @@ class CubitPy(object):
 
         Args
         ----
-        item: cubit.geom, [item_id, item_type]
+        item: data structure according to get_item_id_type.
             Geometry to set the element type for.
-            If a list is given, the first entry is an integer with the id of
-            the item. The id is 1 based. The second entry is a string with the
-            cubit geometry type.
         el_type: str
             Cubit element type.
         name: str
@@ -152,23 +110,19 @@ class CubitPy(object):
         if self.block_counter == 1:
             self.cubit.cmd('reset block')
 
-        # Check what type of input is given.
-        if isinstance(item, list):
-            # The input was given via a list -> The id of the item is an
-            # integer.
-            id_string = str(item[0])
-            type_string = self._get_type_string(item[1])
-        else:
-            # The input is given via a cubitpy object.
-            # Check if the item is a cubit object.
-            id_string = str(item.id())
-            type_string = self._get_type_string(item)
+        # Get element type of item.
+        geometry_type = item.get_geometry_type()
+
+        # For now only 3D elements are allowed.
+        if geometry_type is not cupy.geometry.volume:
+            raise TypeError('For now element types can only be set for '
+                + 'volumes!')
 
         # Execute the block commands in cubit.
         self.cubit.cmd('block {} {} {}'.format(
             self.block_counter,
-            type_string,
-            id_string
+            geometry_type.get_cubit_string(),
+            item.id()
             ))
         self.cubit.cmd('block {} element type {}'.format(
             self.block_counter,
@@ -185,38 +139,30 @@ class CubitPy(object):
 
     def add_node_set(self, item, name=None, bc=None):
         """
-        Set the element type of item.
+        Add a node set to cubit. This node set can have a boundary condition.
 
         Args
         ----
-        item: cubit.geom, [item_id, item_type]
-            Geometry to set the element type for.
-            If a list is given, the first entry is an integer with the id of
-            the item. The id is 1 based. The second entry is a string with the
-            cubit geometry type.
+        item: data structure according to get_item_id_type.
+            Geometry whose nodes will be put into the node set.
         name: str
             Name of the node set.
-        bc: [str]
+        bc: [str1 / BoundaryConditionType, str2]
             Data for the *.bc file that will be used with pre_exodus.
+            - str1: Header for the .dat file section. Can also be given as
+                BoundaryConditionType, where the header is automatically
+                generated.
+            - str2: Line with the concret definition of the boundary condition.
         """
 
-        # Check what type of input is given.
-        if isinstance(item, list):
-            # The input was given via a list -> The id of the item is an
-            # integer.
-            id_string = str(item[0])
-            type_string = self._get_type_string(item[1])
-        else:
-            # The input is given via a cubitpy object.
-            # Check if the item is a cubit object.
-            id_string = str(item.id())
-            type_string = self._get_type_string(item)
+        # Get element type of item.
+        geometry_type = item.get_geometry_type()
 
         # Add the node set to cubit.
         self.cubit.cmd('nodeset {} {} {}'.format(
             self.node_set_counter,
-            type_string,
-            id_string
+            geometry_type.get_cubit_string(),
+            item.id()
             ))
         if name is not None:
             self.cubit.cmd('nodeset {} name "{}"'.format(
@@ -224,7 +170,12 @@ class CubitPy(object):
                 name
                 ))
         if bc is not None:
-            self.node_sets.append([self.node_set_counter, bc])
+            # Check if the name of the boundary condition is given explicitly.
+            if isinstance(bc[0], cupy.bc_type):
+                bc_string = bc[0].get_dat_bc_section_header(geometry_type)
+            else:
+                bc_string = bc[0]
+            self.node_sets.append([self.node_set_counter, [bc_string, bc[1]]])
         self.node_set_counter += 1
 
     def get_surface_center(self, surf):
@@ -233,7 +184,7 @@ class CubitPy(object):
         (parameter space ([-1,1],[-1,1])).
         """
 
-        if not self._get_type(surf) == cupy.geometry.surface:
+        if not surf.get_geometry_type() == cupy.geometry.surface:
             raise TypeError('Did not expect {}'.format(type(surf)))
 
         range_u = surf.get_param_range_U()
@@ -255,8 +206,7 @@ class CubitPy(object):
         """
 
         # Check if item is line.
-        item_type = self._get_type(item)
-        if not item_type == cupy.geometry.curve:
+        if not item.get_geometry_type() == cupy.geometry.curve:
             raise TypeError('Expected line, got {}'.format(type(item)))
         self.cubit.cmd('curve {} interval {} scheme equal'.format(
             item.id(),
