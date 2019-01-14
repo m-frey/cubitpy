@@ -97,7 +97,7 @@ class CubitPy(object):
 
         Args
         ----
-        item: data structure according to get_item_id_type.
+        item: CubitObject
             Geometry to set the element type for.
         el_type: str
             Cubit element type.
@@ -143,7 +143,7 @@ class CubitPy(object):
 
         Args
         ----
-        item: data structure according to get_item_id_type.
+        item: CubitObject
             Geometry whose nodes will be put into the node set.
         name: str
             Name of the node set.
