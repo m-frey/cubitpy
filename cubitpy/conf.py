@@ -41,7 +41,7 @@ class CubitOptions(object):
 
         if name == 'cubit':
             default_paths = [
-                ['/opt/cubit-13.2', os.path.isdir],
+                ['/home/ivo/opt/cubit-13.2', os.path.isdir],
                 [
                     '/nfs/rzhome/nas/compsim/public/opt/cubit-13.2',
                     os.path.isdir]
