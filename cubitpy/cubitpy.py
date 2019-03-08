@@ -11,7 +11,7 @@ import shutil
 import subprocess
 
 # Cubitpy modules.
-from . import cupy
+from . import cupy, CubitGroup
 from cubitpy.utility_functions import check_environment_eclipse
 
 
@@ -289,6 +289,13 @@ class CubitPy(object):
             os.path.join(cupy.temp_dir, 'cubitpy.dat'),
             dat_path
             )
+
+    def group(self, name, add_value=None):
+        """
+        Reference a group in cubit. Depending on the passed keyword arguments
+        the group is created or just references an existing group.
+        """
+        return CubitGroup(self, name, add_value)
 
     def reset(self):
         """
