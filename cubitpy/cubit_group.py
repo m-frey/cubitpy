@@ -81,7 +81,9 @@ class CubitGroup(object):
 
         # Raise an error if the group contains more than one type.
         if not len(group_types) == 1:
-            raise TypeError('There has to be exactly one geometry type.')
+            raise TypeError('There has to be exactly one geometry type. '
+                + 'The given group {} has the types {}!'.format(
+                    self.name, group_types))
 
         # Return the type.
         return group_types[0]
@@ -126,4 +128,7 @@ class CubitGroup(object):
         """Return the string with all ids of the types in this object."""
         id_list = self.get_group_items(self.get_geometry_type())
         return ' '.join(map(str, id_list))
-    
+
+    def __str__(self, *args, **kwargs):
+        """The string representatio of a group is its name."""
+        return self.name
