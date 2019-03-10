@@ -354,7 +354,8 @@ class TestCubitPy(unittest.TestCase):
 
     def test_groups(self):
         """
-        Test that groups are handled correctly when creating node sets and element blocks.
+        Test that groups are handled correctly when creating node sets and
+        element blocks.
         """
 
         # Create a solid brick.
