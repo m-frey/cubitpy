@@ -19,6 +19,8 @@ def cubit_item_to_id(cubit_data_list):
     """Return the id from a cubit data list."""
     if not isinstance(cubit_data_list, list):
         return None
+    if len(cubit_data_list) == 0:
+        return None
     if not isinstance(cubit_data_list[0], str):
         return None
     if cubit_data_list[0].startswith('cp2t3id_'):

@@ -352,6 +352,62 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, 'test_node_set_geometry_type')
 
+    def test_groups(self):
+        """
+        Test that groups are handled correctly when creating node sets and
+        element blocks.
+        """
+
+        # Create a solid brick.
+        cubit = CubitPy()
+        cubit.brick(4, 2, 1)
+
+        # Add to group by string.
+        volume = cubit.group('all_vol')
+        volume.add('add volume all')
+
+        # Add to group via string.
+        surface_fix = cubit.group('fix_surf',
+            'add surface in volume in all_vol with x_coord < 0')
+        surface_load = cubit.group('load_surf',
+            'add surface in volume in all_vol with x_coord > -1.99')
+
+        # Add to group by CubitPy object.
+        surface_load_alt = cubit.group('load_surf_alt')
+        surface_load_alt.add(cubit.surface(1))
+        surface_load_alt.add([cubit.surface(i) for i in [2, 3, 5, 6]])
+
+        # Set element type.
+        cubit.add_element_type(volume,
+            'HEX8',
+            bc=['STRUCTURE',
+                'MAT 1 KINEM nonlinear EAS none',
+                'SOLIDHEX8'
+                ])
+
+        # Add BCs.
+        cubit.add_node_set(surface_fix,
+            bc=[cupy.bc_type.dirichlet,
+                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])
+        cubit.add_node_set(surface_load,
+            bc=[cupy.bc_type.neumann,
+                'NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0'])
+        cubit.add_node_set(surface_load_alt,
+            bc=[cupy.bc_type.neumann,
+                'NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0'])
+
+        # Mesh the model.
+        cubit.cmd('volume {} size auto factor 8'.format(volume.id()))
+        cubit.cmd('mesh {}'.format(volume))
+
+        # Set the head string.
+        cubit.head = '''
+            ----------------------------------------------------------MATERIALS
+            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0'''
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_groups')
+
 
 if __name__ == '__main__':
     unittest.main()
