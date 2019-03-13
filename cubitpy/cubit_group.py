@@ -4,7 +4,8 @@ This file contains a class to represent groups in cubit.
 """
 
 # Import CubitPy stuff.
-from . import cupy, CubitObject
+from .conf import cupy
+from .cubit_wrapper3 import CubitConnect, CubitObject
 
 
 class CubitGroup(object):
