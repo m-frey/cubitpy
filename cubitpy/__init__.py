@@ -9,12 +9,6 @@ import sys
 # Global options for cubitpy.
 from .conf import cupy
 
-# Cubit wrapper is needed to use cubit in python3.
-from .cubit_wrapper3 import CubitConnect, CubitObject
-
-# Cubit group object.
-from .cubit_group import CubitGroup
-
 # Global object.
 from .cubitpy import CubitPy
 
@@ -23,5 +17,5 @@ __all__ = [
     # cubit options.
     'cupy',
     # Cubit objects.
-    'CubitPy', 'CubitGroup'
+    'CubitPy'
     ]

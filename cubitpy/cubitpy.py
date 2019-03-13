@@ -11,8 +11,9 @@ import shutil
 import subprocess
 
 # Cubitpy modules.
-from . import cupy, CubitGroup
-from cubitpy.utility_functions import check_environment_eclipse
+from .conf import cupy
+from .cubit_group import CubitGroup
+from .utility_functions import check_environment_eclipse
 
 
 class CubitPy(object):

@@ -8,8 +8,8 @@ cubitpy.
 import os
 
 # Cubitpy imports.
-from .cubitpy_types import FiniteElementObject, GeometryType, ElementType, \
-    BoundaryConditionType
+from .cubitpy_types import (FiniteElementObject, GeometryType, ElementType,
+    BoundaryConditionType)
 
 
 class CubitOptions(object):
