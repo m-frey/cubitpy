@@ -291,7 +291,7 @@ class TestCubitPy(unittest.TestCase):
         for i, element_type in enumerate(element_type_list):
             # Create the cube with factor as mesh size.
             cube = create_brick(cubit, 0.5, 0.8, 1.1,
-                element_type=element_type, mesh_size=['factor', 9],
+                element_type=element_type, mesh_factor=9,
                 name=str(element_type) + str(i), mesh=False,
                 material='test material string')
             cubit.move(cube, [i, 0, 0])
@@ -300,7 +300,7 @@ class TestCubitPy(unittest.TestCase):
         for i, element_type in enumerate(element_type_list):
             # Create the cube with intervals as mesh size.
             cube = create_brick(cubit, 0.5, 0.8, 1.1,
-                element_type=element_type, mesh_size=['interval', 3, 2, 1],
+                element_type=element_type, mesh_interval=[3, 2, 1],
                 name=str(element_type) + str(i + 5), mesh=False,
                 material='test material string')
             cubit.move(cube, [i + 5, 0, 0])
@@ -314,7 +314,7 @@ class TestCubitPy(unittest.TestCase):
 
         # First create the solid mesh.
         cubit = CubitPy()
-        solid = create_brick(cubit, 1, 1, 1, mesh_size=['interval', 1, 1, 1])
+        solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
         cubit.add_node_set(
             solid.vertices()[0],
             name='vertex',
