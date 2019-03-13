@@ -8,8 +8,9 @@ Implements functions that create basic meshes in cubit.
 from . import cupy
 
 
-def create_brick(cubit, h_x, h_y, h_z, *, element_type=None, mesh_size=None,
-        name=None, mesh=True, material='MAT 1 KINEM nonlinear'):
+def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
+        mesh_interval=None, mesh_factor=None, name=None, mesh=True,
+        material='MAT 1 KINEM nonlinear'):
     """
     Create a cube in cubit.
 
@@ -21,13 +22,12 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None, mesh_size=None,
             size of the cube in x, y, and z direction.
         element_type: str
             Type of the created element (HEX8, HEX20, HEX27, TETRA4, TETRA10)
-        mesh_size: list
-            mesh_size[0] == 'factor':
-                A global factor will be set for the meshsize. The factor will
-                be taken from mesh_size[1].
-            mesh_size[0] == 'interval':
-                Intervals in each direction will be set. The intervals are
-                taken from mesh_size[1:]
+        mesh_interval: [int, int, int]
+            Number of elements in each direction. This option is mutually
+            exclusive with mesh_factor.
+        mesh_interval: int
+            Meshing factor in cubit. 10 is the largest. This option is mutually
+            exclusive with mesh_factor.
         name: str
             Name that will be given to this block in the baci bc file.
         mesh: bool
@@ -43,6 +43,9 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None, mesh_size=None,
     # Check the input parameters.
     if h_x < 0 or h_y < 0 or h_z < 0:
         raise ValueError('Only positive lengths are possible!')
+    if (mesh_interval is not None and mesh_factor is not None):
+        raise ValueError('The keywords mesh_interval and mesh_factor are '
+            + 'mutually exclusive!')
 
     # Get the element type parameters.
     cubit_scheme, cubit_element_type, baci_element_type, baci_dat_string = \
@@ -56,25 +59,24 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None, mesh_size=None,
     cubit.cmd('volume {} scheme {}'.format(volume_id, cubit_scheme))
 
     # Set mesh properties.
-    if mesh_size is not None:
-        if mesh_size[0] == 'factor':
-            # Set a cubit factor for the mesh size. 10 is the largest.
-            cubit.cmd('volume {} size auto factor {}'.format(
-                volume_id, mesh_size[1]))
-        elif mesh_size[0] == 'interval':
-            # Set the number of elements in x, y and z direction.
-            cubit.cmd('curve {} {} {} {} interval {} scheme equal'.format(
-                solid.curves()[1].id(), solid.curves()[3].id(),
-                solid.curves()[5].id(), solid.curves()[7].id(),
-                mesh_size[1]))
-            cubit.cmd('curve {} {} {} {} interval {} scheme equal'.format(
-                solid.curves()[0].id(), solid.curves()[2].id(),
-                solid.curves()[4].id(), solid.curves()[6].id(),
-                mesh_size[2]))
-            cubit.cmd('curve {} {} {} {} interval {} scheme equal'.format(
-                solid.curves()[8].id(), solid.curves()[9].id(),
-                solid.curves()[10].id(), solid.curves()[11].id(),
-                mesh_size[3]))
+    if mesh_interval is not None:
+        # Set the number of elements in x, y and z direction.
+        cubit.cmd('curve {} {} {} {} interval {} scheme equal'.format(
+            solid.curves()[1].id(), solid.curves()[3].id(),
+            solid.curves()[5].id(), solid.curves()[7].id(),
+            mesh_interval[0]))
+        cubit.cmd('curve {} {} {} {} interval {} scheme equal'.format(
+            solid.curves()[0].id(), solid.curves()[2].id(),
+            solid.curves()[4].id(), solid.curves()[6].id(),
+            mesh_interval[1]))
+        cubit.cmd('curve {} {} {} {} interval {} scheme equal'.format(
+            solid.curves()[8].id(), solid.curves()[9].id(),
+            solid.curves()[10].id(), solid.curves()[11].id(),
+            mesh_interval[2]))
+    if mesh_factor is not None:
+        # Set a cubit factor for the mesh size.
+        cubit.cmd('volume {} size auto factor {}'.format(
+            volume_id, mesh_factor))
 
     # Set the element type.
     cubit.add_element_type(solid.volumes()[0], cubit_element_type, name=name,
