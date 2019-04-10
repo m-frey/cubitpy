@@ -40,31 +40,24 @@ class CubitOptions(object):
         """Look for and return a path to cubit or pre_exodus."""
 
         if name == 'cubit':
-            default_paths = [
-                ['/home/ivo/opt/cubit-13.2', os.path.isdir],
-                [
-                    '/rzhome/nas/compsim/public/opt/cubit-13.2',
-                    os.path.isdir]
-                ]
+            environment_variable = 'CUBIT'
+            test_function = os.path.isdir
         elif name == 'pre_exodus':
-            default_paths = [
-                ['/home/ivo/workspace/baci/master/release/pre_exodus',
-                    os.path.isfile],
-                ['/hdd/gitlab-runner/lib/baci-master/release/pre_exodus',
-                    os.path.isfile]
-            ]
+            environment_variable = 'BACI_PRE_EXODUS'
+            test_function = os.path.isfile
         else:
             raise ValueError('Type {} not implemented!'.format(name))
 
-        # Check which path exists.
-        for [path, function] in default_paths:
-            if function(path):
-                return path
+        # Check if he environment variable is set and the path exits.
+        if environment_variable in os.environ.keys():
+            if test_function(os.environ[environment_variable]):
+                return os.environ[environment_variable]
+
+        # No valid path found or given.
+        if throw_error:
+            raise ValueError('Path for {} not found!'.format(name))
         else:
-            if throw_error:
-                raise ValueError('Path for {} not found!'.format(name))
-            else:
-                return None
+            return None
 
 
 # Global object with options for cubitpy.
