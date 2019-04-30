@@ -76,9 +76,22 @@ class ElementType(IntEnum):
     tet4 = 4
     tet10 = 5
 
+    def get_string(self):
+        """Get the string representation of this element type."""
+        if self.value == self.hex8:
+            return 'hex8'
+        elif self.value == self.hex20:
+            return 'hex20'
+        elif self.value == self.hex27:
+            return 'hex27'
+        elif self.value == self.tet4:
+            return 'tet4'
+        elif self.value == self.tet10:
+            return 'tet10'
+
     def get_element_type_strings(self):
         """
-        Get the strigns that represent this element type for cubit and BACI.
+        Get the strings that represent this element type for cubit and BACI.
         """
 
         # Get the element type parameters.
