@@ -75,6 +75,7 @@ class ElementType(IntEnum):
     hex27 = 3
     tet4 = 4
     tet10 = 5
+    hex8sh = 6
 
     def get_string(self):
         """Get the string representation of this element type."""
@@ -119,6 +120,11 @@ class ElementType(IntEnum):
             cubit_scheme = 'Tetmesh'
             cubit_element_type = 'TETRA10'
             baci_element_type = 'SOLIDT10'
+            baci_dat_string = ''
+        elif self.value == self.hex8sh:
+            cubit_scheme = 'Auto'
+            cubit_element_type = 'HEX8'
+            baci_element_type = 'SOLIDSH8'
             baci_dat_string = ''
 
         return cubit_scheme, cubit_element_type, baci_element_type, \

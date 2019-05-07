@@ -82,9 +82,9 @@ class TestCubitPy(unittest.TestCase):
         # Compare with the ref file.
         ref_file = os.path.join(testing_input, name + '_ref.dat')
         with open(dat_file, 'r') as text_file:
-            string1 = text_file.read()
-        with open(ref_file, 'r') as text_file:
             string2 = text_file.read()
+        with open(ref_file, 'r') as text_file:
+            string1 = text_file.read()
         self.assertTrue(
             compare_strings(string1, string2), name)
 
@@ -285,7 +285,8 @@ class TestCubitPy(unittest.TestCase):
             cupy.element_type.hex20,
             cupy.element_type.hex27,
             cupy.element_type.tet4,
-            cupy.element_type.tet10
+            cupy.element_type.tet10,
+            cupy.element_type.hex8sh
             ]
 
         for i, element_type in enumerate(element_type_list):

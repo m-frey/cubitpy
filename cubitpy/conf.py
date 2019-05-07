@@ -35,6 +35,9 @@ class CubitOptions(object):
         # Boundary condition type.
         self.bc_type = BoundaryConditionType
 
+        # Tolerance for geometry.
+        self.eps_pos = 1e-10
+
     @staticmethod
     def get_default_paths(name, throw_error=True):
         """Look for and return a path to cubit or pre_exodus."""
