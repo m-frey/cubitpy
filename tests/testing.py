@@ -57,7 +57,8 @@ def compare_strings(string_ref, string_compare):
 class TestCubitPy(unittest.TestCase):
     """This class tests the implementation of the CubitPy class."""
 
-    def compare(self, cubit, name, single_precision=False):
+    def compare(self, cubit, name, dat_lines_compare=False,
+            single_precision=False):
         """
         Write create the dat file from the cubit mesh and compare to a
         reference file.
@@ -68,28 +69,45 @@ class TestCubitPy(unittest.TestCase):
         name: str
             Name of the test case. A reference file 'name' + '_ref.dat' must
             exits in the reference file folder.
+        dat_lines_compare: bool
+            If the created file should be compared or the list of lines
+            returned by get_dat_lines.
         single_precision: bool
             If the output of cubit is single or double precision.
         """
 
         # Create the dat file for the solid.
         check_tmp_dir()
-        dat_file = os.path.join(testing_temp, name + '.dat')
+
         if single_precision:
             cubit.cmd('set exodus single precision on')
-        cubit.create_dat(dat_file)
+
+        # Get the string of the input file, depending on the chosen method.
+        if not dat_lines_compare:
+            dat_file = os.path.join(testing_temp, name + '.dat')
+            cubit.create_dat(dat_file)
+            with open(dat_file, 'r') as text_file:
+                string2 = text_file.read()
+        else:
+            string2 = ''.join(cubit.get_dat_lines())
 
         # Compare with the ref file.
         ref_file = os.path.join(testing_input, name + '_ref.dat')
-        with open(dat_file, 'r') as text_file:
-            string2 = text_file.read()
         with open(ref_file, 'r') as text_file:
             string1 = text_file.read()
         self.assertTrue(
             compare_strings(string1, string2), name)
 
-    def create_block(self, cubit):
-        """Create a block with cubit."""
+    def create_block(self, cubit, dat_lines_compare=False):
+        """
+        Create a block with cubit.
+
+        Args
+        ----
+        dat_lines_compare: bool
+            If the created dat file should be compared or the list of lines
+            returned by get_dat_lines.
+        """
 
         # Set head
         cubit.head = '''
@@ -150,11 +168,12 @@ class TestCubitPy(unittest.TestCase):
                     'FUNCT 0 0 0 0 0 0'])
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_create_block')
+        self.compare(cubit, 'test_create_block',
+            dat_lines_compare=dat_lines_compare)
 
     def test_create_block(self):
         """
-        Test the creation of a cubit block
+        Test the creation of a cubit block.
         """
 
         # Initialize cubit.
@@ -182,6 +201,15 @@ class TestCubitPy(unittest.TestCase):
         cubit_2 = CubitPy()
         self.create_block(cubit)
         self.create_block(cubit_2)
+
+    def test_create_block_dat_lines(self):
+        """
+        Test the creation of a cubit block, with the get_dat_lines method.
+        """
+
+        # Initialize cubit.
+        cubit = CubitPy()
+        self.create_block(cubit, dat_lines_compare=True)
 
     def test_element_types(self):
         """Create a curved solid in a curved solid."""

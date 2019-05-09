@@ -266,7 +266,7 @@ class CubitPy(object):
         Return a list with all lines in this input file.
         """
 
-        with open(self._create_dat) as dat_file:
+        with open(self._create_dat()) as dat_file:
             lines = dat_file.readlines()
         return lines
 
