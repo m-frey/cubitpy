@@ -261,6 +261,15 @@ class CubitPy(object):
         # Copy dat file.
         shutil.copyfile(temp_dat_file, dat_path)
 
+    def get_dat_lines(self):
+        """
+        Return a list with all lines in this input file.
+        """
+
+        with open(self._create_dat) as dat_file:
+            lines = dat_file.readlines()
+        return lines
+
     def _create_dat(self):
         """
         This function creates a finished baci input *.dat file. First the mesh,
