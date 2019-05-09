@@ -247,20 +247,30 @@ class CubitPy(object):
 
     def create_dat(self, dat_path):
         """
-        This function creates a finished baci input *.dat file. First the mesh,
-        head and bc files are written to a temp directory and then pre_exodus
-        is called to create the *.dat file. The final input file is copied to
-        dat_path.
+        Create the dat file an copy it to dat_path.
         """
-
-        # Check if the path to pre_exodus is valid.
-        if self.pre_exodus is None:
-            raise ValueError('The path to pre_exodus is None!')
 
         # Check if output path exists.
         dat_dir = os.path.dirname(dat_path)
         if not os.path.exists(dat_dir):
             raise ValueError('Path {} does not exist!'.format(dat_dir))
+
+        # Create the dat file.
+        temp_dat_file = self._create_dat()
+
+        # Copy dat file.
+        shutil.copyfile(temp_dat_file, dat_path)
+
+    def _create_dat(self):
+        """
+        This function creates a finished baci input *.dat file. First the mesh,
+        head and bc files are written to a temp directory and then pre_exodus
+        is called to create the *.dat file.
+        """
+
+        # Check if the path to pre_exodus is valid.
+        if self.pre_exodus is None:
+            raise ValueError('The path to pre_exodus is None!')
 
         os.makedirs(cupy.temp_dir, exist_ok=True)
 
@@ -285,11 +295,8 @@ class CubitPy(object):
             '--head=cubitpy.head'
             ], cwd=cupy.temp_dir)
 
-        # Copy dat file.
-        shutil.copyfile(
-            os.path.join(cupy.temp_dir, 'cubitpy.dat'),
-            dat_path
-            )
+        # Return the path to the dat file.
+        return os.path.join(cupy.temp_dir, 'cubitpy.dat')
 
     def group(self, name, add_value=None):
         """
