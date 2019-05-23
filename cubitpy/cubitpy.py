@@ -108,8 +108,13 @@ class CubitPy(object):
             Data for the *.bc file that will be used with pre_exodus.
         """
 
-        if self.block_counter == 1:
-            self.cubit.cmd('reset block')
+        # Check that all blocks in cubit are created with this function.
+        if not len(self.cubit.get_block_id_list()) == self.block_counter - 1:
+            raise ValueError(('The block counter is {}, but the number of '
+                + 'blocks in cubit is {}, all blocks should be created with '
+                + 'this function!').format(
+                    len(self.cubit.get_block_id_list()),
+                    self.block_counter - 1))
 
         # Get element type of item.
         geometry_type = item.get_geometry_type()
