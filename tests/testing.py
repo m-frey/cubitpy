@@ -141,11 +141,9 @@ class TestCubitPy(unittest.TestCase):
 
         # Mesh the block.
         block.mesh()
-        cubit.add_element_type(block.volumes()[0], 'HEX8', name='block',
-            bc=['STRUCTURE',
-                'MAT 1 KINEM nonlinear EAS none',
-                'SOLIDH8'
-                ])
+        cubit.add_element_type(block.volumes()[0], cupy.element_type.hex8,
+            name='block', material='MAT 1',
+            bc_description='KINEM nonlinear EAS none')
 
         # Create node sets.
         cubit.add_node_set(block.volumes()[0], name='all')
@@ -223,14 +221,16 @@ class TestCubitPy(unittest.TestCase):
                 + 'normal 0 0 1 start angle 0 stop angle {}').format(
                     radius, angle))
 
-        mesh_types = [
-            ['Tetmesh', 'TETRA4', 'SOLIDT4', ''],
-            ['Auto', 'HEX8', 'SOLIDH8', 'EAS none'],
-            ['Tetmesh', 'TETRA10', 'SOLIDT10', ''],
-            ['Auto', 'HEX20', 'SOLIDH20', ''],
-            ['Auto', 'HEX27', 'SOLIDH27', '']
+        element_type_list = [
+            cupy.element_type.hex8,
+            cupy.element_type.hex20,
+            cupy.element_type.hex27,
+            cupy.element_type.tet4,
+            cupy.element_type.tet10,
+            cupy.element_type.hex8sh
             ]
-        for i, [scheme, string1, string2, dat_string] in enumerate(mesh_types):
+
+        for i, element_type in enumerate(element_type_list):
 
             # Offset for the next volume.
             offset_point = i * 12
@@ -265,6 +265,7 @@ class TestCubitPy(unittest.TestCase):
                 i * 0.4))
 
             # Set the size and type of the elements.
+            scheme, _dummy = element_type.get_cubit_names()
             cubit.cmd('volume {} scheme {}'.format(1 + offset_volume, scheme))
 
             # Set mesh properties.
@@ -274,12 +275,10 @@ class TestCubitPy(unittest.TestCase):
             # Set the element type.
             cubit.add_element_type(
                 cubit.volume(1 + offset_volume),
-                string1,
+                element_type,
                 name='block_' + str(i),
-                bc=['STRUCTURE',
-                    'MAT 1 KINEM nonlinear {}'.format(dat_string),
-                    string2
-                    ])
+                material='MAT 1',
+                bc_description=None)
 
             # Add the node sets.
             cubit.add_node_set(
@@ -407,12 +406,8 @@ class TestCubitPy(unittest.TestCase):
         surface_load_alt.add([cubit.surface(i) for i in [2, 3, 5, 6]])
 
         # Set element type.
-        cubit.add_element_type(volume,
-            'HEX8',
-            bc=['STRUCTURE',
-                'MAT 1 KINEM nonlinear EAS none',
-                'SOLIDHEX8'
-                ])
+        cubit.add_element_type(volume, cupy.element_type.hex8,
+            material='MAT 1', bc_description='KINEM nonlinear EAS none')
 
         # Add BCs.
         cubit.add_node_set(surface_fix,

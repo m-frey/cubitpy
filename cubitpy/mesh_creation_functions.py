@@ -47,8 +47,7 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
             + 'mutually exclusive!')
 
     # Get the element type parameters.
-    cubit_scheme, cubit_element_type, baci_element_type, baci_dat_string = \
-        element_type.get_element_type_strings()
+    cubit_scheme, cubit_element_type = element_type.get_cubit_names()
 
     # Create the block in cubit.
     solid = cubit.brick(h_x, h_y, h_z)

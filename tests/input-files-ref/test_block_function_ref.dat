@@ -891,364 +891,364 @@ NODE       869 COORD  1.0250000000000000e+01  0.0000000000000000e+00  5.50000011
 NODE       870 COORD  1.0250000000000000e+01  4.0000000596046448e-01 -5.5000001192092896e-01
 NODE       871 COORD  1.0250000000000000e+01  4.0000000596046448e-01  5.5000001192092896e-01
 ------------------------------------------------STRUCTURE ELEMENTS
-   1 SOLIDH8 HEX8  1 2 3 4 5 6 7 8    test material string EAS none
-   2 SOLIDH8 HEX8  2 9 10 3 6 11 12 7    test material string EAS none
-   3 SOLIDH8 HEX8  9 13 14 10 11 15 16 12    test material string EAS none
-   4 SOLIDH8 HEX8  4 3 17 18 8 7 19 20    test material string EAS none
-   5 SOLIDH8 HEX8  3 10 21 17 7 12 22 19    test material string EAS none
-   6 SOLIDH8 HEX8  10 14 23 21 12 16 24 22    test material string EAS none
-   7 SOLIDH20 HEX20  25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44    test material string 
-   8 SOLIDH20 HEX20  26 45 46 27 30 47 48 31 49 50 51 34 38 52 53 39 54 55 56 42    test material string 
-   9 SOLIDH20 HEX20  45 57 58 46 47 59 60 48 61 62 63 50 52 64 65 53 66 67 68 55    test material string 
-   10 SOLIDH20 HEX20  28 27 69 70 32 31 71 72 35 73 74 75 40 39 76 77 43 78 79 80    test material string 
-   11 SOLIDH20 HEX20  27 46 81 69 31 48 82 71 51 83 84 73 39 53 85 76 56 86 87 78    test material string 
-   12 SOLIDH20 HEX20  46 58 88 81 48 60 89 82 63 90 91 83 53 65 92 85 68 93 94 86    test material string 
-   13 SOLIDH27 HEX27  95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 116 120 119 121 118 117 115    test material string 
-   14 SOLIDH27 HEX27  96 122 123 97 100 124 125 101 126 127 128 104 108 129 130 109 131 132 133 112 135 138 137 139 119 136 134    test material string 
-   15 SOLIDH27 HEX27  122 140 141 123 124 142 143 125 144 145 146 127 129 147 148 130 149 150 151 132 153 156 155 157 137 154 152    test material string 
-   16 SOLIDH27 HEX27  98 97 158 159 102 101 160 161 105 162 163 164 110 109 165 166 113 167 168 169 171 121 174 175 173 172 170    test material string 
-   17 SOLIDH27 HEX27  97 123 176 158 101 125 177 160 128 178 179 162 109 130 180 165 133 181 182 167 184 139 186 187 174 185 183    test material string 
-   18 SOLIDH27 HEX27  123 141 188 176 125 143 189 177 146 190 191 178 130 148 192 180 151 193 194 181 196 157 198 199 186 197 195    test material string 
-   19 SOLIDT4 TET4  200 201 202 203    test material string 
-   20 SOLIDT4 TET4  204 201 202 200    test material string 
-   21 SOLIDT4 TET4  201 205 203 206    test material string 
-   22 SOLIDT4 TET4  201 204 207 200    test material string 
-   23 SOLIDT4 TET4  201 202 205 208    test material string 
-   24 SOLIDT4 TET4  201 209 208 206    test material string 
-   25 SOLIDT4 TET4  201 210 208 209    test material string 
-   26 SOLIDT4 TET4  201 203 200 210    test material string 
-   27 SOLIDT4 TET4  201 210 209 203    test material string 
-   28 SOLIDT4 TET4  211 212 210 213    test material string 
-   29 SOLIDT4 TET4  210 211 207 214    test material string 
-   30 SOLIDT4 TET4  208 215 209 210    test material string 
-   31 SOLIDT4 TET4  208 210 207 214    test material string 
-   32 SOLIDT4 TET4  204 213 207 200    test material string 
-   33 SOLIDT4 TET4  201 207 202 208    test material string 
-   34 SOLIDT4 TET4  210 214 215 212    test material string 
-   35 SOLIDT4 TET4  200 216 213 210    test material string 
-   36 SOLIDT4 TET4  202 200 217 204    test material string 
-   37 SOLIDT4 TET4  213 210 207 200    test material string 
-   38 SOLIDT4 TET4  218 203 200 217    test material string 
-   39 SOLIDT4 TET4  201 205 206 208    test material string 
-   40 SOLIDT4 TET4  201 206 203 209    test material string 
-   41 SOLIDT4 TET4  210 214 208 215    test material string 
-   42 SOLIDT4 TET4  201 203 205 202    test material string 
-   43 SOLIDT4 TET4  201 207 210 200    test material string 
-   44 SOLIDT4 TET4  213 211 207 210    test material string 
-   45 SOLIDT4 TET4  201 207 204 202    test material string 
-   46 SOLIDT4 TET4  201 208 210 207    test material string 
-   47 SOLIDT4 TET4  214 212 210 211    test material string 
-   48 SOLIDT4 TET4  210 216 213 212    test material string 
-   49 SOLIDT4 TET4  203 200 217 202    test material string 
-   50 SOLIDT10 TET10  219 220 221 222 223 224 225 226 227 228    test material string 
-   51 SOLIDT10 TET10  219 222 229 220 226 230 231 223 227 232    test material string 
-   52 SOLIDT10 TET10  219 222 233 229 226 234 235 231 230 236    test material string 
-   53 SOLIDT10 TET10  219 237 238 233 239 240 241 235 242 243    test material string 
-   54 SOLIDT10 TET10  219 244 237 233 245 246 239 235 247 242    test material string 
-   55 SOLIDT10 TET10  219 248 233 238 249 250 235 241 251 243    test material string 
-   56 SOLIDT10 TET10  219 252 253 244 254 255 256 245 257 258    test material string 
-   57 SOLIDT10 TET10  219 248 253 259 249 260 256 261 262 263    test material string 
-   58 SOLIDT10 TET10  219 252 244 233 254 257 245 235 264 247    test material string 
-   59 SOLIDT10 TET10  219 253 237 244 256 265 239 245 258 246    test material string 
-   60 SOLIDT10 TET10  266 252 259 222 267 268 269 270 271 272    test material string 
-   61 SOLIDT10 TET10  273 274 252 266 275 276 277 278 279 267    test material string 
-   62 SOLIDT10 TET10  252 273 259 280 277 281 268 282 283 284    test material string 
-   63 SOLIDT10 TET10  252 259 253 280 268 263 255 282 284 285    test material string 
-   64 SOLIDT10 TET10  253 286 244 252 287 288 258 255 289 257    test material string 
-   65 SOLIDT10 TET10  280 274 252 273 290 276 282 283 275 277    test material string 
-   66 SOLIDT10 TET10  219 221 220 248 225 224 223 249 291 292    test material string 
-   67 SOLIDT10 TET10  222 293 266 252 294 295 270 271 296 267    test material string 
-   68 SOLIDT10 TET10  219 220 229 233 223 232 231 235 297 236    test material string 
-   69 SOLIDT10 TET10  219 259 253 252 261 263 256 254 268 255    test material string 
-   70 SOLIDT10 TET10  219 221 259 222 225 298 261 226 228 272    test material string 
-   71 SOLIDT10 TET10  252 293 266 274 296 295 267 276 299 279    test material string 
-   72 SOLIDT10 TET10  219 248 238 253 249 251 241 256 260 300    test material string 
-   73 SOLIDT10 TET10  219 220 233 248 223 297 235 249 292 250    test material string 
-   74 SOLIDT10 TET10  219 222 259 252 226 272 261 254 271 268    test material string 
-   75 SOLIDT10 TET10  221 222 266 259 228 270 301 298 272 269    test material string 
-   76 SOLIDT10 TET10  252 280 286 274 282 302 289 276 290 303    test material string 
-   77 SOLIDT10 TET10  252 280 253 286 282 285 255 289 302 287    test material string 
-   78 SOLIDT10 TET10  266 273 259 252 278 281 269 267 277 268    test material string 
-   79 SOLIDT10 TET10  219 259 221 248 261 298 225 249 262 291    test material string 
-   80 SOLIDT10 TET10  219 253 238 237 256 300 241 239 265 240    test material string 
-   81 SOLIDT10 TET10  219 252 233 222 254 264 235 226 271 234    test material string 
-   82 SOLIDSH8 HEX8  304 305 306 307 308 309 310 311    test material string 
-   83 SOLIDSH8 HEX8  305 312 313 306 309 314 315 310    test material string 
-   84 SOLIDSH8 HEX8  312 316 317 313 314 318 319 315    test material string 
-   85 SOLIDSH8 HEX8  307 306 320 321 311 310 322 323    test material string 
-   86 SOLIDSH8 HEX8  306 313 324 320 310 315 325 322    test material string 
-   87 SOLIDSH8 HEX8  313 317 326 324 315 319 327 325    test material string 
-   88 SOLIDH8 HEX8  328 329 330 331 332 333 334 335    test material string EAS none
-   89 SOLIDH8 HEX8  331 330 336 337 335 334 338 339    test material string EAS none
-   90 SOLIDH8 HEX8  332 333 334 335 340 341 342 343    test material string EAS none
-   91 SOLIDH8 HEX8  335 334 338 339 343 342 344 345    test material string EAS none
-   92 SOLIDH8 HEX8  340 341 342 343 346 347 348 349    test material string EAS none
-   93 SOLIDH8 HEX8  343 342 344 345 349 348 350 351    test material string EAS none
-   94 SOLIDH20 HEX20  352 353 354 355 356 357 358 359 360 361 362 363 364 365 366 367 368 369 370 371    test material string 
-   95 SOLIDH20 HEX20  355 354 372 373 359 358 374 375 362 376 377 378 367 366 379 380 370 381 382 383    test material string 
-   96 SOLIDH20 HEX20  356 357 358 359 384 385 386 387 368 369 370 371 388 389 390 391 392 393 394 395    test material string 
-   97 SOLIDH20 HEX20  359 358 374 375 387 386 396 397 370 381 382 383 391 390 398 399 394 400 401 402    test material string 
-   98 SOLIDH20 HEX20  384 385 386 387 403 404 405 406 392 393 394 395 407 408 409 410 411 412 413 414    test material string 
-   99 SOLIDH20 HEX20  387 386 396 397 406 405 415 416 394 400 401 402 410 409 417 418 413 419 420 421    test material string 
-   100 SOLIDH27 HEX27  422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438 439 440 441 443 447 446 448 445 444 442    test material string 
-   101 SOLIDH27 HEX27  425 424 449 450 429 428 451 452 432 453 454 455 437 436 456 457 440 458 459 460 462 448 465 466 464 463 461    test material string 
-   102 SOLIDH27 HEX27  426 427 428 429 467 468 469 470 438 439 440 441 471 472 473 474 475 476 477 478 444 483 482 484 481 480 479    test material string 
-   103 SOLIDH27 HEX27  429 428 451 452 470 469 485 486 440 458 459 460 474 473 487 488 477 489 490 491 463 484 495 496 494 493 492    test material string 
-   104 SOLIDH27 HEX27  467 468 469 470 497 498 499 500 475 476 477 478 501 502 503 504 505 506 507 508 480 513 512 514 511 510 509    test material string 
-   105 SOLIDH27 HEX27  470 469 485 486 500 499 515 516 477 489 490 491 504 503 517 518 507 519 520 521 493 514 525 526 524 523 522    test material string 
-   106 SOLIDT4 TET4  527 528 529 530    test material string 
-   107 SOLIDT4 TET4  527 531 532 533    test material string 
-   108 SOLIDT4 TET4  534 535 536 537    test material string 
-   109 SOLIDT4 TET4  529 538 539 531    test material string 
-   110 SOLIDT4 TET4  540 527 541 538    test material string 
-   111 SOLIDT4 TET4  534 537 536 542    test material string 
-   112 SOLIDT4 TET4  533 543 541 531    test material string 
-   113 SOLIDT4 TET4  527 528 544 545    test material string 
-   114 SOLIDT4 TET4  531 546 532 543    test material string 
-   115 SOLIDT4 TET4  531 529 528 547    test material string 
-   116 SOLIDT4 TET4  531 539 547 546    test material string 
-   117 SOLIDT4 TET4  548 549 550 551    test material string 
-   118 SOLIDT4 TET4  539 548 552 538    test material string 
-   119 SOLIDT4 TET4  553 538 554 552    test material string 
-   120 SOLIDT4 TET4  548 553 555 550    test material string 
-   121 SOLIDT4 TET4  548 553 550 552    test material string 
-   122 SOLIDT4 TET4  554 538 553 556    test material string 
-   123 SOLIDT4 TET4  557 558 539 559    test material string 
-   124 SOLIDT4 TET4  560 543 558 559    test material string 
-   125 SOLIDT4 TET4  552 538 554 539    test material string 
-   126 SOLIDT4 TET4  554 541 556 561    test material string 
-   127 SOLIDT4 TET4  554 543 561 560    test material string 
-   128 SOLIDT4 TET4  533 527 541 562    test material string 
-   129 SOLIDT4 TET4  533 531 541 527    test material string 
-   130 SOLIDT4 TET4  527 531 529 528    test material string 
-   131 SOLIDT4 TET4  563 535 536 534    test material string 
-   132 SOLIDT4 TET4  527 545 531 528    test material string 
-   133 SOLIDT4 TET4  564 565 555 538    test material string 
-   134 SOLIDT4 TET4  538 527 531 529    test material string 
-   135 SOLIDT4 TET4  529 547 537 534    test material string 
-   136 SOLIDT4 TET4  531 539 529 547    test material string 
-   137 SOLIDT4 TET4  539 537 547 542    test material string 
-   138 SOLIDT4 TET4  548 538 564 555    test material string 
-   139 SOLIDT4 TET4  559 539 552 554    test material string 
-   140 SOLIDT4 TET4  539 538 564 548    test material string 
-   141 SOLIDT4 TET4  548 566 539 557    test material string 
-   142 SOLIDT4 TET4  543 554 559 560    test material string 
-   143 SOLIDT4 TET4  548 550 549 567    test material string 
-   144 SOLIDT4 TET4  548 555 553 538    test material string 
-   145 SOLIDT4 TET4  548 551 564 549    test material string 
-   146 SOLIDT4 TET4  557 552 539 548    test material string 
-   147 SOLIDT4 TET4  529 547 534 528    test material string 
-   148 SOLIDT4 TET4  527 532 531 545    test material string 
-   149 SOLIDT4 TET4  545 532 546 568    test material string 
-   150 SOLIDT4 TET4  535 529 534 563    test material string 
-   151 SOLIDT4 TET4  529 565 535 538    test material string 
-   152 SOLIDT4 TET4  529 528 534 563    test material string 
-   153 SOLIDT4 TET4  563 535 569 536    test material string 
-   154 SOLIDT4 TET4  531 543 539 546    test material string 
-   155 SOLIDT4 TET4  554 552 559 570    test material string 
-   156 SOLIDT4 TET4  529 539 537 547    test material string 
-   157 SOLIDT4 TET4  548 566 571 539    test material string 
-   158 SOLIDT4 TET4  554 553 552 570    test material string 
-   159 SOLIDT4 TET4  543 538 541 531    test material string 
-   160 SOLIDT4 TET4  548 566 549 571    test material string 
-   161 SOLIDT4 TET4  564 529 572 535    test material string 
-   162 SOLIDT4 TET4  554 561 556 570    test material string 
-   163 SOLIDT4 TET4  554 570 560 561    test material string 
-   164 SOLIDT4 TET4  538 530 529 565    test material string 
-   165 SOLIDT4 TET4  527 530 540 544    test material string 
-   166 SOLIDT4 TET4  565 530 529 563    test material string 
-   167 SOLIDT4 TET4  529 563 530 528    test material string 
-   168 SOLIDT4 TET4  545 568 544 532    test material string 
-   169 SOLIDT4 TET4  562 527 544 532    test material string 
-   170 SOLIDT4 TET4  544 568 573 532    test material string 
-   171 SOLIDT4 TET4  535 538 564 529    test material string 
-   172 SOLIDT4 TET4  554 559 560 570    test material string 
-   173 SOLIDT4 TET4  565 538 564 535    test material string 
-   174 SOLIDT4 TET4  527 529 538 530    test material string 
-   175 SOLIDT4 TET4  527 562 533 532    test material string 
-   176 SOLIDT4 TET4  529 572 571 564    test material string 
-   177 SOLIDT4 TET4  532 562 573 544    test material string 
-   178 SOLIDT4 TET4  547 537 534 542    test material string 
-   179 SOLIDT4 TET4  544 562 573 540    test material string 
-   180 SOLIDT4 TET4  554 538 541 543    test material string 
-   181 SOLIDT4 TET4  527 545 544 532    test material string 
-   182 SOLIDT4 TET4  554 556 541 538    test material string 
-   183 SOLIDT4 TET4  540 527 544 562    test material string 
-   184 SOLIDT4 TET4  527 538 540 530    test material string 
-   185 SOLIDT4 TET4  548 564 571 549    test material string 
-   186 SOLIDT4 TET4  548 550 567 552    test material string 
-   187 SOLIDT4 TET4  554 556 553 570    test material string 
-   188 SOLIDT4 TET4  571 537 539 542    test material string 
-   189 SOLIDT4 TET4  539 554 559 543    test material string 
-   190 SOLIDT4 TET4  537 572 571 529    test material string 
-   191 SOLIDT4 TET4  554 543 541 561    test material string 
-   192 SOLIDT4 TET4  562 540 527 541    test material string 
-   193 SOLIDT4 TET4  529 571 537 539    test material string 
-   194 SOLIDT4 TET4  531 547 528 545    test material string 
-   195 SOLIDT4 TET4  557 559 539 552    test material string 
-   196 SOLIDT4 TET4  556 538 540 541    test material string 
-   197 SOLIDT4 TET4  548 557 552 567    test material string 
-   198 SOLIDT4 TET4  531 545 532 546    test material string 
-   199 SOLIDT4 TET4  542 566 539 571    test material string 
-   200 SOLIDT4 TET4  537 529 534 535    test material string 
-   201 SOLIDT4 TET4  565 535 569 563    test material string 
-   202 SOLIDT4 TET4  538 548 552 553    test material string 
-   203 SOLIDT4 TET4  548 567 549 566    test material string 
-   204 SOLIDT4 TET4  563 565 535 529    test material string 
-   205 SOLIDT4 TET4  531 546 547 545    test material string 
-   206 SOLIDT4 TET4  559 543 558 539    test material string 
-   207 SOLIDT4 TET4  531 541 527 538    test material string 
-   208 SOLIDT4 TET4  548 557 567 566    test material string 
-   209 SOLIDT4 TET4  531 533 543 532    test material string 
-   210 SOLIDT4 TET4  548 551 555 564    test material string 
-   211 SOLIDT4 TET4  564 529 539 571    test material string 
-   212 SOLIDT4 TET4  543 546 558 539    test material string 
-   213 SOLIDT4 TET4  538 539 543 554    test material string 
-   214 SOLIDT4 TET4  548 550 555 551    test material string 
-   215 SOLIDT4 TET4  529 538 564 539    test material string 
-   216 SOLIDT4 TET4  529 572 535 537    test material string 
-   217 SOLIDT4 TET4  548 539 571 564    test material string 
-   218 SOLIDT4 TET4  527 530 544 528    test material string 
-   219 SOLIDT4 TET4  531 539 543 538    test material string 
-   220 SOLIDT10 TET10  574 575 576 577 578 579 580 581 582 583    test material string 
-   221 SOLIDT10 TET10  584 585 576 577 586 587 588 589 590 583    test material string 
-   222 SOLIDT10 TET10  591 592 593 576 594 595 596 597 598 599    test material string 
-   223 SOLIDT10 TET10  576 574 591 600 580 601 597 602 603 604    test material string 
-   224 SOLIDT10 TET10  605 606 607 608 609 610 611 612 613 614    test material string 
-   225 SOLIDT10 TET10  574 591 600 605 601 604 603 615 616 617    test material string 
-   226 SOLIDT10 TET10  574 618 600 619 620 621 603 622 623 624    test material string 
-   227 SOLIDT10 TET10  625 626 575 576 627 628 629 630 631 579    test material string 
-   228 SOLIDT10 TET10  575 625 632 626 629 633 634 628 627 635    test material string 
-   229 SOLIDT10 TET10  636 637 638 576 639 640 641 642 643 644    test material string 
-   230 SOLIDT10 TET10  625 626 576 645 627 631 630 646 647 648    test material string 
-   231 SOLIDT10 TET10  625 626 645 632 627 647 646 633 635 649    test material string 
-   232 SOLIDT10 TET10  625 577 584 576 650 589 651 630 583 588    test material string 
-   233 SOLIDT10 TET10  575 577 652 653 582 654 655 656 657 658    test material string 
-   234 SOLIDT10 TET10  659 575 660 626 661 662 663 664 628 665    test material string 
-   235 SOLIDT10 TET10  626 645 666 659 647 667 668 664 669 670    test material string 
-   236 SOLIDT10 TET10  577 575 625 632 582 629 650 671 634 633    test material string 
-   237 SOLIDT10 TET10  625 637 584 672 673 674 651 675 676 677    test material string 
-   238 SOLIDT10 TET10  626 575 576 659 628 579 631 664 661 678    test material string 
-   239 SOLIDT10 TET10  576 637 584 625 643 674 588 630 673 651    test material string 
-   240 SOLIDT10 TET10  672 585 577 679 680 590 681 682 683 684    test material string 
-   241 SOLIDT10 TET10  584 685 686 672 687 688 689 677 690 691    test material string 
-   242 SOLIDT10 TET10  584 585 686 692 586 693 689 694 695 696    test material string 
-   243 SOLIDT10 TET10  632 672 637 625 697 676 698 633 675 673    test material string 
-   244 SOLIDT10 TET10  575 576 659 699 579 678 661 700 701 702    test material string 
-   245 SOLIDT10 TET10  575 652 703 704 655 705 706 707 708 709    test material string 
-   246 SOLIDT10 TET10  625 576 575 577 630 579 629 650 583 582    test material string 
-   247 SOLIDT10 TET10  575 710 703 699 711 712 706 700 713 714    test material string 
-   248 SOLIDT10 TET10  715 632 645 666 716 649 717 718 719 667    test material string 
-   249 SOLIDT10 TET10  626 645 632 666 647 649 635 668 667 719    test material string 
-   250 SOLIDT10 TET10  626 666 632 660 668 719 635 665 720 721    test material string 
-   251 SOLIDT10 TET10  645 636 659 576 722 723 669 648 642 678    test material string 
-   252 SOLIDT10 TET10  585 576 577 574 587 583 590 724 580 581    test material string 
-   253 SOLIDT10 TET10  576 585 725 593 587 726 727 599 728 729    test material string 
-   254 SOLIDT10 TET10  645 730 636 637 731 732 722 733 734 639    test material string 
-   255 SOLIDT10 TET10  585 574 606 591 724 735 736 737 601 738    test material string 
-   256 SOLIDT10 TET10  591 576 593 585 597 599 596 737 587 728    test material string 
-   257 SOLIDT10 TET10  577 585 574 606 590 724 581 739 736 735    test material string 
-   258 SOLIDT10 TET10  574 652 575 577 740 655 578 581 654 582    test material string 
-   259 SOLIDT10 TET10  605 591 606 574 616 738 609 615 601 735    test material string 
-   260 SOLIDT10 TET10  574 605 618 652 615 741 620 740 742 743    test material string 
-   261 SOLIDT10 TET10  577 605 606 574 744 609 739 581 615 735    test material string 
-   262 SOLIDT10 TET10  584 685 692 686 687 745 694 689 688 696    test material string 
-   263 SOLIDT10 TET10  585 746 591 606 747 748 737 736 749 738    test material string 
-   264 SOLIDT10 TET10  750 575 632 660 751 634 752 753 662 721    test material string 
-   265 SOLIDT10 TET10  591 746 754 607 748 755 756 757 758 759    test material string 
-   266 SOLIDT10 TET10  608 605 606 577 612 609 613 760 744 739    test material string 
-   267 SOLIDT10 TET10  692 585 725 576 695 726 761 762 587 727    test material string 
-   268 SOLIDT10 TET10  575 632 577 750 634 671 582 751 752 763    test material string 
-   269 SOLIDT10 TET10  632 577 750 764 671 763 752 765 766 767    test material string 
-   270 SOLIDT10 TET10  626 645 659 576 647 669 664 631 648 678    test material string 
-   271 SOLIDT10 TET10  626 660 659 666 665 663 664 668 720 670    test material string 
-   272 SOLIDT10 TET10  575 632 660 626 634 721 662 628 635 665    test material string 
-   273 SOLIDT10 TET10  576 584 692 585 588 694 762 587 586 695    test material string 
-   274 SOLIDT10 TET10  584 637 692 685 674 768 694 687 769 745    test material string 
-   275 SOLIDT10 TET10  637 645 576 636 733 648 643 639 722 642    test material string 
-   276 SOLIDT10 TET10  591 607 754 605 757 759 756 616 611 770    test material string 
-   277 SOLIDT10 TET10  607 605 608 771 611 612 614 772 773 774    test material string 
-   278 SOLIDT10 TET10  584 585 577 672 586 590 589 677 680 681    test material string 
-   279 SOLIDT10 TET10  585 746 725 593 747 775 726 728 776 729    test material string 
-   280 SOLIDT10 TET10  585 606 777 746 736 778 779 747 749 780    test material string 
-   281 SOLIDT10 TET10  637 645 625 576 733 646 673 643 648 630    test material string 
-   282 SOLIDT10 TET10  692 576 638 637 762 644 781 768 643 640    test material string 
-   283 SOLIDT10 TET10  632 764 672 577 765 782 697 671 766 681    test material string 
-   284 SOLIDT10 TET10  637 632 645 715 698 649 733 783 716 717    test material string 
-   285 SOLIDT10 TET10  632 764 715 672 765 784 716 697 782 785    test material string 
-   286 SOLIDT10 TET10  575 660 786 710 662 787 788 711 789 790    test material string 
-   287 SOLIDT10 TET10  591 593 754 746 596 791 756 748 776 755    test material string 
-   288 SOLIDT10 TET10  574 618 605 600 620 741 615 603 621 617    test material string 
-   289 SOLIDT10 TET10  585 606 679 777 736 792 683 779 778 793    test material string 
-   290 SOLIDT10 TET10  652 577 608 653 654 760 794 658 657 795    test material string 
-   291 SOLIDT10 TET10  585 725 746 777 726 775 747 779 796 780    test material string 
-   292 SOLIDT10 TET10  764 577 679 672 766 684 797 782 681 682    test material string 
-   293 SOLIDT10 TET10  585 686 672 584 693 691 680 586 689 677    test material string 
-   294 SOLIDT10 TET10  575 699 659 710 700 702 661 711 713 798    test material string 
-   295 SOLIDT10 TET10  575 619 703 652 799 800 706 655 801 705    test material string 
-   296 SOLIDT10 TET10  575 653 704 786 656 802 707 788 803 804    test material string 
-   297 SOLIDT10 TET10  575 619 699 703 799 805 700 706 800 714    test material string 
-   298 SOLIDT10 TET10  575 750 577 653 751 763 582 656 806 657    test material string 
-   299 SOLIDT10 TET10  679 686 672 585 807 691 682 683 693 680    test material string 
-   300 SOLIDT10 TET10  585 777 686 692 779 808 693 695 809 696    test material string 
-   301 SOLIDT10 TET10  632 666 810 660 719 811 812 721 720 813    test material string 
-   302 SOLIDT10 TET10  645 666 636 730 667 814 722 731 815 732    test material string 
-   303 SOLIDT10 TET10  574 575 652 619 578 655 740 622 799 801    test material string 
-   304 SOLIDT10 TET10  584 672 637 685 677 676 674 687 690 769    test material string 
-   305 SOLIDT10 TET10  777 686 816 679 808 817 818 793 807 819    test material string 
-   306 SOLIDT10 TET10  591 754 600 605 756 820 604 616 770 617    test material string 
-   307 SOLIDT10 TET10  575 750 786 660 751 821 788 662 753 787    test material string 
-   308 SOLIDT10 TET10  754 600 605 822 820 617 770 823 824 825    test material string 
-   309 SOLIDT10 TET10  754 605 771 822 770 773 826 823 825 827    test material string 
-   310 SOLIDT10 TET10  625 632 645 637 633 649 646 673 698 733    test material string 
-   311 SOLIDT10 TET10  574 619 600 576 622 624 603 580 828 602    test material string 
-   312 SOLIDT10 TET10  585 574 591 576 724 601 737 587 580 597    test material string 
-   313 SOLIDT10 TET10  632 764 750 810 765 767 752 812 829 830    test material string 
-   314 SOLIDT10 TET10  666 715 730 645 718 831 815 667 717 731    test material string 
-   315 SOLIDT10 TET10  575 750 653 786 751 806 656 788 821 803    test material string 
-   316 SOLIDT10 TET10  575 710 786 703 711 790 788 706 712 832    test material string 
-   317 SOLIDT10 TET10  777 692 725 816 809 761 796 818 833 834    test material string 
-   318 SOLIDT10 TET10  632 810 715 764 812 835 716 765 829 784    test material string 
-   319 SOLIDT10 TET10  592 822 600 754 836 824 837 838 823 820    test material string 
-   320 SOLIDT10 TET10  576 600 591 592 602 604 597 598 837 594    test material string 
-   321 SOLIDT10 TET10  593 576 638 725 599 644 839 729 727 840    test material string 
-   322 SOLIDT10 TET10  575 699 619 576 700 805 799 579 701 828    test material string 
-   323 SOLIDT10 TET10  575 704 703 786 707 709 706 788 804 832    test material string 
-   324 SOLIDT10 TET10  710 659 575 660 798 661 711 789 663 662    test material string 
-   325 SOLIDT10 TET10  754 592 593 591 838 595 791 756 594 596    test material string 
-   326 SOLIDT10 TET10  632 750 660 810 752 753 721 812 830 813    test material string 
-   327 SOLIDT10 TET10  607 771 754 605 772 826 759 611 773 770    test material string 
-   328 SOLIDT10 TET10  637 584 692 576 674 694 768 643 588 762    test material string 
-   329 SOLIDT10 TET10  592 600 591 754 837 604 594 838 820 756    test material string 
-   330 SOLIDT10 TET10  577 632 625 672 671 633 650 681 697 675    test material string 
-   331 SOLIDT10 TET10  574 652 618 619 740 743 620 622 801 623    test material string 
-   332 SOLIDT10 TET10  645 666 659 636 667 670 669 722 814 723    test material string 
-   333 SOLIDT10 TET10  715 672 637 632 785 676 783 716 697 698    test material string 
-   334 SOLIDT10 TET10  575 652 704 653 655 708 707 656 658 802    test material string 
-   335 SOLIDT10 TET10  577 606 679 585 739 792 684 590 736 683    test material string 
-   336 SOLIDT10 TET10  699 576 592 619 701 598 841 805 828 842    test material string 
-   337 SOLIDT10 TET10  574 652 577 605 740 654 581 615 742 744    test material string 
-   338 SOLIDT10 TET10  585 777 692 725 779 809 695 726 796 761    test material string 
-   339 SOLIDT10 TET10  638 692 843 725 781 844 845 840 761 846    test material string 
-   340 SOLIDT10 TET10  605 652 577 608 742 654 744 612 794 760    test material string 
-   341 SOLIDT10 TET10  591 606 746 607 738 749 748 757 610 758    test material string 
-   342 SOLIDT10 TET10  725 692 843 816 761 844 846 834 833 847    test material string 
-   343 SOLIDT10 TET10  777 816 686 692 818 817 808 809 833 696    test material string 
-   344 SOLIDT10 TET10  725 576 638 692 727 644 840 761 762 781    test material string 
-   345 SOLIDT10 TET10  645 715 730 637 717 831 731 733 783 734    test material string 
-   346 SOLIDT10 TET10  619 600 576 592 624 602 828 842 837 598    test material string 
-   347 SOLIDT10 TET10  810 632 715 666 812 716 835 811 719 718    test material string 
-   348 SOLIDT10 TET10  574 576 575 619 580 579 578 622 828 799    test material string 
-   349 SOLIDT10 TET10  777 585 686 679 779 693 808 793 683 807    test material string 
-   350 SOLIDT10 TET10  625 672 584 577 675 677 651 650 681 589    test material string 
-   351 SOLIDT10 TET10  607 605 591 606 611 616 757 610 609 738    test material string 
-   352 SOLIDT10 TET10  585 593 591 746 728 596 737 747 776 748    test material string 
-   353 SOLIDSH8 HEX8  848 849 850 851 852 853 854 855    test material string 
-   354 SOLIDSH8 HEX8  851 850 856 857 855 854 858 859    test material string 
-   355 SOLIDSH8 HEX8  852 853 854 855 860 861 862 863    test material string 
-   356 SOLIDSH8 HEX8  855 854 858 859 863 862 864 865    test material string 
-   357 SOLIDSH8 HEX8  860 861 862 863 866 867 868 869    test material string 
-   358 SOLIDSH8 HEX8  863 862 864 865 869 868 870 871    test material string 
+   1 SOLIDH8 HEX8  1 2 3 4 5 6 7 8    test material string KINEM nonlinear EAS none
+   2 SOLIDH8 HEX8  2 9 10 3 6 11 12 7    test material string KINEM nonlinear EAS none
+   3 SOLIDH8 HEX8  9 13 14 10 11 15 16 12    test material string KINEM nonlinear EAS none
+   4 SOLIDH8 HEX8  4 3 17 18 8 7 19 20    test material string KINEM nonlinear EAS none
+   5 SOLIDH8 HEX8  3 10 21 17 7 12 22 19    test material string KINEM nonlinear EAS none
+   6 SOLIDH8 HEX8  10 14 23 21 12 16 24 22    test material string KINEM nonlinear EAS none
+   7 SOLIDH20 HEX20  25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44    test material string KINEM nonlinear
+   8 SOLIDH20 HEX20  26 45 46 27 30 47 48 31 49 50 51 34 38 52 53 39 54 55 56 42    test material string KINEM nonlinear
+   9 SOLIDH20 HEX20  45 57 58 46 47 59 60 48 61 62 63 50 52 64 65 53 66 67 68 55    test material string KINEM nonlinear
+   10 SOLIDH20 HEX20  28 27 69 70 32 31 71 72 35 73 74 75 40 39 76 77 43 78 79 80    test material string KINEM nonlinear
+   11 SOLIDH20 HEX20  27 46 81 69 31 48 82 71 51 83 84 73 39 53 85 76 56 86 87 78    test material string KINEM nonlinear
+   12 SOLIDH20 HEX20  46 58 88 81 48 60 89 82 63 90 91 83 53 65 92 85 68 93 94 86    test material string KINEM nonlinear
+   13 SOLIDH27 HEX27  95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 116 120 119 121 118 117 115    test material string KINEM nonlinear
+   14 SOLIDH27 HEX27  96 122 123 97 100 124 125 101 126 127 128 104 108 129 130 109 131 132 133 112 135 138 137 139 119 136 134    test material string KINEM nonlinear
+   15 SOLIDH27 HEX27  122 140 141 123 124 142 143 125 144 145 146 127 129 147 148 130 149 150 151 132 153 156 155 157 137 154 152    test material string KINEM nonlinear
+   16 SOLIDH27 HEX27  98 97 158 159 102 101 160 161 105 162 163 164 110 109 165 166 113 167 168 169 171 121 174 175 173 172 170    test material string KINEM nonlinear
+   17 SOLIDH27 HEX27  97 123 176 158 101 125 177 160 128 178 179 162 109 130 180 165 133 181 182 167 184 139 186 187 174 185 183    test material string KINEM nonlinear
+   18 SOLIDH27 HEX27  123 141 188 176 125 143 189 177 146 190 191 178 130 148 192 180 151 193 194 181 196 157 198 199 186 197 195    test material string KINEM nonlinear
+   19 SOLIDT4 TET4  200 201 202 203    test material string KINEM nonlinear
+   20 SOLIDT4 TET4  204 201 202 200    test material string KINEM nonlinear
+   21 SOLIDT4 TET4  201 205 203 206    test material string KINEM nonlinear
+   22 SOLIDT4 TET4  201 204 207 200    test material string KINEM nonlinear
+   23 SOLIDT4 TET4  201 202 205 208    test material string KINEM nonlinear
+   24 SOLIDT4 TET4  201 209 208 206    test material string KINEM nonlinear
+   25 SOLIDT4 TET4  201 210 208 209    test material string KINEM nonlinear
+   26 SOLIDT4 TET4  201 203 200 210    test material string KINEM nonlinear
+   27 SOLIDT4 TET4  201 210 209 203    test material string KINEM nonlinear
+   28 SOLIDT4 TET4  211 212 210 213    test material string KINEM nonlinear
+   29 SOLIDT4 TET4  210 211 207 214    test material string KINEM nonlinear
+   30 SOLIDT4 TET4  208 215 209 210    test material string KINEM nonlinear
+   31 SOLIDT4 TET4  208 210 207 214    test material string KINEM nonlinear
+   32 SOLIDT4 TET4  204 213 207 200    test material string KINEM nonlinear
+   33 SOLIDT4 TET4  201 207 202 208    test material string KINEM nonlinear
+   34 SOLIDT4 TET4  210 214 215 212    test material string KINEM nonlinear
+   35 SOLIDT4 TET4  200 216 213 210    test material string KINEM nonlinear
+   36 SOLIDT4 TET4  202 200 217 204    test material string KINEM nonlinear
+   37 SOLIDT4 TET4  213 210 207 200    test material string KINEM nonlinear
+   38 SOLIDT4 TET4  218 203 200 217    test material string KINEM nonlinear
+   39 SOLIDT4 TET4  201 205 206 208    test material string KINEM nonlinear
+   40 SOLIDT4 TET4  201 206 203 209    test material string KINEM nonlinear
+   41 SOLIDT4 TET4  210 214 208 215    test material string KINEM nonlinear
+   42 SOLIDT4 TET4  201 203 205 202    test material string KINEM nonlinear
+   43 SOLIDT4 TET4  201 207 210 200    test material string KINEM nonlinear
+   44 SOLIDT4 TET4  213 211 207 210    test material string KINEM nonlinear
+   45 SOLIDT4 TET4  201 207 204 202    test material string KINEM nonlinear
+   46 SOLIDT4 TET4  201 208 210 207    test material string KINEM nonlinear
+   47 SOLIDT4 TET4  214 212 210 211    test material string KINEM nonlinear
+   48 SOLIDT4 TET4  210 216 213 212    test material string KINEM nonlinear
+   49 SOLIDT4 TET4  203 200 217 202    test material string KINEM nonlinear
+   50 SOLIDT10 TET10  219 220 221 222 223 224 225 226 227 228    test material string KINEM nonlinear
+   51 SOLIDT10 TET10  219 222 229 220 226 230 231 223 227 232    test material string KINEM nonlinear
+   52 SOLIDT10 TET10  219 222 233 229 226 234 235 231 230 236    test material string KINEM nonlinear
+   53 SOLIDT10 TET10  219 237 238 233 239 240 241 235 242 243    test material string KINEM nonlinear
+   54 SOLIDT10 TET10  219 244 237 233 245 246 239 235 247 242    test material string KINEM nonlinear
+   55 SOLIDT10 TET10  219 248 233 238 249 250 235 241 251 243    test material string KINEM nonlinear
+   56 SOLIDT10 TET10  219 252 253 244 254 255 256 245 257 258    test material string KINEM nonlinear
+   57 SOLIDT10 TET10  219 248 253 259 249 260 256 261 262 263    test material string KINEM nonlinear
+   58 SOLIDT10 TET10  219 252 244 233 254 257 245 235 264 247    test material string KINEM nonlinear
+   59 SOLIDT10 TET10  219 253 237 244 256 265 239 245 258 246    test material string KINEM nonlinear
+   60 SOLIDT10 TET10  266 252 259 222 267 268 269 270 271 272    test material string KINEM nonlinear
+   61 SOLIDT10 TET10  273 274 252 266 275 276 277 278 279 267    test material string KINEM nonlinear
+   62 SOLIDT10 TET10  252 273 259 280 277 281 268 282 283 284    test material string KINEM nonlinear
+   63 SOLIDT10 TET10  252 259 253 280 268 263 255 282 284 285    test material string KINEM nonlinear
+   64 SOLIDT10 TET10  253 286 244 252 287 288 258 255 289 257    test material string KINEM nonlinear
+   65 SOLIDT10 TET10  280 274 252 273 290 276 282 283 275 277    test material string KINEM nonlinear
+   66 SOLIDT10 TET10  219 221 220 248 225 224 223 249 291 292    test material string KINEM nonlinear
+   67 SOLIDT10 TET10  222 293 266 252 294 295 270 271 296 267    test material string KINEM nonlinear
+   68 SOLIDT10 TET10  219 220 229 233 223 232 231 235 297 236    test material string KINEM nonlinear
+   69 SOLIDT10 TET10  219 259 253 252 261 263 256 254 268 255    test material string KINEM nonlinear
+   70 SOLIDT10 TET10  219 221 259 222 225 298 261 226 228 272    test material string KINEM nonlinear
+   71 SOLIDT10 TET10  252 293 266 274 296 295 267 276 299 279    test material string KINEM nonlinear
+   72 SOLIDT10 TET10  219 248 238 253 249 251 241 256 260 300    test material string KINEM nonlinear
+   73 SOLIDT10 TET10  219 220 233 248 223 297 235 249 292 250    test material string KINEM nonlinear
+   74 SOLIDT10 TET10  219 222 259 252 226 272 261 254 271 268    test material string KINEM nonlinear
+   75 SOLIDT10 TET10  221 222 266 259 228 270 301 298 272 269    test material string KINEM nonlinear
+   76 SOLIDT10 TET10  252 280 286 274 282 302 289 276 290 303    test material string KINEM nonlinear
+   77 SOLIDT10 TET10  252 280 253 286 282 285 255 289 302 287    test material string KINEM nonlinear
+   78 SOLIDT10 TET10  266 273 259 252 278 281 269 267 277 268    test material string KINEM nonlinear
+   79 SOLIDT10 TET10  219 259 221 248 261 298 225 249 262 291    test material string KINEM nonlinear
+   80 SOLIDT10 TET10  219 253 238 237 256 300 241 239 265 240    test material string KINEM nonlinear
+   81 SOLIDT10 TET10  219 252 233 222 254 264 235 226 271 234    test material string KINEM nonlinear
+   82 SOLIDSH8 HEX8  304 305 306 307 308 309 310 311    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   83 SOLIDSH8 HEX8  305 312 313 306 309 314 315 310    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   84 SOLIDSH8 HEX8  312 316 317 313 314 318 319 315    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   85 SOLIDSH8 HEX8  307 306 320 321 311 310 322 323    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   86 SOLIDSH8 HEX8  306 313 324 320 310 315 325 322    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   87 SOLIDSH8 HEX8  313 317 326 324 315 319 327 325    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   88 SOLIDH8 HEX8  328 329 330 331 332 333 334 335    test material string KINEM nonlinear EAS none
+   89 SOLIDH8 HEX8  331 330 336 337 335 334 338 339    test material string KINEM nonlinear EAS none
+   90 SOLIDH8 HEX8  332 333 334 335 340 341 342 343    test material string KINEM nonlinear EAS none
+   91 SOLIDH8 HEX8  335 334 338 339 343 342 344 345    test material string KINEM nonlinear EAS none
+   92 SOLIDH8 HEX8  340 341 342 343 346 347 348 349    test material string KINEM nonlinear EAS none
+   93 SOLIDH8 HEX8  343 342 344 345 349 348 350 351    test material string KINEM nonlinear EAS none
+   94 SOLIDH20 HEX20  352 353 354 355 356 357 358 359 360 361 362 363 364 365 366 367 368 369 370 371    test material string KINEM nonlinear
+   95 SOLIDH20 HEX20  355 354 372 373 359 358 374 375 362 376 377 378 367 366 379 380 370 381 382 383    test material string KINEM nonlinear
+   96 SOLIDH20 HEX20  356 357 358 359 384 385 386 387 368 369 370 371 388 389 390 391 392 393 394 395    test material string KINEM nonlinear
+   97 SOLIDH20 HEX20  359 358 374 375 387 386 396 397 370 381 382 383 391 390 398 399 394 400 401 402    test material string KINEM nonlinear
+   98 SOLIDH20 HEX20  384 385 386 387 403 404 405 406 392 393 394 395 407 408 409 410 411 412 413 414    test material string KINEM nonlinear
+   99 SOLIDH20 HEX20  387 386 396 397 406 405 415 416 394 400 401 402 410 409 417 418 413 419 420 421    test material string KINEM nonlinear
+   100 SOLIDH27 HEX27  422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438 439 440 441 443 447 446 448 445 444 442    test material string KINEM nonlinear
+   101 SOLIDH27 HEX27  425 424 449 450 429 428 451 452 432 453 454 455 437 436 456 457 440 458 459 460 462 448 465 466 464 463 461    test material string KINEM nonlinear
+   102 SOLIDH27 HEX27  426 427 428 429 467 468 469 470 438 439 440 441 471 472 473 474 475 476 477 478 444 483 482 484 481 480 479    test material string KINEM nonlinear
+   103 SOLIDH27 HEX27  429 428 451 452 470 469 485 486 440 458 459 460 474 473 487 488 477 489 490 491 463 484 495 496 494 493 492    test material string KINEM nonlinear
+   104 SOLIDH27 HEX27  467 468 469 470 497 498 499 500 475 476 477 478 501 502 503 504 505 506 507 508 480 513 512 514 511 510 509    test material string KINEM nonlinear
+   105 SOLIDH27 HEX27  470 469 485 486 500 499 515 516 477 489 490 491 504 503 517 518 507 519 520 521 493 514 525 526 524 523 522    test material string KINEM nonlinear
+   106 SOLIDT4 TET4  527 528 529 530    test material string KINEM nonlinear
+   107 SOLIDT4 TET4  527 531 532 533    test material string KINEM nonlinear
+   108 SOLIDT4 TET4  534 535 536 537    test material string KINEM nonlinear
+   109 SOLIDT4 TET4  529 538 539 531    test material string KINEM nonlinear
+   110 SOLIDT4 TET4  540 527 541 538    test material string KINEM nonlinear
+   111 SOLIDT4 TET4  534 537 536 542    test material string KINEM nonlinear
+   112 SOLIDT4 TET4  533 543 541 531    test material string KINEM nonlinear
+   113 SOLIDT4 TET4  527 528 544 545    test material string KINEM nonlinear
+   114 SOLIDT4 TET4  531 546 532 543    test material string KINEM nonlinear
+   115 SOLIDT4 TET4  531 529 528 547    test material string KINEM nonlinear
+   116 SOLIDT4 TET4  531 539 547 546    test material string KINEM nonlinear
+   117 SOLIDT4 TET4  548 549 550 551    test material string KINEM nonlinear
+   118 SOLIDT4 TET4  539 548 552 538    test material string KINEM nonlinear
+   119 SOLIDT4 TET4  553 538 554 552    test material string KINEM nonlinear
+   120 SOLIDT4 TET4  548 553 555 550    test material string KINEM nonlinear
+   121 SOLIDT4 TET4  548 553 550 552    test material string KINEM nonlinear
+   122 SOLIDT4 TET4  554 538 553 556    test material string KINEM nonlinear
+   123 SOLIDT4 TET4  557 558 539 559    test material string KINEM nonlinear
+   124 SOLIDT4 TET4  560 543 558 559    test material string KINEM nonlinear
+   125 SOLIDT4 TET4  552 538 554 539    test material string KINEM nonlinear
+   126 SOLIDT4 TET4  554 541 556 561    test material string KINEM nonlinear
+   127 SOLIDT4 TET4  554 543 561 560    test material string KINEM nonlinear
+   128 SOLIDT4 TET4  533 527 541 562    test material string KINEM nonlinear
+   129 SOLIDT4 TET4  533 531 541 527    test material string KINEM nonlinear
+   130 SOLIDT4 TET4  527 531 529 528    test material string KINEM nonlinear
+   131 SOLIDT4 TET4  563 535 536 534    test material string KINEM nonlinear
+   132 SOLIDT4 TET4  527 545 531 528    test material string KINEM nonlinear
+   133 SOLIDT4 TET4  564 565 555 538    test material string KINEM nonlinear
+   134 SOLIDT4 TET4  538 527 531 529    test material string KINEM nonlinear
+   135 SOLIDT4 TET4  529 547 537 534    test material string KINEM nonlinear
+   136 SOLIDT4 TET4  531 539 529 547    test material string KINEM nonlinear
+   137 SOLIDT4 TET4  539 537 547 542    test material string KINEM nonlinear
+   138 SOLIDT4 TET4  548 538 564 555    test material string KINEM nonlinear
+   139 SOLIDT4 TET4  559 539 552 554    test material string KINEM nonlinear
+   140 SOLIDT4 TET4  539 538 564 548    test material string KINEM nonlinear
+   141 SOLIDT4 TET4  548 566 539 557    test material string KINEM nonlinear
+   142 SOLIDT4 TET4  543 554 559 560    test material string KINEM nonlinear
+   143 SOLIDT4 TET4  548 550 549 567    test material string KINEM nonlinear
+   144 SOLIDT4 TET4  548 555 553 538    test material string KINEM nonlinear
+   145 SOLIDT4 TET4  548 551 564 549    test material string KINEM nonlinear
+   146 SOLIDT4 TET4  557 552 539 548    test material string KINEM nonlinear
+   147 SOLIDT4 TET4  529 547 534 528    test material string KINEM nonlinear
+   148 SOLIDT4 TET4  527 532 531 545    test material string KINEM nonlinear
+   149 SOLIDT4 TET4  545 532 546 568    test material string KINEM nonlinear
+   150 SOLIDT4 TET4  535 529 534 563    test material string KINEM nonlinear
+   151 SOLIDT4 TET4  529 565 535 538    test material string KINEM nonlinear
+   152 SOLIDT4 TET4  529 528 534 563    test material string KINEM nonlinear
+   153 SOLIDT4 TET4  563 535 569 536    test material string KINEM nonlinear
+   154 SOLIDT4 TET4  531 543 539 546    test material string KINEM nonlinear
+   155 SOLIDT4 TET4  554 552 559 570    test material string KINEM nonlinear
+   156 SOLIDT4 TET4  529 539 537 547    test material string KINEM nonlinear
+   157 SOLIDT4 TET4  548 566 571 539    test material string KINEM nonlinear
+   158 SOLIDT4 TET4  554 553 552 570    test material string KINEM nonlinear
+   159 SOLIDT4 TET4  543 538 541 531    test material string KINEM nonlinear
+   160 SOLIDT4 TET4  548 566 549 571    test material string KINEM nonlinear
+   161 SOLIDT4 TET4  564 529 572 535    test material string KINEM nonlinear
+   162 SOLIDT4 TET4  554 561 556 570    test material string KINEM nonlinear
+   163 SOLIDT4 TET4  554 570 560 561    test material string KINEM nonlinear
+   164 SOLIDT4 TET4  538 530 529 565    test material string KINEM nonlinear
+   165 SOLIDT4 TET4  527 530 540 544    test material string KINEM nonlinear
+   166 SOLIDT4 TET4  565 530 529 563    test material string KINEM nonlinear
+   167 SOLIDT4 TET4  529 563 530 528    test material string KINEM nonlinear
+   168 SOLIDT4 TET4  545 568 544 532    test material string KINEM nonlinear
+   169 SOLIDT4 TET4  562 527 544 532    test material string KINEM nonlinear
+   170 SOLIDT4 TET4  544 568 573 532    test material string KINEM nonlinear
+   171 SOLIDT4 TET4  535 538 564 529    test material string KINEM nonlinear
+   172 SOLIDT4 TET4  554 559 560 570    test material string KINEM nonlinear
+   173 SOLIDT4 TET4  565 538 564 535    test material string KINEM nonlinear
+   174 SOLIDT4 TET4  527 529 538 530    test material string KINEM nonlinear
+   175 SOLIDT4 TET4  527 562 533 532    test material string KINEM nonlinear
+   176 SOLIDT4 TET4  529 572 571 564    test material string KINEM nonlinear
+   177 SOLIDT4 TET4  532 562 573 544    test material string KINEM nonlinear
+   178 SOLIDT4 TET4  547 537 534 542    test material string KINEM nonlinear
+   179 SOLIDT4 TET4  544 562 573 540    test material string KINEM nonlinear
+   180 SOLIDT4 TET4  554 538 541 543    test material string KINEM nonlinear
+   181 SOLIDT4 TET4  527 545 544 532    test material string KINEM nonlinear
+   182 SOLIDT4 TET4  554 556 541 538    test material string KINEM nonlinear
+   183 SOLIDT4 TET4  540 527 544 562    test material string KINEM nonlinear
+   184 SOLIDT4 TET4  527 538 540 530    test material string KINEM nonlinear
+   185 SOLIDT4 TET4  548 564 571 549    test material string KINEM nonlinear
+   186 SOLIDT4 TET4  548 550 567 552    test material string KINEM nonlinear
+   187 SOLIDT4 TET4  554 556 553 570    test material string KINEM nonlinear
+   188 SOLIDT4 TET4  571 537 539 542    test material string KINEM nonlinear
+   189 SOLIDT4 TET4  539 554 559 543    test material string KINEM nonlinear
+   190 SOLIDT4 TET4  537 572 571 529    test material string KINEM nonlinear
+   191 SOLIDT4 TET4  554 543 541 561    test material string KINEM nonlinear
+   192 SOLIDT4 TET4  562 540 527 541    test material string KINEM nonlinear
+   193 SOLIDT4 TET4  529 571 537 539    test material string KINEM nonlinear
+   194 SOLIDT4 TET4  531 547 528 545    test material string KINEM nonlinear
+   195 SOLIDT4 TET4  557 559 539 552    test material string KINEM nonlinear
+   196 SOLIDT4 TET4  556 538 540 541    test material string KINEM nonlinear
+   197 SOLIDT4 TET4  548 557 552 567    test material string KINEM nonlinear
+   198 SOLIDT4 TET4  531 545 532 546    test material string KINEM nonlinear
+   199 SOLIDT4 TET4  542 566 539 571    test material string KINEM nonlinear
+   200 SOLIDT4 TET4  537 529 534 535    test material string KINEM nonlinear
+   201 SOLIDT4 TET4  565 535 569 563    test material string KINEM nonlinear
+   202 SOLIDT4 TET4  538 548 552 553    test material string KINEM nonlinear
+   203 SOLIDT4 TET4  548 567 549 566    test material string KINEM nonlinear
+   204 SOLIDT4 TET4  563 565 535 529    test material string KINEM nonlinear
+   205 SOLIDT4 TET4  531 546 547 545    test material string KINEM nonlinear
+   206 SOLIDT4 TET4  559 543 558 539    test material string KINEM nonlinear
+   207 SOLIDT4 TET4  531 541 527 538    test material string KINEM nonlinear
+   208 SOLIDT4 TET4  548 557 567 566    test material string KINEM nonlinear
+   209 SOLIDT4 TET4  531 533 543 532    test material string KINEM nonlinear
+   210 SOLIDT4 TET4  548 551 555 564    test material string KINEM nonlinear
+   211 SOLIDT4 TET4  564 529 539 571    test material string KINEM nonlinear
+   212 SOLIDT4 TET4  543 546 558 539    test material string KINEM nonlinear
+   213 SOLIDT4 TET4  538 539 543 554    test material string KINEM nonlinear
+   214 SOLIDT4 TET4  548 550 555 551    test material string KINEM nonlinear
+   215 SOLIDT4 TET4  529 538 564 539    test material string KINEM nonlinear
+   216 SOLIDT4 TET4  529 572 535 537    test material string KINEM nonlinear
+   217 SOLIDT4 TET4  548 539 571 564    test material string KINEM nonlinear
+   218 SOLIDT4 TET4  527 530 544 528    test material string KINEM nonlinear
+   219 SOLIDT4 TET4  531 539 543 538    test material string KINEM nonlinear
+   220 SOLIDT10 TET10  574 575 576 577 578 579 580 581 582 583    test material string KINEM nonlinear
+   221 SOLIDT10 TET10  584 585 576 577 586 587 588 589 590 583    test material string KINEM nonlinear
+   222 SOLIDT10 TET10  591 592 593 576 594 595 596 597 598 599    test material string KINEM nonlinear
+   223 SOLIDT10 TET10  576 574 591 600 580 601 597 602 603 604    test material string KINEM nonlinear
+   224 SOLIDT10 TET10  605 606 607 608 609 610 611 612 613 614    test material string KINEM nonlinear
+   225 SOLIDT10 TET10  574 591 600 605 601 604 603 615 616 617    test material string KINEM nonlinear
+   226 SOLIDT10 TET10  574 618 600 619 620 621 603 622 623 624    test material string KINEM nonlinear
+   227 SOLIDT10 TET10  625 626 575 576 627 628 629 630 631 579    test material string KINEM nonlinear
+   228 SOLIDT10 TET10  575 625 632 626 629 633 634 628 627 635    test material string KINEM nonlinear
+   229 SOLIDT10 TET10  636 637 638 576 639 640 641 642 643 644    test material string KINEM nonlinear
+   230 SOLIDT10 TET10  625 626 576 645 627 631 630 646 647 648    test material string KINEM nonlinear
+   231 SOLIDT10 TET10  625 626 645 632 627 647 646 633 635 649    test material string KINEM nonlinear
+   232 SOLIDT10 TET10  625 577 584 576 650 589 651 630 583 588    test material string KINEM nonlinear
+   233 SOLIDT10 TET10  575 577 652 653 582 654 655 656 657 658    test material string KINEM nonlinear
+   234 SOLIDT10 TET10  659 575 660 626 661 662 663 664 628 665    test material string KINEM nonlinear
+   235 SOLIDT10 TET10  626 645 666 659 647 667 668 664 669 670    test material string KINEM nonlinear
+   236 SOLIDT10 TET10  577 575 625 632 582 629 650 671 634 633    test material string KINEM nonlinear
+   237 SOLIDT10 TET10  625 637 584 672 673 674 651 675 676 677    test material string KINEM nonlinear
+   238 SOLIDT10 TET10  626 575 576 659 628 579 631 664 661 678    test material string KINEM nonlinear
+   239 SOLIDT10 TET10  576 637 584 625 643 674 588 630 673 651    test material string KINEM nonlinear
+   240 SOLIDT10 TET10  672 585 577 679 680 590 681 682 683 684    test material string KINEM nonlinear
+   241 SOLIDT10 TET10  584 685 686 672 687 688 689 677 690 691    test material string KINEM nonlinear
+   242 SOLIDT10 TET10  584 585 686 692 586 693 689 694 695 696    test material string KINEM nonlinear
+   243 SOLIDT10 TET10  632 672 637 625 697 676 698 633 675 673    test material string KINEM nonlinear
+   244 SOLIDT10 TET10  575 576 659 699 579 678 661 700 701 702    test material string KINEM nonlinear
+   245 SOLIDT10 TET10  575 652 703 704 655 705 706 707 708 709    test material string KINEM nonlinear
+   246 SOLIDT10 TET10  625 576 575 577 630 579 629 650 583 582    test material string KINEM nonlinear
+   247 SOLIDT10 TET10  575 710 703 699 711 712 706 700 713 714    test material string KINEM nonlinear
+   248 SOLIDT10 TET10  715 632 645 666 716 649 717 718 719 667    test material string KINEM nonlinear
+   249 SOLIDT10 TET10  626 645 632 666 647 649 635 668 667 719    test material string KINEM nonlinear
+   250 SOLIDT10 TET10  626 666 632 660 668 719 635 665 720 721    test material string KINEM nonlinear
+   251 SOLIDT10 TET10  645 636 659 576 722 723 669 648 642 678    test material string KINEM nonlinear
+   252 SOLIDT10 TET10  585 576 577 574 587 583 590 724 580 581    test material string KINEM nonlinear
+   253 SOLIDT10 TET10  576 585 725 593 587 726 727 599 728 729    test material string KINEM nonlinear
+   254 SOLIDT10 TET10  645 730 636 637 731 732 722 733 734 639    test material string KINEM nonlinear
+   255 SOLIDT10 TET10  585 574 606 591 724 735 736 737 601 738    test material string KINEM nonlinear
+   256 SOLIDT10 TET10  591 576 593 585 597 599 596 737 587 728    test material string KINEM nonlinear
+   257 SOLIDT10 TET10  577 585 574 606 590 724 581 739 736 735    test material string KINEM nonlinear
+   258 SOLIDT10 TET10  574 652 575 577 740 655 578 581 654 582    test material string KINEM nonlinear
+   259 SOLIDT10 TET10  605 591 606 574 616 738 609 615 601 735    test material string KINEM nonlinear
+   260 SOLIDT10 TET10  574 605 618 652 615 741 620 740 742 743    test material string KINEM nonlinear
+   261 SOLIDT10 TET10  577 605 606 574 744 609 739 581 615 735    test material string KINEM nonlinear
+   262 SOLIDT10 TET10  584 685 692 686 687 745 694 689 688 696    test material string KINEM nonlinear
+   263 SOLIDT10 TET10  585 746 591 606 747 748 737 736 749 738    test material string KINEM nonlinear
+   264 SOLIDT10 TET10  750 575 632 660 751 634 752 753 662 721    test material string KINEM nonlinear
+   265 SOLIDT10 TET10  591 746 754 607 748 755 756 757 758 759    test material string KINEM nonlinear
+   266 SOLIDT10 TET10  608 605 606 577 612 609 613 760 744 739    test material string KINEM nonlinear
+   267 SOLIDT10 TET10  692 585 725 576 695 726 761 762 587 727    test material string KINEM nonlinear
+   268 SOLIDT10 TET10  575 632 577 750 634 671 582 751 752 763    test material string KINEM nonlinear
+   269 SOLIDT10 TET10  632 577 750 764 671 763 752 765 766 767    test material string KINEM nonlinear
+   270 SOLIDT10 TET10  626 645 659 576 647 669 664 631 648 678    test material string KINEM nonlinear
+   271 SOLIDT10 TET10  626 660 659 666 665 663 664 668 720 670    test material string KINEM nonlinear
+   272 SOLIDT10 TET10  575 632 660 626 634 721 662 628 635 665    test material string KINEM nonlinear
+   273 SOLIDT10 TET10  576 584 692 585 588 694 762 587 586 695    test material string KINEM nonlinear
+   274 SOLIDT10 TET10  584 637 692 685 674 768 694 687 769 745    test material string KINEM nonlinear
+   275 SOLIDT10 TET10  637 645 576 636 733 648 643 639 722 642    test material string KINEM nonlinear
+   276 SOLIDT10 TET10  591 607 754 605 757 759 756 616 611 770    test material string KINEM nonlinear
+   277 SOLIDT10 TET10  607 605 608 771 611 612 614 772 773 774    test material string KINEM nonlinear
+   278 SOLIDT10 TET10  584 585 577 672 586 590 589 677 680 681    test material string KINEM nonlinear
+   279 SOLIDT10 TET10  585 746 725 593 747 775 726 728 776 729    test material string KINEM nonlinear
+   280 SOLIDT10 TET10  585 606 777 746 736 778 779 747 749 780    test material string KINEM nonlinear
+   281 SOLIDT10 TET10  637 645 625 576 733 646 673 643 648 630    test material string KINEM nonlinear
+   282 SOLIDT10 TET10  692 576 638 637 762 644 781 768 643 640    test material string KINEM nonlinear
+   283 SOLIDT10 TET10  632 764 672 577 765 782 697 671 766 681    test material string KINEM nonlinear
+   284 SOLIDT10 TET10  637 632 645 715 698 649 733 783 716 717    test material string KINEM nonlinear
+   285 SOLIDT10 TET10  632 764 715 672 765 784 716 697 782 785    test material string KINEM nonlinear
+   286 SOLIDT10 TET10  575 660 786 710 662 787 788 711 789 790    test material string KINEM nonlinear
+   287 SOLIDT10 TET10  591 593 754 746 596 791 756 748 776 755    test material string KINEM nonlinear
+   288 SOLIDT10 TET10  574 618 605 600 620 741 615 603 621 617    test material string KINEM nonlinear
+   289 SOLIDT10 TET10  585 606 679 777 736 792 683 779 778 793    test material string KINEM nonlinear
+   290 SOLIDT10 TET10  652 577 608 653 654 760 794 658 657 795    test material string KINEM nonlinear
+   291 SOLIDT10 TET10  585 725 746 777 726 775 747 779 796 780    test material string KINEM nonlinear
+   292 SOLIDT10 TET10  764 577 679 672 766 684 797 782 681 682    test material string KINEM nonlinear
+   293 SOLIDT10 TET10  585 686 672 584 693 691 680 586 689 677    test material string KINEM nonlinear
+   294 SOLIDT10 TET10  575 699 659 710 700 702 661 711 713 798    test material string KINEM nonlinear
+   295 SOLIDT10 TET10  575 619 703 652 799 800 706 655 801 705    test material string KINEM nonlinear
+   296 SOLIDT10 TET10  575 653 704 786 656 802 707 788 803 804    test material string KINEM nonlinear
+   297 SOLIDT10 TET10  575 619 699 703 799 805 700 706 800 714    test material string KINEM nonlinear
+   298 SOLIDT10 TET10  575 750 577 653 751 763 582 656 806 657    test material string KINEM nonlinear
+   299 SOLIDT10 TET10  679 686 672 585 807 691 682 683 693 680    test material string KINEM nonlinear
+   300 SOLIDT10 TET10  585 777 686 692 779 808 693 695 809 696    test material string KINEM nonlinear
+   301 SOLIDT10 TET10  632 666 810 660 719 811 812 721 720 813    test material string KINEM nonlinear
+   302 SOLIDT10 TET10  645 666 636 730 667 814 722 731 815 732    test material string KINEM nonlinear
+   303 SOLIDT10 TET10  574 575 652 619 578 655 740 622 799 801    test material string KINEM nonlinear
+   304 SOLIDT10 TET10  584 672 637 685 677 676 674 687 690 769    test material string KINEM nonlinear
+   305 SOLIDT10 TET10  777 686 816 679 808 817 818 793 807 819    test material string KINEM nonlinear
+   306 SOLIDT10 TET10  591 754 600 605 756 820 604 616 770 617    test material string KINEM nonlinear
+   307 SOLIDT10 TET10  575 750 786 660 751 821 788 662 753 787    test material string KINEM nonlinear
+   308 SOLIDT10 TET10  754 600 605 822 820 617 770 823 824 825    test material string KINEM nonlinear
+   309 SOLIDT10 TET10  754 605 771 822 770 773 826 823 825 827    test material string KINEM nonlinear
+   310 SOLIDT10 TET10  625 632 645 637 633 649 646 673 698 733    test material string KINEM nonlinear
+   311 SOLIDT10 TET10  574 619 600 576 622 624 603 580 828 602    test material string KINEM nonlinear
+   312 SOLIDT10 TET10  585 574 591 576 724 601 737 587 580 597    test material string KINEM nonlinear
+   313 SOLIDT10 TET10  632 764 750 810 765 767 752 812 829 830    test material string KINEM nonlinear
+   314 SOLIDT10 TET10  666 715 730 645 718 831 815 667 717 731    test material string KINEM nonlinear
+   315 SOLIDT10 TET10  575 750 653 786 751 806 656 788 821 803    test material string KINEM nonlinear
+   316 SOLIDT10 TET10  575 710 786 703 711 790 788 706 712 832    test material string KINEM nonlinear
+   317 SOLIDT10 TET10  777 692 725 816 809 761 796 818 833 834    test material string KINEM nonlinear
+   318 SOLIDT10 TET10  632 810 715 764 812 835 716 765 829 784    test material string KINEM nonlinear
+   319 SOLIDT10 TET10  592 822 600 754 836 824 837 838 823 820    test material string KINEM nonlinear
+   320 SOLIDT10 TET10  576 600 591 592 602 604 597 598 837 594    test material string KINEM nonlinear
+   321 SOLIDT10 TET10  593 576 638 725 599 644 839 729 727 840    test material string KINEM nonlinear
+   322 SOLIDT10 TET10  575 699 619 576 700 805 799 579 701 828    test material string KINEM nonlinear
+   323 SOLIDT10 TET10  575 704 703 786 707 709 706 788 804 832    test material string KINEM nonlinear
+   324 SOLIDT10 TET10  710 659 575 660 798 661 711 789 663 662    test material string KINEM nonlinear
+   325 SOLIDT10 TET10  754 592 593 591 838 595 791 756 594 596    test material string KINEM nonlinear
+   326 SOLIDT10 TET10  632 750 660 810 752 753 721 812 830 813    test material string KINEM nonlinear
+   327 SOLIDT10 TET10  607 771 754 605 772 826 759 611 773 770    test material string KINEM nonlinear
+   328 SOLIDT10 TET10  637 584 692 576 674 694 768 643 588 762    test material string KINEM nonlinear
+   329 SOLIDT10 TET10  592 600 591 754 837 604 594 838 820 756    test material string KINEM nonlinear
+   330 SOLIDT10 TET10  577 632 625 672 671 633 650 681 697 675    test material string KINEM nonlinear
+   331 SOLIDT10 TET10  574 652 618 619 740 743 620 622 801 623    test material string KINEM nonlinear
+   332 SOLIDT10 TET10  645 666 659 636 667 670 669 722 814 723    test material string KINEM nonlinear
+   333 SOLIDT10 TET10  715 672 637 632 785 676 783 716 697 698    test material string KINEM nonlinear
+   334 SOLIDT10 TET10  575 652 704 653 655 708 707 656 658 802    test material string KINEM nonlinear
+   335 SOLIDT10 TET10  577 606 679 585 739 792 684 590 736 683    test material string KINEM nonlinear
+   336 SOLIDT10 TET10  699 576 592 619 701 598 841 805 828 842    test material string KINEM nonlinear
+   337 SOLIDT10 TET10  574 652 577 605 740 654 581 615 742 744    test material string KINEM nonlinear
+   338 SOLIDT10 TET10  585 777 692 725 779 809 695 726 796 761    test material string KINEM nonlinear
+   339 SOLIDT10 TET10  638 692 843 725 781 844 845 840 761 846    test material string KINEM nonlinear
+   340 SOLIDT10 TET10  605 652 577 608 742 654 744 612 794 760    test material string KINEM nonlinear
+   341 SOLIDT10 TET10  591 606 746 607 738 749 748 757 610 758    test material string KINEM nonlinear
+   342 SOLIDT10 TET10  725 692 843 816 761 844 846 834 833 847    test material string KINEM nonlinear
+   343 SOLIDT10 TET10  777 816 686 692 818 817 808 809 833 696    test material string KINEM nonlinear
+   344 SOLIDT10 TET10  725 576 638 692 727 644 840 761 762 781    test material string KINEM nonlinear
+   345 SOLIDT10 TET10  645 715 730 637 717 831 731 733 783 734    test material string KINEM nonlinear
+   346 SOLIDT10 TET10  619 600 576 592 624 602 828 842 837 598    test material string KINEM nonlinear
+   347 SOLIDT10 TET10  810 632 715 666 812 716 835 811 719 718    test material string KINEM nonlinear
+   348 SOLIDT10 TET10  574 576 575 619 580 579 578 622 828 799    test material string KINEM nonlinear
+   349 SOLIDT10 TET10  777 585 686 679 779 693 808 793 683 807    test material string KINEM nonlinear
+   350 SOLIDT10 TET10  625 672 584 577 675 677 651 650 681 589    test material string KINEM nonlinear
+   351 SOLIDT10 TET10  607 605 591 606 611 616 757 610 609 738    test material string KINEM nonlinear
+   352 SOLIDT10 TET10  585 593 591 746 728 596 737 747 776 748    test material string KINEM nonlinear
+   353 SOLIDSH8 HEX8  848 849 850 851 852 853 854 855    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   354 SOLIDSH8 HEX8  851 850 856 857 855 854 858 859    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   355 SOLIDSH8 HEX8  852 853 854 855 860 861 862 863    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   356 SOLIDSH8 HEX8  855 854 858 859 863 862 864 865    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   357 SOLIDSH8 HEX8  860 861 862 863 866 867 868 869    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
+   358 SOLIDSH8 HEX8  863 862 864 865 869 868 870 871    test material string KINEM nonlinear EAS none ANS none THICKDIR auto
 ----------------------------------------------------FLUID ELEMENTS
 ------------------------------------------------------ALE ELEMENTS
 ------------------------------------------------LUBRICATION ELEMENTS
