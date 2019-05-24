@@ -90,45 +90,70 @@ class ElementType(IntEnum):
         elif self.value == self.tet10:
             return 'tet10'
 
-    def get_element_type_strings(self):
+    def get_cubit_names(self):
         """
-        Get the strings that represent this element type for cubit and BACI.
+        Get the strings that are needed to mesh and describe this element in
+        cubit.
+        """
+
+        # Get the element type parameters.
+        if (self.value == self.hex8 or self.value == self.hex8sh):
+            cubit_scheme = 'Auto'
+            cubit_element_type = 'HEX8'
+        elif self.value == self.hex20:
+            cubit_scheme = 'Auto'
+            cubit_element_type = 'HEX20'
+        elif self.value == self.hex27:
+            cubit_scheme = 'Auto'
+            cubit_element_type = 'HEX27'
+        elif self.value == self.tet4:
+            cubit_scheme = 'Tetmesh'
+            cubit_element_type = 'TETRA4'
+        elif self.value == self.tet10:
+            cubit_scheme = 'Tetmesh'
+            cubit_element_type = 'TETRA10'
+        else:
+            raise ValueError('Got wrong element type {}!'.format(self.value))
+
+        return cubit_scheme, cubit_element_type
+
+    def get_baci_name(self):
+        """Get the name of this element in baci."""
+
+        # Get the element type parameters.
+        if self.value == self.hex8:
+            return 'SOLIDH8'
+        elif self.value == self.hex20:
+            return 'SOLIDH20'
+        elif self.value == self.hex27:
+            return 'SOLIDH27'
+        elif self.value == self.tet4:
+            return 'SOLIDT4'
+        elif self.value == self.tet10:
+            return 'SOLIDT10'
+        elif self.value == self.hex8sh:
+            return 'SOLIDSH8'
+        else:
+            raise ValueError('Got wrong element type {}!'.format(self.value))
+
+    def get_default_baci_description(self):
+        """
+        Get the default text for the description in baci after the material
+        string.
         """
 
         # Get the element type parameters.
         if self.value == self.hex8:
-            cubit_scheme = 'Auto'
-            cubit_element_type = 'HEX8'
-            baci_element_type = 'SOLIDH8'
-            baci_dat_string = 'EAS none'
-        elif self.value == self.hex20:
-            cubit_scheme = 'Auto'
-            cubit_element_type = 'HEX20'
-            baci_element_type = 'SOLIDH20'
-            baci_dat_string = ''
-        elif self.value == self.hex27:
-            cubit_scheme = 'Auto'
-            cubit_element_type = 'HEX27'
-            baci_element_type = 'SOLIDH27'
-            baci_dat_string = ''
-        elif self.value == self.tet4:
-            cubit_scheme = 'Tetmesh'
-            cubit_element_type = 'TETRA4'
-            baci_element_type = 'SOLIDT4'
-            baci_dat_string = ''
-        elif self.value == self.tet10:
-            cubit_scheme = 'Tetmesh'
-            cubit_element_type = 'TETRA10'
-            baci_element_type = 'SOLIDT10'
-            baci_dat_string = ''
+            return 'KINEM nonlinear EAS none'
+        elif (self.value == self.hex20
+                or self.value == self.hex27
+                or self.value == self.tet4
+                or self.value == self.tet10):
+            return 'KINEM nonlinear'
         elif self.value == self.hex8sh:
-            cubit_scheme = 'Auto'
-            cubit_element_type = 'HEX8'
-            baci_element_type = 'SOLIDSH8'
-            baci_dat_string = ''
-
-        return cubit_scheme, cubit_element_type, baci_element_type, \
-            baci_dat_string
+            return 'KINEM nonlinear EAS none ANS none THICKDIR auto'
+        else:
+            raise ValueError('Got wrong element type {}!'.format(self.value))
 
 
 class BoundaryConditionType(IntEnum):

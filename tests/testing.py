@@ -141,31 +141,31 @@ class TestCubitPy(unittest.TestCase):
 
         # Mesh the block.
         block.mesh()
-        cubit.add_element_type(block.volumes()[0], 'HEX8', name='block',
-            bc=['STRUCTURE',
-                'MAT 1 KINEM nonlinear EAS none',
-                'SOLIDH8'
-                ])
+        cubit.add_element_type(block.volumes()[0], cupy.element_type.hex8,
+            name='block', material='MAT 1',
+            bc_description='KINEM nonlinear EAS none')
 
         # Create node sets.
-        cubit.add_node_set(block.volumes()[0], name='all')
         for i, surf in enumerate(block.surfaces()):
             normal = np.array(surf.normal_at(cubit.get_surface_center(surf)))
             if np.dot(normal, [0, 0, -1]) == 1:
-                cubit.add_node_set(surf, name='fix', bc=[
-                    'DESIGN SURF DIRICH CONDITIONS',
-                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 '
-                    + 'FUNCT 0 0 0 0 0 0'])
+                cubit.add_node_set(surf, name='fix',
+                    bc_section='DESIGN SURF DIRICH CONDITIONS',
+                    bc_description='NUMDOF 6 ONOFF 1 1 1 0 0 0 '
+                        + 'VAL 0.0 0.0 0.0 0.0 0.0 0.0 '
+                        + 'FUNCT 0 0 0 0 0 0')
             elif np.dot(normal, [0, 0, 1]) == 1:
-                cubit.add_node_set(surf, name='load', bc=[
-                    'DESIGN SURF DIRICH CONDITIONS',
-                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 '
-                    + 'FUNCT 0 0 0 0 0 0'])
+                cubit.add_node_set(surf, name='load',
+                    bc_section='DESIGN SURF DIRICH CONDITIONS',
+                    bc_description='NUMDOF 6 ONOFF 1 1 1 0 0 0 '
+                        + 'VAL 0.0 0.0 0.0 0.0 0.0 0.0 '
+                        + 'FUNCT 0 0 0 0 0 0')
             else:
-                cubit.add_node_set(surf, name='load{}'.format(i), bc=[
-                    'DESIGN SURF NEUMANN CONDITIONS',
-                    'NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 ' +
-                    'FUNCT 0 0 0 0 0 0'])
+                cubit.add_node_set(surf, name='load{}'.format(i),
+                    bc_section='DESIGN SURF NEUMANN CONDITIONS',
+                    bc_description='NUMDOF 6 ONOFF 1 1 1 0 0 0 '
+                        + 'VAL 0.0 0.0 0.0 0.0 0.0 0.0 '
+                        + 'FUNCT 0 0 0 0 0 0')
 
         # Compare the input file created for baci.
         self.compare(cubit, 'test_create_block',
@@ -223,14 +223,16 @@ class TestCubitPy(unittest.TestCase):
                 + 'normal 0 0 1 start angle 0 stop angle {}').format(
                     radius, angle))
 
-        mesh_types = [
-            ['Tetmesh', 'TETRA4', 'SOLIDT4', ''],
-            ['Auto', 'HEX8', 'SOLIDH8', 'EAS none'],
-            ['Tetmesh', 'TETRA10', 'SOLIDT10', ''],
-            ['Auto', 'HEX20', 'SOLIDH20', ''],
-            ['Auto', 'HEX27', 'SOLIDH27', '']
+        element_type_list = [
+            cupy.element_type.hex8,
+            cupy.element_type.hex20,
+            cupy.element_type.hex27,
+            cupy.element_type.tet4,
+            cupy.element_type.tet10,
+            cupy.element_type.hex8sh
             ]
-        for i, [scheme, string1, string2, dat_string] in enumerate(mesh_types):
+
+        for i, element_type in enumerate(element_type_list):
 
             # Offset for the next volume.
             offset_point = i * 12
@@ -265,6 +267,7 @@ class TestCubitPy(unittest.TestCase):
                 i * 0.4))
 
             # Set the size and type of the elements.
+            scheme, _dummy = element_type.get_cubit_names()
             cubit.cmd('volume {} scheme {}'.format(1 + offset_volume, scheme))
 
             # Set mesh properties.
@@ -274,19 +277,17 @@ class TestCubitPy(unittest.TestCase):
             # Set the element type.
             cubit.add_element_type(
                 cubit.volume(1 + offset_volume),
-                string1,
+                element_type,
                 name='block_' + str(i),
-                bc=['STRUCTURE',
-                    'MAT 1 KINEM nonlinear {}'.format(dat_string),
-                    string2
-                    ])
+                material='MAT 1',
+                bc_description=None)
 
             # Add the node sets.
             cubit.add_node_set(
                 cubit.surface(5 + offset_surface),
                 name='fix_' + str(i),
-                bc=['DESIGN SURF DIRICH CONDITIONS',
-                    'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])
+                bc_section='DESIGN SURF DIRICH CONDITIONS',
+                bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
 
         # Set the head string.
         cubit.head = '''
@@ -347,31 +348,23 @@ class TestCubitPy(unittest.TestCase):
         cubit.add_node_set(
             solid.vertices()[0],
             name='vertex',
-            bc=[
-                cupy.bc_type.dirichlet,
-                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 1'
-                ])
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 1')
         cubit.add_node_set(
             solid.curves()[0],
             name='curve',
-            bc=[
-                cupy.bc_type.neumann,
-                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 2'
-                ])
+            bc_type=cupy.bc_type.neumann,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 2')
         cubit.add_node_set(
             solid.surfaces()[0],
             name='surface',
-            bc=[
-                cupy.bc_type.dirichlet,
-                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 3'
-                ])
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 3')
         cubit.add_node_set(
             solid.volumes()[0],
             name='volume',
-            bc=[
-                cupy.bc_type.neumann,
-                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4'
-                ])
+            bc_type=cupy.bc_type.neumann,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4')
 
         # Set the head string.
         cubit.head = '''
@@ -407,23 +400,19 @@ class TestCubitPy(unittest.TestCase):
         surface_load_alt.add([cubit.surface(i) for i in [2, 3, 5, 6]])
 
         # Set element type.
-        cubit.add_element_type(volume,
-            'HEX8',
-            bc=['STRUCTURE',
-                'MAT 1 KINEM nonlinear EAS none',
-                'SOLIDHEX8'
-                ])
+        cubit.add_element_type(volume, cupy.element_type.hex8,
+            material='MAT 1', bc_description='KINEM nonlinear EAS none')
 
         # Add BCs.
         cubit.add_node_set(surface_fix,
-            bc=[cupy.bc_type.dirichlet,
-                'NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0'])
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
         cubit.add_node_set(surface_load,
-            bc=[cupy.bc_type.neumann,
-                'NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0'])
+            bc_type=cupy.bc_type.neumann,
+            bc_description='NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0')
         cubit.add_node_set(surface_load_alt,
-            bc=[cupy.bc_type.neumann,
-                'NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0'])
+            bc_type=cupy.bc_type.neumann,
+            bc_description='NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0')
 
         # Mesh the model.
         cubit.cmd('volume {} size auto factor 8'.format(volume.id()))
