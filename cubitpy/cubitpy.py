@@ -81,8 +81,6 @@ class CubitPy(object):
         """
         self.node_sets = []
         self.blocks = []
-        self.node_set_counter = 1
-        self.block_counter = 1
 
     def __getattr__(self, key, *args, **kwargs):
         """
@@ -114,12 +112,12 @@ class CubitPy(object):
         """
 
         # Check that all blocks in cubit are created with this function.
-        if not len(self.cubit.get_block_id_list()) == self.block_counter - 1:
-            raise ValueError(('The block counter is {}, but the number of '
-                + 'blocks in cubit is {}, all blocks should be created with '
+        n_blocks = len(self.blocks)
+        if not len(self.cubit.get_block_id_list()) == n_blocks:
+            raise ValueError(('The block counter is {1}, but the number of '
+                + 'blocks in cubit is {0}, all blocks should be created with '
                 + 'this function!').format(
-                    len(self.cubit.get_block_id_list()),
-                    self.block_counter - 1))
+                    len(self.cubit.get_block_id_list()), n_blocks))
 
         # Get element type of item.
         geometry_type = item.get_geometry_type()
@@ -132,17 +130,17 @@ class CubitPy(object):
         # Execute the block commands in cubit.
         _cubit_scheme, cubit_element_type = el_type.get_cubit_names()
         self.cubit.cmd('block {} {} {}'.format(
-            self.block_counter,
+            n_blocks + 1,
             geometry_type.get_cubit_string(),
             item.id()
             ))
         self.cubit.cmd('block {} element type {}'.format(
-            self.block_counter,
+            n_blocks + 1,
             cubit_element_type
             ))
         if name is not None:
             self.cubit.cmd('block {} name "{}"'.format(
-                self.block_counter,
+                n_blocks + 1,
                 name
                 ))
 
@@ -152,13 +150,13 @@ class CubitPy(object):
 
         # Add data that will be written to bc file.
         self.blocks.append([
-            self.block_counter,
             'STRUCTURE', ' '.join([material, bc_description]),
-            el_type.get_baci_name()])
+            el_type.get_baci_name()
+            ])
 
-        self.block_counter += 1
-
-    def add_node_set(self, item, name=None, bc=None):
+    def add_node_set(self, item, *, name=None, bc_type=None,
+            bc_description='NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0',
+            bc_section=None):
         """
         Add a node set to cubit. This node set can have a boundary condition.
 
@@ -168,36 +166,50 @@ class CubitPy(object):
             Geometry whose nodes will be put into the node set.
         name: str
             Name of the node set.
-        bc: [str1 / BoundaryConditionType, str2]
-            Data for the *.bc file that will be used with pre_exodus.
-            - str1: Header for the .dat file section. Can also be given as
-                BoundaryConditionType, where the header is automatically
-                generated.
-            - str2: Line with the concret definition of the boundary condition.
+        bc_type: cubit.bc_type
+            Type of boundary (dirichlet or neumann).
+        bc_section: str
+            Name of the section in the input file. Mutually exclusive with
+            bc_type.
+        bc_description: str
+            Definition of the boundary condition.
         """
+
+        # Check that all node sets  in cubit are created with this function.
+        n_node_sets = len(self.node_sets)
+        if not len(self.cubit.get_nodeset_id_list()) == n_node_sets:
+            raise ValueError(('The node set counter is {1}, but the number of '
+                + 'node sets in cubit is {0}, all node sets should be created '
+                + 'with this function!').format(
+                    len(self.cubit.get_nodeset_id_list()), n_node_sets))
 
         # Get element type of item.
         geometry_type = item.get_geometry_type()
 
         # Add the node set to cubit.
         self.cubit.cmd('nodeset {} {} {}'.format(
-            self.node_set_counter,
+            n_node_sets + 1,
             geometry_type.get_cubit_string(),
             item.id()
             ))
+
+        # Check if the name of the boundary condition is given explicitly.
         if name is not None:
             self.cubit.cmd('nodeset {} name "{}"'.format(
-                self.node_set_counter,
+                n_node_sets + 1,
                 name
                 ))
-        if bc is not None:
-            # Check if the name of the boundary condition is given explicitly.
-            if isinstance(bc[0], cupy.bc_type):
-                bc_string = bc[0].get_dat_bc_section_header(geometry_type)
-            else:
-                bc_string = bc[0]
-            self.node_sets.append([self.node_set_counter, [bc_string, bc[1]]])
-        self.node_set_counter += 1
+
+        # Add data that will be written to bc file.
+        if ((bc_section is None and bc_type is None)
+                or bc_section is not None and bc_type is not None):
+            raise ValueError('One of the two arguments "bc_section" and '
+                + '"bc_type" has to be set!')
+        if bc_section is None:
+            bc_section = bc_type.get_dat_bc_section_header(geometry_type)
+        self.node_sets.append([
+            bc_section,
+            bc_description])
 
     def get_surface_center(self, surf):
         """
@@ -252,18 +264,16 @@ class CubitPy(object):
 
         with open(bc_path, 'w') as bc_file:
             bc_file.write('---------------------------------------BCSPECS\n\n')
-            for block in self.blocks:
+            for i, block in enumerate(self.blocks):
                 bc_file.write((
                     '*eb{}="ELEMENT"\nsectionname="{}"\n'
                     + 'description="{}"\nelementname="{}"\n\n').format(
-                        block[0], block[1], block[2], block[3]
-                        ))
-            for node_set in self.node_sets:
+                        i + 1, block[0], block[1], block[2]))
+            for i, node_set in enumerate(self.node_sets):
                 bc_file.write((
                     '*ns{}="CONDITION"\nsectionname="{}"\n'
                     + 'description="{}"\n\n').format(
-                        node_set[0], node_set[1][0], node_set[1][1]
-                        ))
+                        i + 1, node_set[0], node_set[1]))
 
     def create_dat(self, dat_path):
         """
