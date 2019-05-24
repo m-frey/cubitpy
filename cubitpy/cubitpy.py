@@ -91,7 +91,8 @@ class CubitPy(object):
         """
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
-    def add_element_type(self, item, el_type, name=None, bc=None):
+    def add_element_type(self, item, el_type, *, name=None, material='MAT 1',
+            bc_description=None):
         """
         Add a block to cubit that contains the geometry in item. Also set the
         element type of block.
@@ -100,12 +101,16 @@ class CubitPy(object):
         ----
         item: CubitObject
             Geometry to set the element type for.
-        el_type: str
+        el_type: cubit.ElementType
             Cubit element type.
         name: str
             Name of the block.
-        bc: [str]
-            Data for the *.bc file that will be used with pre_exodus.
+        material: str
+            Material string of the block, will be the first part of the BC
+            description.
+        bc_description: str
+            Will be written after the material string. If this is not set, the
+            default values for the given element type will be used.
         """
 
         # Check that all blocks in cubit are created with this function.
@@ -125,6 +130,7 @@ class CubitPy(object):
                 + 'volumes!')
 
         # Execute the block commands in cubit.
+        _cubit_scheme, cubit_element_type = el_type.get_cubit_names()
         self.cubit.cmd('block {} {} {}'.format(
             self.block_counter,
             geometry_type.get_cubit_string(),
@@ -132,15 +138,24 @@ class CubitPy(object):
             ))
         self.cubit.cmd('block {} element type {}'.format(
             self.block_counter,
-            el_type
+            cubit_element_type
             ))
         if name is not None:
             self.cubit.cmd('block {} name "{}"'.format(
                 self.block_counter,
                 name
                 ))
-        if bc is not None:
-            self.blocks.append([self.block_counter, bc])
+
+        # If the used does not give a bc_description, load the default one.
+        if bc_description is None:
+            bc_description = el_type.get_default_baci_description()
+
+        # Add data that will be written to bc file.
+        self.blocks.append([
+            self.block_counter,
+            'STRUCTURE', ' '.join([material, bc_description]),
+            el_type.get_baci_name()])
+
         self.block_counter += 1
 
     def add_node_set(self, item, name=None, bc=None):
@@ -241,7 +256,7 @@ class CubitPy(object):
                 bc_file.write((
                     '*eb{}="ELEMENT"\nsectionname="{}"\n'
                     + 'description="{}"\nelementname="{}"\n\n').format(
-                        block[0], block[1][0], block[1][1], block[1][2]
+                        block[0], block[1], block[2], block[3]
                         ))
             for node_set in self.node_sets:
                 bc_file.write((

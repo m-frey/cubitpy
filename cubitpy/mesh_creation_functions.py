@@ -11,31 +11,28 @@ from . import cupy
 
 
 def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
-        mesh_interval=None, mesh_factor=None, name=None, mesh=True,
-        material='MAT 1 KINEM nonlinear'):
+        mesh_interval=None, mesh_factor=None, mesh=True, **kwargs):
     """
     Create a cube in cubit.
 
     Args
-        ----
-        cubit: CubitPy
-            CubitPy object.
-        h_x, h_y, h_z: float
-            size of the cube in x, y, and z direction.
-        element_type: str
-            Type of the created element (HEX8, HEX20, HEX27, TETRA4, TETRA10)
-        mesh_interval: [int, int, int]
-            Number of elements in each direction. This option is mutually
-            exclusive with mesh_factor.
-        mesh_interval: int
-            Meshing factor in cubit. 10 is the largest. This option is mutually
-            exclusive with mesh_factor.
-        name: str
-            Name that will be given to this block in the baci bc file.
-        mesh: bool
-            If the cube will be meshed or not.
-        material: str
-            Material string in baci.
+    ----
+    cubit: CubitPy
+        CubitPy object.
+    h_x, h_y, h_z: float
+        size of the cube in x, y, and z direction.
+    element_type: cubit.ElementType
+        Type of the created element (HEX8, HEX20, HEX27, ...)
+    mesh_interval: [int, int, int]
+        Number of elements in each direction. This option is mutually
+        exclusive with mesh_factor.
+    mesh_interval: int
+        Meshing factor in cubit. 10 is the largest. This option is mutually
+        exclusive with mesh_factor.
+    mesh: bool
+        If the cube will be meshed or not.
+    kwargs:
+        Are passed to the Cubit.add_element_type function.
     """
 
     # Check if default value has to be set for element_type.
@@ -89,10 +86,7 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
             volume_id, mesh_factor))
 
     # Set the element type.
-    cubit.add_element_type(solid.volumes()[0], cubit_element_type, name=name,
-        bc=['STRUCTURE', '{} {}'.format(material, baci_dat_string),
-            baci_element_type
-            ])
+    cubit.add_element_type(solid.volumes()[0], el_type=element_type, **kwargs)
 
     # Mesh the created block.
     if mesh:
