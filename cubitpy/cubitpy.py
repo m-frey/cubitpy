@@ -154,6 +154,19 @@ class CubitPy(object):
             el_type.get_baci_name()
             ])
 
+    def reset_blocks(self):
+        """
+        This method deletes all blocks in Cubit and resets the counter in
+        this object.
+        """
+
+        # Reset the block list of this object.
+        self.blocks = []
+
+        # Delete all blocks.
+        for block_id in self.get_block_id_list():
+            self.cmd('delete Block {}'.format(block_id))
+
     def add_node_set(self, item, *, name=None, bc_type=None,
             bc_description='NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0',
             bc_section=None):
