@@ -426,6 +426,27 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, 'test_groups')
 
+    def test_reset_block(self):
+        """
+        Test that the block counter can be reset in cubit.
+        """
+
+        # Create a solid brick.
+        cubit = CubitPy()
+        block_1 = cubit.brick(1, 1, 1)
+        block_2 = cubit.brick(2, 0.5, 0.5)
+        cubit.cmd('volume 1 size auto factor 10')
+        cubit.cmd('volume 2 size auto factor 10')
+        cubit.cmd('mesh volume 1')
+        cubit.cmd('mesh volume 2')
+
+        cubit.add_element_type(block_1.volumes()[0], cupy.element_type.hex8)
+        self.compare(cubit, 'test_reset_block_1')
+
+        cubit.reset_blocks()
+        cubit.add_element_type(block_2.volumes()[0], cupy.element_type.hex8)
+        self.compare(cubit, 'test_reset_block_2')
+
 
 if __name__ == '__main__':
     unittest.main()
