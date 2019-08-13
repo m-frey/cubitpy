@@ -239,6 +239,30 @@ class CubitPy(object):
         v = 0.5 * (range_v[1] + range_v[0])
         return surf.position_from_u_v(u, v)
 
+    def get_ids(self, geometry_type):
+        """
+        Get a list with all available ids of a certain geometry type.
+        """
+        return self.get_entities(geometry_type.get_cubit_string())
+
+    def get_items(self, geometry_type):
+        """
+        Get a list with all available cubit objects of a certain geometry type.
+        """
+
+        if geometry_type == cupy.geometry.vertex:
+            funct = self.vertex
+        elif geometry_type == cupy.geometry.curve:
+            funct = self.curve
+        elif geometry_type == cupy.geometry.surface:
+            funct = self.surface
+        elif geometry_type == cupy.geometry.volume:
+            funct = self.volume
+        else:
+            raise ValueError('Got unexpected geometry type!')
+
+        return [funct(index) for index in self.get_ids(geometry_type)]
+
     def set_line_interval(self, item, n_el):
         """
         Set the number of elements along a line.
