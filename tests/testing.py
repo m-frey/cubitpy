@@ -447,6 +447,30 @@ class TestCubitPy(unittest.TestCase):
         cubit.add_element_type(block_2.volumes()[0], cupy.element_type.hex8)
         self.compare(cubit, 'test_reset_block_2')
 
+    def test_get_id_functions(self):
+        """
+        Test if the get_ids and get_items methods work as expected.
+        """
+
+        cubit = CubitPy()
+
+        cubit.cmd('create vertex 0 0 0')
+        cubit.cmd('create curve location 0 0 0 location 1 1 1')
+        cubit.cmd('create surface circle radius 1 zplane')
+        cubit.cmd('brick x 1')
+
+        self.assertEqual(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            cubit.get_ids(cupy.geometry.vertex))
+        self.assertEqual(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+            cubit.get_ids(cupy.geometry.curve))
+        self.assertEqual(
+            [1, 2, 3, 4, 5, 6, 7],
+            cubit.get_ids(cupy.geometry.surface))
+        self.assertEqual(
+            [2], cubit.get_ids(cupy.geometry.volume))
+
 
 if __name__ == '__main__':
     unittest.main()
