@@ -417,7 +417,7 @@ class CubitPy(object):
                 journal.write('label {} On\n'.format(item.get_cubit_string()))
 
             if len(label) > 0:
-                journal.write('display')
+                journal.write('display\n')
 
         # Adapt the environment if needed.
         is_eclipse, python_path_old = check_environment_eclipse()
