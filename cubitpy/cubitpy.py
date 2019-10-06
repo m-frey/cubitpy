@@ -9,6 +9,7 @@ interface works only with Python2, a wrapper for the cubit methods is used.
 import os
 import shutil
 import subprocess
+import time
 
 # Cubitpy modules.
 from .conf import cupy
@@ -403,9 +404,15 @@ class CubitPy(object):
             vol).
         """
 
+        # Export the cubit state. After the export, we wait, to ensure that the
+        # write operation finished, and the state file can be opened cleanly
+        # (in some cases the creation of the state file takes to long and in
+        # the subsequent parts of this code we open a file that is not yet
+        # fully written to disk).
         os.makedirs(cupy.temp_dir, exist_ok=True)
         state_path = os.path.join(cupy.temp_dir, 'state.cub')
         self.export_cub(state_path)
+        time.sleep(0.5)
 
         # Write file that opens the state in cubit.
         journal_path = os.path.join(cupy.temp_dir, 'open_state.jou')
