@@ -52,7 +52,7 @@ def is_cubit_type(obj):
 
 
 # All cubit items that are created are stored in this dictionary. The keys are
-# the unique object ids. The items are deleted once they run out of scope in 
+# the unique object ids. The items are deleted once they run out of scope in
 # python3.
 cubit_objects = {}
 
@@ -189,7 +189,7 @@ while 1:
         cubit_id = cubit_item_to_id(receive[1])
         if cubit_id is None:
             raise TypeError('Expected cubit object! Got {}!'.format(item))
- 
+
         # Delete the object from the dictionary.
         if cubit_id in cubit_objects.keys():
             del cubit_objects[cubit_id]
@@ -199,7 +199,7 @@ while 1:
 
         # Return to python3.
         channel.send(None)
-        
+
 
     else:
         raise ValueError('The case of "{}" is not implemented!'.format(
