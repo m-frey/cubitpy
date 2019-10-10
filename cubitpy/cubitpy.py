@@ -391,7 +391,7 @@ class CubitPy(object):
         self.cubit.reset()
         self._default_cubit_variables()
 
-    def display_in_cubit(self, label=''):
+    def display_in_cubit(self, label='', delay=0.5):
         """
         Save the state to a cubit file and open cubit with that file.
         Additionally labels can be displayed in cubit to simplify the mesh
@@ -402,6 +402,9 @@ class CubitPy(object):
         label: []
             What kind of labels will be shown in cubit (vertex, curve, surf,
             vol).
+        delay: float
+            Time (in seconds) to wait after sending the write command until the
+            new cubit session is opened.
         """
 
         # Export the cubit state. After the export, we wait, to ensure that the
@@ -409,10 +412,12 @@ class CubitPy(object):
         # (in some cases the creation of the state file takes to long and in
         # the subsequent parts of this code we open a file that is not yet
         # fully written to disk).
+        # TODO: find a way to do this without the wait command, but to check if
+        # the file is readable.
         os.makedirs(cupy.temp_dir, exist_ok=True)
         state_path = os.path.join(cupy.temp_dir, 'state.cub')
         self.export_cub(state_path)
-        time.sleep(0.5)
+        time.sleep(delay)
 
         # Write file that opens the state in cubit.
         journal_path = os.path.join(cupy.temp_dir, 'open_state.jou')
