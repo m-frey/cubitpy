@@ -345,6 +345,10 @@ class TestCubitPy(unittest.TestCase):
         # First create the solid mesh.
         cubit = CubitPy()
         solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+
+        # Add all possible boundary conditions.
+
+        # Dirichlet and Neumann.
         cubit.add_node_set(
             solid.vertices()[0],
             name='vertex',
@@ -365,6 +369,20 @@ class TestCubitPy(unittest.TestCase):
             name='volume',
             bc_type=cupy.bc_type.neumann,
             bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4')
+
+        # Coupling.
+        cubit.add_node_set(
+            solid.volumes()[0],
+            name='coupling_btsv',
+            bc_type=cupy.bc_type.beam_to_solid_volume_meshtying,
+            bc_description='COUPLING_ID 1'
+            )
+        cubit.add_node_set(
+            solid.surfaces()[0],
+            name='coupling_btss',
+            bc_type=cupy.bc_type.beam_to_solid_surface_meshtying,
+            bc_description='COUPLING_ID 1'
+            )
 
         # Set the head string.
         cubit.head = '''
