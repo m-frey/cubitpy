@@ -160,6 +160,8 @@ class BoundaryConditionType(IntEnum):
     """Enum for boundary conditions types."""
     dirichlet = 1
     neumann = 2
+    beam_to_solid_volume_meshtying = 3
+    beam_to_solid_surface_meshtying = 4
 
     def get_dat_bc_section_header(self, geometry_type):
         """
@@ -167,12 +169,22 @@ class BoundaryConditionType(IntEnum):
         dat file.
         """
 
-        if self.value == self.dirichlet:
-            self_string = 'DIRICH'
-        else:
-            self_string = 'NEUMANN'
+        if self.value == self.dirichlet or self.value == self.neumann:
+            if self.value == self.dirichlet:
+                self_string = 'DIRICH'
+            else:
+                self_string = 'NEUMANN'
 
-        return 'DESIGN {} {} CONDITIONS'.format(
-            geometry_type.get_dat_bc_section_string(),
-            self_string
-            )
+            return 'DESIGN {} {} CONDITIONS'.format(
+                geometry_type.get_dat_bc_section_string(),
+                self_string
+                )
+        elif (self.value == self.beam_to_solid_volume_meshtying and
+                geometry_type == GeometryType.volume):
+            return 'BEAM INTERACTION/BEAM TO SOLID VOLUME MESHTYING VOLUME'
+        elif (self.value == self.beam_to_solid_surface_meshtying and
+                geometry_type == GeometryType.surface):
+            return 'BEAM INTERACTION/BEAM TO SOLID SURFACE MESHTYING SURFACE'
+
+        raise ValueError('No implemented case for {} and {}!'.format(
+            self.value, geometry_type))
