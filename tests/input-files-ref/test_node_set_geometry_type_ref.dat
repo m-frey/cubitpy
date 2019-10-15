@@ -14,8 +14,8 @@ MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0
 ------------------------------------------------DESIGN DESCRIPTION
 NDPOINT 1
 NDLINE  1
-NDSURF  1
-NDVOL   1
+NDSURF  2
+NDVOL   2
 ------------------------------------DESIGN LINE NEUMANN CONDITIONS
 DLINE  1
 // curve
@@ -32,6 +32,14 @@ E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 1
 DSURF  1
 // surface
 E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 3
+------------BEAM INTERACTION/BEAM TO SOLID VOLUME MESHTYING VOLUME
+DVOL   1
+// coupling_btsv
+E 2 - COUPLING_ID 1
+----------BEAM INTERACTION/BEAM TO SOLID SURFACE MESHTYING SURFACE
+DSURF  1
+// coupling_btss
+E 2 - COUPLING_ID 1
 -----------------------------------------------DNODE-NODE TOPOLOGY
 NODE    5 DNODE 1
 -----------------------------------------------DLINE-NODE TOPOLOGY
@@ -42,6 +50,10 @@ NODE    1 DSURFACE 1
 NODE    4 DSURFACE 1
 NODE    5 DSURFACE 1
 NODE    8 DSURFACE 1
+NODE    1 DSURFACE 2
+NODE    4 DSURFACE 2
+NODE    5 DSURFACE 2
+NODE    8 DSURFACE 2
 ------------------------------------------------DVOL-NODE TOPOLOGY
 NODE    1 DVOL 1
 NODE    2 DVOL 1
@@ -51,6 +63,14 @@ NODE    5 DVOL 1
 NODE    6 DVOL 1
 NODE    7 DVOL 1
 NODE    8 DVOL 1
+NODE    1 DVOL 2
+NODE    2 DVOL 2
+NODE    3 DVOL 2
+NODE    4 DVOL 2
+NODE    5 DVOL 2
+NODE    6 DVOL 2
+NODE    7 DVOL 2
+NODE    8 DVOL 2
 -------------------------------------------------------NODE COORDS
 NODE         1 COORD -5.0000000000000000e-01 -5.0000000000000000e-01  5.0000000000000000e-01
 NODE         2 COORD -5.0000000000000000e-01 -5.0000000000000000e-01 -5.0000000000000000e-01
