@@ -128,8 +128,13 @@ class CubitPy(object):
             raise TypeError('For now element types can only be set for '
                 + 'volumes!')
 
+        cubit_scheme, cubit_element_type = el_type.get_cubit_names()
+
+        # Set the meshing scheme for this element type.
+        self.cubit.cmd('{} {} scheme {}'.format(
+            geometry_type.get_cubit_string(), item.id(), cubit_scheme))
+
         # Execute the block commands in cubit.
-        _cubit_scheme, cubit_element_type = el_type.get_cubit_names()
         self.cubit.cmd('block {} {} {}'.format(
             n_blocks + 1,
             geometry_type.get_cubit_string(),
