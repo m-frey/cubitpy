@@ -212,7 +212,7 @@ class TestCubitPy(unittest.TestCase):
         self.create_block(cubit, dat_lines_compare=True)
 
     def test_element_types(self):
-        """Create a curved solid in a curved solid."""
+        """Create a curved solid with different element types."""
 
         # Initialize cubit.
         cubit = CubitPy()
@@ -266,14 +266,6 @@ class TestCubitPy(unittest.TestCase):
             cubit.cmd('move Volume {} x 0 y 0 z {}'.format(1 + offset_volume,
                 i * 0.4))
 
-            # Set the size and type of the elements.
-            scheme, _dummy = element_type.get_cubit_names()
-            cubit.cmd('volume {} scheme {}'.format(1 + offset_volume, scheme))
-
-            # Set mesh properties.
-            cubit.cmd('volume {} size auto factor 7'.format(1 + offset_volume))
-            cubit.cmd('mesh volume {}'.format(1 + offset_volume))
-
             # Set the element type.
             cubit.add_element_type(
                 cubit.volume(1 + offset_volume),
@@ -281,6 +273,10 @@ class TestCubitPy(unittest.TestCase):
                 name='block_' + str(i),
                 material='MAT 1',
                 bc_description=None)
+
+            # Set mesh properties.
+            cubit.cmd('volume {} size auto factor 7'.format(1 + offset_volume))
+            cubit.cmd('mesh volume {}'.format(1 + offset_volume))
 
             # Add the node sets.
             cubit.add_node_set(
