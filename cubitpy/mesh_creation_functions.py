@@ -46,15 +46,12 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
         raise ValueError('The keywords mesh_interval and mesh_factor are '
             + 'mutually exclusive!')
 
-    # Get the element type parameters.
-    cubit_scheme, cubit_element_type = element_type.get_cubit_names()
-
     # Create the block in cubit.
     solid = cubit.brick(h_x, h_y, h_z)
     volume_id = solid.volumes()[0].id()
 
-    # Set the size and type of the elements.
-    cubit.cmd('volume {} scheme {}'.format(volume_id, cubit_scheme))
+    # Set the element type.
+    cubit.add_element_type(solid.volumes()[0], el_type=element_type, **kwargs)
 
     # Set mesh properties.
     if mesh_interval is not None:
@@ -83,9 +80,6 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
         # Set a cubit factor for the mesh size.
         cubit.cmd('volume {} size auto factor {}'.format(
             volume_id, mesh_factor))
-
-    # Set the element type.
-    cubit.add_element_type(solid.volumes()[0], el_type=element_type, **kwargs)
 
     # Mesh the created block.
     if mesh:
