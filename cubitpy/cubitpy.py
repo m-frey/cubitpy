@@ -194,7 +194,7 @@ class CubitPy(object):
             Definition of the boundary condition.
         """
 
-        # Check that all node sets  in cubit are created with this function.
+        # Check that all node sets in cubit are created with this function.
         n_node_sets = len(self.node_sets)
         if not len(self.cubit.get_nodeset_id_list()) == n_node_sets:
             raise ValueError(('The node set counter is {1}, but the number of '
