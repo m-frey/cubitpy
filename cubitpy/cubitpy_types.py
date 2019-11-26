@@ -26,6 +26,8 @@ class GeometryType(IntEnum):
             return 'surface'
         elif self.value == self.volume:
             return 'volume'
+        else:
+            raise ValueError('Got unexpected type {}!'.format(self.value))
 
     def get_dat_bc_section_string(self):
         """
@@ -40,6 +42,8 @@ class GeometryType(IntEnum):
             return 'SURF'
         elif self.value == self.volume:
             return 'VOL'
+        else:
+            raise ValueError('Got unexpected type {}!'.format(self.value))
 
 
 class FiniteElementObject(IntEnum):
@@ -66,6 +70,17 @@ class FiniteElementObject(IntEnum):
             return 'edge'
         elif self.value == self.node:
             return 'node'
+
+    def get_dat_bc_section_string(self):
+        """
+        Return the string that represents this item in a dat file section.
+        Currently this only makes sense for the node type, when explicitly
+        defining boundary conditions on nodes.
+        """
+        if self.value == self.node:
+            return 'POINT'
+        else:
+            raise ValueError('Got unexpected type {}!'.format(self.value))
 
 
 class ElementType(IntEnum):
