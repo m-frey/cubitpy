@@ -175,8 +175,9 @@ class BoundaryConditionType(IntEnum):
     """Enum for boundary conditions types."""
     dirichlet = 1
     neumann = 2
-    beam_to_solid_volume_meshtying = 3
-    beam_to_solid_surface_meshtying = 4
+    point_coupling = 3
+    beam_to_solid_volume_meshtying = 4
+    beam_to_solid_surface_meshtying = 5
 
     def get_dat_bc_section_header(self, geometry_type):
         """
@@ -200,6 +201,10 @@ class BoundaryConditionType(IntEnum):
         elif (self.value == self.beam_to_solid_surface_meshtying and
                 geometry_type == GeometryType.surface):
             return 'BEAM INTERACTION/BEAM TO SOLID SURFACE MESHTYING SURFACE'
-
-        raise ValueError('No implemented case for {} and {}!'.format(
-            self.value, geometry_type))
+        elif (self.value == self.point_coupling and
+                (geometry_type == GeometryType.vertex
+                    or geometry_type == FiniteElementObject.node)):
+            return 'DESIGN POINT COUPLING CONDITIONS'
+        else:
+            raise ValueError('No implemented case for {} and {}!'.format(
+                self.value, geometry_type))

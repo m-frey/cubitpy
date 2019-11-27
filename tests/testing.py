@@ -400,6 +400,63 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, 'test_node_set_geometry_type')
 
+    def test_coupling(self):
+        """Create node-node and vertex-vertex coupling."""
+
+        # First create two blocks.
+        cubit = CubitPy()
+        solid_1 = create_brick(cubit, 1, 1, 1, mesh_interval=[2, 2, 2],
+            mesh=False)
+        cubit.move(solid_1, [0.0, -0.5, 0.0])
+        solid_2 = create_brick(cubit, 1, 2, 1, mesh_interval=[2, 4, 2],
+            mesh=False)
+        cubit.move(solid_2, [0.0, 1.0, 0.0])
+
+        # Mesh the blocks.
+        solid_1.mesh()
+        solid_2.mesh()
+
+        # Couple all nodes on the two surfaces. Therefore we first have to get
+        # the surfaces of the two blocks that are at the interface.
+        surfaces = cubit.group('interface_surfaces')
+        surfaces.add('add surface with -0.1 < y_coord and y_coord < 0.1')
+
+        # Check each node with each other node. If they are at the same
+        # position, add a coupling.
+        surf = surfaces.get_geometry_objects(cupy.geometry.surface)
+        for node_id_1 in surf[0].get_node_ids():
+            coordinates_1 = np.array(cubit.get_nodal_coordinates(node_id_1))
+            for node_id_2 in surf[1].get_node_ids():
+                coordinates_2 = cubit.get_nodal_coordinates(node_id_2)
+                if (np.linalg.norm(coordinates_2 - coordinates_1)
+                        < cupy.eps_pos):
+                    cubit.add_node_set(
+                        CubitNodes([node_id_1, node_id_2]),
+                        bc_type=cupy.bc_type.point_coupling,
+                        bc_description='NUMDOF 3 ONOFF 1 1 1'
+                        )
+
+        # Also add coupling explicitly to the on corners.
+        for point_1 in solid_1.vertices():
+            coordinates_1 = np.array(point_1.coordinates())
+            for point_2 in solid_2.vertices():
+                coordinates_2 = np.array(point_2.coordinates())
+                if (np.linalg.norm(coordinates_2 - coordinates_1)
+                        < cupy.eps_pos):
+
+                    # Here a group has to be created.
+                    group = cubit.group('temp_{}_{}'.format(point_1.id(),
+                            point_2.id()))
+                    group.add([point_1, point_2])
+                    cubit.add_node_set(
+                        group,
+                        bc_type=cupy.bc_type.point_coupling,
+                        bc_description='NUMDOF 3 ONOFF 1 2 3'
+                        )
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_point_coupling')
+
     def test_groups(self):
         """
         Test that groups are handled correctly when creating node sets and

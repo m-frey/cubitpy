@@ -97,7 +97,7 @@ class CubitGroup(object):
                 + 'name {}!'.format(self.name))
         return cubit_id
 
-    def get_group_items(self, geometry_type):
+    def get_geometry_ids(self, geometry_type):
         """
         Get a list of all items in the group for the given geometry_type.
         """
@@ -114,6 +114,13 @@ class CubitGroup(object):
         else:
             raise TypeError('Wrong geometry type.')
 
+    def get_geometry_objects(self, geometry_type):
+        """
+        Get a list of all items in the group for the given geometry_type.
+        """
+        all_items = self.cubit.get_items(geometry_type)
+        return [all_items[i - 1] for i in self.get_geometry_ids(geometry_type)]
+
     def get_geometry_dict(self):
         """
         Return a dictionary where the keys are the geometry types and the
@@ -122,12 +129,12 @@ class CubitGroup(object):
 
         group_items = {}
         for geometry_type in cupy.geometry:
-            group_items[geometry_type] = self.get_group_items(geometry_type)
+            group_items[geometry_type] = self.get_geometry_ids(geometry_type)
         return group_items
 
     def id(self):
         """Return the string with all ids of the types in this object."""
-        id_list = self.get_group_items(self.get_geometry_type())
+        id_list = self.get_geometry_ids(self.get_geometry_type())
         return ' '.join(map(str, id_list))
 
     def __str__(self, *args, **kwargs):
