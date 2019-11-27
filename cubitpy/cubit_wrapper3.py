@@ -274,6 +274,35 @@ class CubitObject(object):
         # Default value -> not a valid geometry.
         raise TypeError('The item is not a valid geometry!')
 
+    def get_node_ids(self):
+        """
+        Return a list with the node IDs (index 1) of this object.
+
+        This is done my creating a temporary node set that this geometry is
+        added to. It is not possible to get the node list directly from cubit.
+        """
+
+        # Get a node set ID that is not yet taken.
+        node_set_ids = [0]
+        node_set_ids.extend(self.cubit_connect.cubit.get_nodeset_id_list())
+        temp_node_set_id = max(node_set_ids) + 1
+
+        # Add a temporary node set with this geometry.
+        self.cubit_connect.cubit.cmd('nodeset {} {} {}'.format(
+            temp_node_set_id,
+            self.get_geometry_type().get_cubit_string(),
+            self.id()
+            ))
+
+        # Get the nodes in the created node set.
+        node_ids = self.cubit_connect.cubit.get_nodeset_nodes_inclusive(
+            temp_node_set_id)
+
+        # Delete the temp node set and return the node list.
+        self.cubit_connect.cubit.cmd('delete nodeset {}'.format(
+            temp_node_set_id))
+        return node_ids
+
 
 class CubitObjectMain(CubitObject):
     """
