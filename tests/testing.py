@@ -497,6 +497,32 @@ class TestCubitPy(unittest.TestCase):
         self.assertEqual(
             [2], cubit.get_ids(cupy.geometry.volume))
 
+    def test_get_node_id_function(self):
+        """
+        Test if the get_node_ids methods in the cubit objects work as expected.
+        """
+
+        # Create brick.
+        cubit = CubitPy()
+        brick = create_brick(cubit, 1, 1, 1, mesh_interval=[2, 2, 2])
+
+        # Compare volume, surface, curve and vertex nodes.
+        node_ids = brick.volumes()[0].get_node_ids()
+        node_ids.sort()
+        self.assertEqual(node_ids, list(range(1, 28)))
+
+        node_ids = brick.surfaces()[3].get_node_ids()
+        node_ids.sort()
+        self.assertEqual(node_ids, [4, 6, 7, 13, 15, 16, 19, 22, 23])
+
+        node_ids = brick.curves()[4].get_node_ids()
+        node_ids.sort()
+        self.assertEqual(node_ids, [10, 11, 12])
+
+        node_ids = brick.vertices()[7].get_node_ids()
+        node_ids.sort()
+        self.assertEqual(node_ids, [15])
+
 
 if __name__ == '__main__':
     unittest.main()
