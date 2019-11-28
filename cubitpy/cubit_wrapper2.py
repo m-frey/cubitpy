@@ -108,8 +108,7 @@ while 1:
         # object.
 
         # Check the length of the cubit_objects dictionary and return an error
-        # if it gets very long. Then maybe think about passing delete functions
-        # from python3.
+        # if it gets very long.
         if len(cubit_objects) > 10000:
             raise OverflowError(
                 'The cubit_objects has {} items, that is too much!'.format(
