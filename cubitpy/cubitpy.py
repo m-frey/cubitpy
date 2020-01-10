@@ -380,12 +380,12 @@ class CubitPy(object):
         # Return the path to the dat file.
         return os.path.join(cupy.temp_dir, 'cubitpy.dat')
 
-    def group(self, name, add_value=None):
+    def group(self, **kwargs):
         """
         Reference a group in cubit. Depending on the passed keyword arguments
         the group is created or just references an existing group.
         """
-        return CubitGroup(self, name, add_value)
+        return CubitGroup(self, **kwargs)
 
     def reset(self):
         """
