@@ -418,7 +418,7 @@ class TestCubitPy(unittest.TestCase):
 
         # Couple all nodes on the two surfaces. Therefore we first have to get
         # the surfaces of the two blocks that are at the interface.
-        surfaces = cubit.group('interface_surfaces')
+        surfaces = cubit.group(name='interface_surfaces')
         surfaces.add('add surface with -0.1 < y_coord and y_coord < 0.1')
 
         # Check each node with each other node. If they are at the same
@@ -445,8 +445,7 @@ class TestCubitPy(unittest.TestCase):
                         < cupy.eps_pos):
 
                     # Here a group has to be created.
-                    group = cubit.group('temp_{}_{}'.format(point_1.id(),
-                            point_2.id()))
+                    group = cubit.group()
                     group.add([point_1, point_2])
                     cubit.add_node_set(
                         group,
@@ -468,17 +467,17 @@ class TestCubitPy(unittest.TestCase):
         cubit.brick(4, 2, 1)
 
         # Add to group by string.
-        volume = cubit.group('all_vol')
+        volume = cubit.group(name='all_vol')
         volume.add('add volume all')
 
         # Add to group via string.
-        surface_fix = cubit.group('fix_surf',
-            'add surface in volume in all_vol with x_coord < 0')
-        surface_load = cubit.group('load_surf',
-            'add surface in volume in all_vol with x_coord > -1.99')
+        surface_fix = cubit.group(name='fix_surf',
+            add_value='add surface in volume in all_vol with x_coord < 0')
+        surface_load = cubit.group(name='load_surf',
+            add_value='add surface in volume in all_vol with x_coord > -1.99')
 
         # Add to group by CubitPy object.
-        surface_load_alt = cubit.group('load_surf_alt')
+        surface_load_alt = cubit.group(name='load_surf_alt')
         surface_load_alt.add(cubit.surface(1))
         surface_load_alt.add([cubit.surface(i) for i in [2, 3, 5, 6]])
 

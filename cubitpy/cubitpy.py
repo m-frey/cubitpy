@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import time
+import warnings
 
 # Cubitpy modules.
 from .conf import cupy
@@ -90,6 +91,53 @@ class CubitPy(object):
         """
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
+    def _name_created_set(self, set_type, set_id, name, item):
+        """
+        Create a node set or block and name it. This is an own method because
+        it can be used for both types of set in cubit. If the added item is a
+        group, no explicit name should be given and the group name should be
+        used.
+
+        Args
+        ----
+        set_type: str
+            Type of the set to be added. Can be one of the following:
+              - 'nodeset'
+              - 'block'
+        set_id: int
+            Id of the item to rename.
+        name: str
+            An explicitly given name.
+        item: CubitObject, CubitGroup
+            The item that was added to the set.
+        """
+
+        # Check if the item is a group and if it has a name.
+        if isinstance(item, CubitGroup) and item.name is not None:
+            group_name = item.name
+        else:
+            group_name = None
+
+        # If two names are given, a warning is displayed as this is not the
+        # intended case.
+        rename_name = None
+        if name is not None and group_name is not None:
+            warnings.warn(('A {} is added for the group "{}" and an explicit '
+                'name of "{}" is given. This might be unintended, as usually '
+                'if a group is given, we expect to use the name of the group.'
+                ' In the current case we will use the given name.').format(
+                    set_type, item.name, name))
+            rename_name = name
+        elif group_name is not None:
+            rename_name = group_name
+        elif name is not None:
+            rename_name = name
+
+        # Rename the item.
+        if rename_name is not None:
+            self.cubit.cmd('{} {} name "{}"'.format(set_type, set_id,
+                rename_name))
+
     def add_element_type(self, item, el_type, *, name=None, material='MAT 1',
             bc_description=None):
         """
@@ -98,7 +146,7 @@ class CubitPy(object):
 
         Args
         ----
-        item: CubitObject
+        item: CubitObject, CubitGroup
             Geometry to set the element type for.
         el_type: cubit.ElementType
             Cubit element type.
@@ -144,11 +192,7 @@ class CubitPy(object):
             n_blocks + 1,
             cubit_element_type
             ))
-        if name is not None:
-            self.cubit.cmd('block {} name "{}"'.format(
-                n_blocks + 1,
-                name
-                ))
+        self._name_created_set('block', n_blocks + 1, name, item)
 
         # If the used does not give a bc_description, load the default one.
         if bc_description is None:
@@ -181,7 +225,7 @@ class CubitPy(object):
 
         Args
         ----
-        item: CubitObject
+        item: CubitObject, CubitGroup
             Geometry whose nodes will be put into the node set.
         name: str
             Name of the node set.
@@ -211,13 +255,7 @@ class CubitPy(object):
             geometry_type.get_cubit_string(),
             item.id()
             ))
-
-        # Check if the name of the boundary condition is given explicitly.
-        if name is not None:
-            self.cubit.cmd('nodeset {} name "{}"'.format(
-                n_node_sets + 1,
-                name
-                ))
+        self._name_created_set('nodeset', n_node_sets + 1, name, item)
 
         # Add data that will be written to bc file.
         if ((bc_section is None and bc_type is None)
@@ -380,12 +418,12 @@ class CubitPy(object):
         # Return the path to the dat file.
         return os.path.join(cupy.temp_dir, 'cubitpy.dat')
 
-    def group(self, name, add_value=None):
+    def group(self, **kwargs):
         """
         Reference a group in cubit. Depending on the passed keyword arguments
         the group is created or just references an existing group.
         """
-        return CubitGroup(self, name, add_value)
+        return CubitGroup(self, **kwargs)
 
     def reset(self):
         """
