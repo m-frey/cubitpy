@@ -12,7 +12,7 @@ DIM           3
 MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0
 
 ------------------------------------------------DESIGN DESCRIPTION
-NDPOINT 0
+NDPOINT 1
 NDLINE  0
 NDSURF  4
 NDVOL   0
@@ -22,6 +22,10 @@ DSURF  2
 E 2 - NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0
 // load_surf_alt
 E 3 - NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0
+------------------------------------DESIGN POINT DIRICH CONDITIONS
+DPOINT 1
+// fix_group_explicit_type
+E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
 -------------------------------------DESIGN SURF DIRICH CONDITIONS
 DSURF  2
 // fix_surf
@@ -29,6 +33,39 @@ E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
 // fix_surf_no_name_group
 E 4 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
 -----------------------------------------------DNODE-NODE TOPOLOGY
+NODE    9 DNODE 1
+NODE    10 DNODE 1
+NODE    11 DNODE 1
+NODE    12 DNODE 1
+NODE    17 DNODE 1
+NODE    18 DNODE 1
+NODE    20 DNODE 1
+NODE    23 DNODE 1
+NODE    24 DNODE 1
+NODE    29 DNODE 1
+NODE    30 DNODE 1
+NODE    33 DNODE 1
+NODE    36 DNODE 1
+NODE    41 DNODE 1
+NODE    42 DNODE 1
+NODE    45 DNODE 1
+NODE    48 DNODE 1
+NODE    53 DNODE 1
+NODE    54 DNODE 1
+NODE    57 DNODE 1
+NODE    60 DNODE 1
+NODE    65 DNODE 1
+NODE    66 DNODE 1
+NODE    69 DNODE 1
+NODE    72 DNODE 1
+NODE    73 DNODE 1
+NODE    76 DNODE 1
+NODE    77 DNODE 1
+NODE    78 DNODE 1
+NODE    80 DNODE 1
+NODE    81 DNODE 1
+NODE    83 DNODE 1
+NODE    84 DNODE 1
 -----------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY
 NODE    1 DSURFACE 1

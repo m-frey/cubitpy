@@ -485,6 +485,12 @@ class TestCubitPy(unittest.TestCase):
         group_no_name = cubit.group()
         group_no_name.add('add surface in volume in all_vol with x_coord < 0')
 
+        # Create a group without a name.
+        group_explicit_type = cubit.group()
+        group_explicit_type.add('add surface 2')
+        group_explicit_type.add('add curve 1')
+        group_explicit_type.add('add vertex 3')
+
         # Set element type.
         cubit.add_element_type(volume, cupy.element_type.hex8,
             material='MAT 1', bc_description='KINEM nonlinear EAS none')
@@ -501,6 +507,11 @@ class TestCubitPy(unittest.TestCase):
             bc_description='NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0')
         cubit.add_node_set(group_no_name,
             name='fix_surf_no_name_group',
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
+        cubit.add_node_set(group_explicit_type,
+            name='fix_group_explicit_type',
+            geometry_type=cupy.geometry.vertex,
             bc_type=cupy.bc_type.dirichlet,
             bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
 
