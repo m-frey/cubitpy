@@ -14,7 +14,7 @@ MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0
 ------------------------------------------------DESIGN DESCRIPTION
 NDPOINT 0
 NDLINE  0
-NDSURF  3
+NDSURF  4
 NDVOL   0
 ------------------------------------DESIGN SURF NEUMANN CONDITIONS
 DSURF  2
@@ -23,9 +23,11 @@ E 2 - NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0
 // load_surf_alt
 E 3 - NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0
 -------------------------------------DESIGN SURF DIRICH CONDITIONS
-DSURF  1
+DSURF  2
 // fix_surf
 E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
+// fix_surf_no_name_group
+E 4 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
 -----------------------------------------------DNODE-NODE TOPOLOGY
 -----------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY
@@ -185,6 +187,18 @@ NODE    81 DSURFACE 3
 NODE    82 DSURFACE 3
 NODE    83 DSURFACE 3
 NODE    84 DSURFACE 3
+NODE    1 DSURFACE 4
+NODE    2 DSURFACE 4
+NODE    3 DSURFACE 4
+NODE    4 DSURFACE 4
+NODE    9 DSURFACE 4
+NODE    10 DSURFACE 4
+NODE    13 DSURFACE 4
+NODE    14 DSURFACE 4
+NODE    17 DSURFACE 4
+NODE    19 DSURFACE 4
+NODE    20 DSURFACE 4
+NODE    23 DSURFACE 4
 ------------------------------------------------DVOL-NODE TOPOLOGY
 -------------------------------------------------------NODE COORDS
 NODE         1 COORD -2.0000000000000000e+00 -1.0000000000000000e+00  5.0000000000000000e-01
