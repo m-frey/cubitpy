@@ -481,6 +481,10 @@ class TestCubitPy(unittest.TestCase):
         surface_load_alt.add(cubit.surface(1))
         surface_load_alt.add([cubit.surface(i) for i in [2, 3, 5, 6]])
 
+        # Create a group without a name.
+        group_no_name = cubit.group()
+        group_no_name.add('add surface in volume in all_vol with x_coord < 0')
+
         # Set element type.
         cubit.add_element_type(volume, cupy.element_type.hex8,
             material='MAT 1', bc_description='KINEM nonlinear EAS none')
@@ -495,6 +499,10 @@ class TestCubitPy(unittest.TestCase):
         cubit.add_node_set(surface_load_alt,
             bc_type=cupy.bc_type.neumann,
             bc_description='NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0')
+        cubit.add_node_set(group_no_name,
+            name='fix_surf_no_name_group',
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
 
         # Mesh the model.
         cubit.cmd('volume {} size auto factor 8'.format(volume.id()))

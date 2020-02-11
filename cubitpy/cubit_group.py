@@ -62,7 +62,7 @@ class CubitGroup(object):
         """
 
         if isinstance(add_value, str):
-            self.cubit.cmd('group "{}" {}'.format(self.name, add_value))
+            self.cubit.cmd('group {} {}'.format(self._id, add_value))
         elif isinstance(add_value, CubitObject):
             self.cubit.add_entity_to_group(
                 self._id,
