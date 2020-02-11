@@ -219,7 +219,7 @@ class CubitPy(object):
 
     def add_node_set(self, item, *, name=None, bc_type=None,
             bc_description='NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0',
-            bc_section=None):
+            bc_section=None, geometry_type=None):
         """
         Add a node set to cubit. This node set can have a boundary condition.
 
@@ -236,6 +236,9 @@ class CubitPy(object):
             bc_type.
         bc_description: str
             Definition of the boundary condition.
+        geometry_type: cupy.geometry
+            Directly set the geometry type, instead of obtaining it from the
+            given item.
         """
 
         # Check that all node sets in cubit are created with this function.
@@ -246,15 +249,24 @@ class CubitPy(object):
                 + 'with this function!').format(
                     len(self.cubit.get_nodeset_id_list()), n_node_sets))
 
-        # Get element type of item.
-        geometry_type = item.get_geometry_type()
+        # Get element type of item if it was not explicitly given.
+        if geometry_type is None:
+            geometry_type = item.get_geometry_type()
 
-        # Add the node set to cubit.
-        self.cubit.cmd('nodeset {} {} {}'.format(
-            n_node_sets + 1,
-            geometry_type.get_cubit_string(),
-            item.id()
-            ))
+        if not isinstance(item, CubitGroup):
+            # Add the geometries to the node set in cubit.
+            self.cubit.cmd('nodeset {} {} {}'.format(
+                n_node_sets + 1,
+                geometry_type.get_cubit_string(),
+                item.id()
+                ))
+        else:
+            # Add the group to the node set in cubit.
+            self.cubit.cmd('nodeset {} group {}'.format(
+                n_node_sets + 1,
+                item._id
+                ))
+
         self._name_created_set('nodeset', n_node_sets + 1, name, item)
 
         # Add data that will be written to bc file.
