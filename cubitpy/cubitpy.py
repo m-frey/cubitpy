@@ -262,10 +262,7 @@ class CubitPy(object):
                 ))
         else:
             # Add the group to the node set in cubit.
-            self.cubit.cmd('nodeset {} group {}'.format(
-                n_node_sets + 1,
-                item._id
-                ))
+            item.add_nodes_to_nodeset(n_node_sets + 1)
 
         self._name_created_set('nodeset', n_node_sets + 1, name, item)
 
