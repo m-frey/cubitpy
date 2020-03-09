@@ -128,6 +128,47 @@ class CubitGroup(object):
             group_items[geometry_type] = self.get_geometry_ids(geometry_type)
         return group_items
 
+    def add_nodes_to_nodeset(self, nodeset_id):
+        """
+        Add the nodes from this geometry to a nodeset.
+
+        Args
+        ----
+        nodeset_id: int
+            Number of the nodeset which the nodes should be added to.
+        """
+
+        group_items = self.get_geometry_dict()
+        group_types = [key for key in group_items.keys()
+            if len(group_items[key]) > 0]
+
+        if len(group_types) > 0:
+            # There is one type of geometry in this group, which is added to
+            # the nodeset.
+            self.cubit.cmd('nodeset {} group {}'.format(
+                nodeset_id,
+                self._id))
+        elif len(group_types) == 0:
+            # No geometry in this group, check if there are nodes or elements.
+
+            nodes = []
+
+            # Add all nodes from the group.
+            for i_node in self.cubit.get_group_nodes(self._id):
+                nodes.append(i_node)
+
+            # Add all nodes from surface elements in the group.
+            for i_quad in self.cubit.get_group_quads(self._id):
+                nodes.extend(self.cubit.get_face_nodes(i_quad))
+
+            # Add all nodes from hex elements in the group.
+            for i_hex in self.cubit.get_group_hexes(self._id):
+                nodes.extend(self.cubit.get_hex_nodes(i_hex))
+
+            # Add all nodes to the nodeset.
+            for i_node in nodes:
+                self.cubit.cmd('nodeset {} node {}'.format(nodeset_id, i_node))
+
     def id(self):
         """Return the string with all ids of the types in this object."""
         id_list = self.get_geometry_ids(self.get_geometry_type())

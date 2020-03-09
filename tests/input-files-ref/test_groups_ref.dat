@@ -2,7 +2,7 @@
                   General Data File BACI
 ==================================================================
 -------------------------------------------------------------TITLE
-created by pre_exodus 
+created by pre_exodus
 ------------------------------------------------------PROBLEM SIZE
 //ELEMENTS    36
 //NODES       84
@@ -12,7 +12,7 @@ DIM           3
 MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0
 
 ------------------------------------------------DESIGN DESCRIPTION
-NDPOINT 1
+NDPOINT 2
 NDLINE  0
 NDSURF  4
 NDVOL   0
@@ -23,9 +23,11 @@ E 2 - NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0
 // load_surf_alt
 E 3 - NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0
 ------------------------------------DESIGN POINT DIRICH CONDITIONS
-DPOINT 1
+DPOINT 2
 // fix_group_explicit_type
 E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
+// mesh_group
+E 2 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
 -------------------------------------DESIGN SURF DIRICH CONDITIONS
 DSURF  2
 // fix_surf
@@ -66,6 +68,22 @@ NODE    80 DNODE 1
 NODE    81 DNODE 1
 NODE    83 DNODE 1
 NODE    84 DNODE 1
+NODE    31 DNODE 2
+NODE    32 DNODE 2
+NODE    34 DNODE 2
+NODE    35 DNODE 2
+NODE    43 DNODE 2
+NODE    44 DNODE 2
+NODE    46 DNODE 2
+NODE    47 DNODE 2
+NODE    61 DNODE 2
+NODE    62 DNODE 2
+NODE    73 DNODE 2
+NODE    74 DNODE 2
+NODE    75 DNODE 2
+NODE    76 DNODE 2
+NODE    79 DNODE 2
+NODE    80 DNODE 2
 -----------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY
 NODE    1 DSURFACE 1

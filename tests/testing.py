@@ -19,8 +19,16 @@ testing_temp = os.path.join(testing_path, 'testing-tmp')
 sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
 
 # Cubitpy imports.
-from cubitpy import CubitPy, cupy, CubitNodes
+from cubitpy import CubitPy, cupy
 from cubitpy.mesh_creation_functions import create_brick
+
+
+# Global variable if this test is run by GitLab.
+if ('TESTING_GITLAB' in os.environ.keys()
+        and os.environ['TESTING_GITLAB'] == '1'):
+    TESTING_GITLAB = True
+else:
+    TESTING_GITLAB = False
 
 
 def check_tmp_dir():
@@ -48,9 +56,12 @@ def compare_strings(string_ref, string_compare):
         for i, file in enumerate(files):
             with open(file, 'w') as input_file:
                 input_file.write(strings[i])
-        child = subprocess.Popen(
-            ['kompare', files[0], files[1]], stderr=subprocess.PIPE)
-        child.communicate()
+        if TESTING_GITLAB:
+            subprocess.run(['diff', files[0], files[1]])
+        else:
+            child = subprocess.Popen(
+                ['kompare', files[0], files[1]], stderr=subprocess.PIPE)
+            child.communicate()
     return compare
 
 
@@ -368,13 +379,16 @@ class TestCubitPy(unittest.TestCase):
 
         # Define boundary conditions on explicit nodes.
         cubit.add_node_set(
-            CubitNodes([2]),
+            cubit.group(add_value='add node 2'),
             name='point2',
+            geometry_type=cupy.geometry.vertex,
             bc_type=cupy.bc_type.neumann,
             bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4')
         cubit.add_node_set(
-            CubitNodes([i for i in range(1, cubit.get_node_count() + 1)]),
+            cubit.group(add_value='add node {}'.format(' '.join(
+                [str(i + 1) for i in range(cubit.get_node_count())]))),
             name='point3',
+            geometry_type=cupy.geometry.vertex,
             bc_type=cupy.bc_type.neumann,
             bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4')
 
@@ -431,7 +445,9 @@ class TestCubitPy(unittest.TestCase):
                 if (np.linalg.norm(coordinates_2 - coordinates_1)
                         < cupy.eps_pos):
                     cubit.add_node_set(
-                        CubitNodes([node_id_1, node_id_2]),
+                        cubit.group(add_value='add node {} {}'.format(
+                            node_id_1, node_id_2)),
+                        geometry_type=cupy.geometry.vertex,
                         bc_type=cupy.bc_type.point_coupling,
                         bc_description='NUMDOF 3 ONOFF 1 1 1'
                         )
@@ -518,6 +534,16 @@ class TestCubitPy(unittest.TestCase):
         # Mesh the model.
         cubit.cmd('volume {} size auto factor 8'.format(volume.id()))
         cubit.cmd('mesh {}'.format(volume))
+
+        # Add a group containing elements and nodes.
+        mesh_group = cubit.group(name='mesh_group')
+        mesh_group.add('add node 1 4 18 58 63')
+        mesh_group.add('add face 69')
+        mesh_group.add('add hex 17')
+        cubit.add_node_set(mesh_group,
+            geometry_type=cupy.geometry.vertex,
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
 
         # Set the head string.
         cubit.head = '''
