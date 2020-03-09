@@ -524,6 +524,16 @@ class TestCubitPy(unittest.TestCase):
         cubit.cmd('volume {} size auto factor 8'.format(volume.id()))
         cubit.cmd('mesh {}'.format(volume))
 
+        # Add a group containing elements and nodes.
+        mesh_group = cubit.group(name='mesh_group')
+        mesh_group.add('add node 1 4 18 58 63')
+        mesh_group.add('add face 69')
+        mesh_group.add('add hex 17')
+        cubit.add_node_set(mesh_group,
+            geometry_type=cupy.geometry.vertex,
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
+
         # Set the head string.
         cubit.head = '''
             ----------------------------------------------------------MATERIALS
