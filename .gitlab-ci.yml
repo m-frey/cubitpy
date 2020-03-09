@@ -8,6 +8,8 @@ cubitpy-testing:
         - "python3 testing.py"
         - "./test_configurations.sh"
     variables:
+        # Indicated the testing script, that it is performed on GitLab.
+        TESTING_GITLAB: 1
         # Define variables for cubit and pre exodus.
         BACI_PRE_EXODUS: "/hdd/gitlab-runner/lib/baci-master/release/pre_exodus"
         CUBIT: "/rzhome/nas/compsim/public/opt/cubit-13.2"

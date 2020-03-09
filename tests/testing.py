@@ -23,6 +23,14 @@ from cubitpy import CubitPy, cupy
 from cubitpy.mesh_creation_functions import create_brick
 
 
+# Global variable if this test is run by GitLab.
+if ('TESTING_GITLAB' in os.environ.keys()
+        and os.environ['TESTING_GITLAB'] == '1'):
+    TESTING_GITLAB = True
+else:
+    TESTING_GITLAB = False
+
+
 def check_tmp_dir():
     """Check if the temp directory exists, if not create it."""
     os.makedirs(testing_temp, exist_ok=True)
@@ -48,9 +56,12 @@ def compare_strings(string_ref, string_compare):
         for i, file in enumerate(files):
             with open(file, 'w') as input_file:
                 input_file.write(strings[i])
-        child = subprocess.Popen(
-            ['kompare', files[0], files[1]], stderr=subprocess.PIPE)
-        child.communicate()
+        if TESTING_GITLAB:
+            subprocess.run(['diff', files[0], files[1]])
+        else:
+            child = subprocess.Popen(
+                ['kompare', files[0], files[1]], stderr=subprocess.PIPE)
+            child.communicate()
     return compare
 
 
