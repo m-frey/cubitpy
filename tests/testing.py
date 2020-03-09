@@ -19,7 +19,7 @@ testing_temp = os.path.join(testing_path, 'testing-tmp')
 sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
 
 # Cubitpy imports.
-from cubitpy import CubitPy, cupy, CubitNodes
+from cubitpy import CubitPy, cupy
 from cubitpy.mesh_creation_functions import create_brick
 
 
@@ -368,13 +368,16 @@ class TestCubitPy(unittest.TestCase):
 
         # Define boundary conditions on explicit nodes.
         cubit.add_node_set(
-            CubitNodes([2]),
+            cubit.group(add_value='add node 2'),
             name='point2',
+            geometry_type=cupy.geometry.vertex,
             bc_type=cupy.bc_type.neumann,
             bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4')
         cubit.add_node_set(
-            CubitNodes([i for i in range(1, cubit.get_node_count() + 1)]),
+            cubit.group(add_value='add node {}'.format(' '.join(
+                [str(i + 1) for i in range(cubit.get_node_count())]))),
             name='point3',
+            geometry_type=cupy.geometry.vertex,
             bc_type=cupy.bc_type.neumann,
             bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4')
 
@@ -431,7 +434,9 @@ class TestCubitPy(unittest.TestCase):
                 if (np.linalg.norm(coordinates_2 - coordinates_1)
                         < cupy.eps_pos):
                     cubit.add_node_set(
-                        CubitNodes([node_id_1, node_id_2]),
+                        cubit.group(add_value='add node {} {}'.format(
+                            node_id_1, node_id_2)),
+                        geometry_type=cupy.geometry.vertex,
                         bc_type=cupy.bc_type.point_coupling,
                         bc_description='NUMDOF 3 ONOFF 1 1 1'
                         )
