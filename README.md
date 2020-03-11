@@ -39,7 +39,7 @@ Run the following command to install the required packages
 pip install -r requirements.txt
 ```
 
-Add the meshpy path to `PYTHONPATH`
+Add the cubitpy path to `PYTHONPATH`
 
 ```bash
 export PYTHONPATH=path_to_cubitpy:$PYTHONPATH
