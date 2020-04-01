@@ -443,7 +443,7 @@ class CubitPy(object):
         self.cubit.reset()
         self._default_cubit_variables()
 
-    def display_in_cubit(self, label='', delay=0.5):
+    def display_in_cubit(self, labels=[], delay=0.5):
         """
         Save the state to a cubit file and open cubit with that file.
         Additionally labels can be displayed in cubit to simplify the mesh
@@ -451,9 +451,8 @@ class CubitPy(object):
 
         Args
         ----
-        label: []
-            What kind of labels will be shown in cubit (vertex, curve, surf,
-            vol).
+        labels: [GeometryType, FiniteElementObject]
+            What kind of labels should be shown in cubit.
         delay: float
             Time (in seconds) to wait after sending the write command until the
             new cubit session is opened.
@@ -476,12 +475,19 @@ class CubitPy(object):
         with open(journal_path, 'w') as journal:
             journal.write('open "{}"\n'.format(state_path))
 
-            # Label items in cubit.
-            for item in label:
-                journal.write('label {} On\n'.format(item.get_cubit_string()))
+            # Get the cubit names of the desired display items.
+            cubit_names = [label.get_cubit_string() for label in labels]
 
-            if len(label) > 0:
-                journal.write('display\n')
+            # Label items in cubit, per default all labels are deactivated.
+            cubit_labels = ['volume', 'surface', 'curve', 'vertex', 'hex',
+                'tet', 'face', 'tri', 'edge', 'node']
+            for item in cubit_labels:
+                if item in cubit_names:
+                    on_off = 'On'
+                else:
+                    on_off = 'Off'
+                journal.write('label {} {}\n'.format(item, on_off))
+            journal.write('display\n')
 
         # Adapt the environment if needed.
         is_eclipse, python_path_old = check_environment_eclipse()
