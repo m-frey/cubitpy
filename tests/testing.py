@@ -624,6 +624,46 @@ class TestCubitPy(unittest.TestCase):
         node_ids.sort()
         self.assertEqual(node_ids, [15])
 
+    def test_display_in_cubit(self):
+        """
+        Call the display_in_cubit function without actually opening the graphic
+        version of cubit. Compare that the created journal file is correct.
+        """
+
+        # Create brick.
+        cubit = CubitPy()
+        create_brick(cubit, 1, 1, 1, mesh_interval=[2, 2, 2])
+
+        # Check the journal file which is created in the display_in_cubit
+        # function.
+        journal_path = cubit.display_in_cubit(labels=[
+            cupy.geometry.vertex,
+            cupy.geometry.curve,
+            cupy.geometry.surface,
+            cupy.geometry.volume,
+            cupy.finite_element_object.node,
+            cupy.finite_element_object.edge,
+            cupy.finite_element_object.face,
+            cupy.finite_element_object.triangle,
+            cupy.finite_element_object.hex_elements,
+            cupy.finite_element_object.tet_elements
+            ], testing=True)
+        with open(journal_path, 'r') as journal:
+            journal_text = journal.read()
+        ref_text = ('open "/tmp/cubitpy/state.cub"\n'
+            'label volume On\n'
+            'label surface On\n'
+            'label curve On\n'
+            'label vertex On\n'
+            'label hex On\n'
+            'label tet On\n'
+            'label face On\n'
+            'label tri On\n'
+            'label edge On\n'
+            'label node On\n'
+            'display')
+        self.assertTrue(journal_text.strip() == ref_text.strip())
+
 
 if __name__ == '__main__':
     unittest.main()
