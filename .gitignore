@@ -1,6 +1,10 @@
 # general filetypes to ignore
 *.txt
 *.pyc
+.*
+
+# coverage report
+*/htmlcov/*
 
 # eclipse stuff
 *.project

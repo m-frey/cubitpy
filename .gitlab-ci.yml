@@ -3,15 +3,45 @@ cubitpy-testing:
     script:
         - "whoami"
         - "pwd"
+        # Source the virtual environment
+        - source "${PYTHON_ENV}/bin/activate"
         # Run tests.
         - "cd tests"
-        - "python3 testing.py"
+        - "coverage run --rcfile=coverage.config -m unittest discover"
+        - "coverage html"
+        - coverage-badge -o htmlcov/coverage.svg
+        # This tests that if cubit is completely closed everything works.
         - "./test_configurations.sh"
+    artifacts:
+        paths:
+          - tests/htmlcov/
     variables:
         # Indicated the testing script, that it is performed on GitLab.
         TESTING_GITLAB: 1
+        
+        # Path to the virtual python environment on the testing machine.
+        PYTHON_ENV: "/hdd/gitlab-runner/lib/python-interpreter/cubitpy-env"
+        
         # Define variables for cubit and pre exodus.
         BACI_PRE_EXODUS: "/hdd/gitlab-runner/lib/baci-master/release/pre_exodus"
         CUBIT: "/rzhome/nas/compsim/public/opt/cubit-13.2"
     tags:
         - "imcs-all"
+
+
+# For the master branch add the coverage report.
+pages:
+    stage: deploy
+    dependencies:
+        - cubitpy-testing
+    script:
+        - mv tests/htmlcov/ public/
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
+    tags:
+        - "imcs-all"
+    only:
+        refs:
+            - master
