@@ -443,7 +443,7 @@ class CubitPy(object):
         self.cubit.reset()
         self._default_cubit_variables()
 
-    def display_in_cubit(self, labels=[], delay=0.5):
+    def display_in_cubit(self, labels=[], delay=0.5, testing=False):
         """
         Save the state to a cubit file and open cubit with that file.
         Additionally labels can be displayed in cubit to simplify the mesh
@@ -456,6 +456,9 @@ class CubitPy(object):
         delay: float
             Time (in seconds) to wait after sending the write command until the
             new cubit session is opened.
+        testing: bool
+            If this is true, cubit will not be opened, instead the created
+            journal and command will re returned.
         """
 
         # Export the cubit state. After the export, we wait, to ensure that the
@@ -489,17 +492,23 @@ class CubitPy(object):
                 journal.write('label {} {}\n'.format(item, on_off))
             journal.write('display\n')
 
-        # Adapt the environment if needed.
-        is_eclipse, python_path_old = check_environment_eclipse()
-
-        # Open the state in cubit.
-        subprocess.call([
+        # Get the command and arguments to open cubit with.
+        cubit_command = [
             os.path.join(self.cubit_path, 'cubit'),
             '-nojournal',
             '-information=Off',
             '-input', 'open_state.jou'
-            ], cwd=cupy.temp_dir)
+            ]
 
-        # Restore environment path.
-        if is_eclipse:
-            os.environ['PYTHONPATH'] = python_path_old
+        if not testing:
+            # Adapt the environment if needed.
+            is_eclipse, python_path_old = check_environment_eclipse()
+
+            # Open the state in cubit.
+            subprocess.call(cubit_command, cwd=cupy.temp_dir)
+
+            # Restore environment path.
+            if is_eclipse:
+                os.environ['PYTHONPATH'] = python_path_old
+        else:
+            return journal_path
