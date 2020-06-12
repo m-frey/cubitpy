@@ -48,19 +48,19 @@ class GeometryType(IntEnum):
 
 class FiniteElementObject(IntEnum):
     """Enum for finite element objects."""
-    hex_elements = 1
-    tet_elements = 2
-    face = 3
-    triangle = 4
-    edge = 5
-    node = 6
+    hex = 101
+    tet = 102
+    face = 103
+    triangle = 104
+    edge = 105
+    node = 106
 
     def get_cubit_string(self):
         """Return the string that represents this item in cubit."""
 
-        if self.value == self.hex_elements:
+        if self.value == self.hex:
             return 'hex'
-        elif self.value == self.tet_elements:
+        elif self.value == self.tet:
             return 'tet'
         elif self.value == self.face:
             return 'face'
@@ -81,6 +81,11 @@ class FiniteElementObject(IntEnum):
             return 'POINT'
         else:
             raise ValueError('Got unexpected type {}!'.format(self.value))
+
+
+class CubitItems(IntEnum):
+    """Enum for cubit internal items such as groups."""
+    group = 201
 
 
 class ElementType(IntEnum):

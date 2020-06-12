@@ -176,25 +176,30 @@ class CubitPy(object):
             raise TypeError('For now element types can only be set for '
                 + 'volumes!')
 
-        cubit_scheme, cubit_element_type = el_type.get_cubit_names()
+        self.cubit.cmd('create block {}'.format(n_blocks + 1))
 
-        # Set the meshing scheme for this element type.
-        self.cubit.cmd('{} {} scheme {}'.format(
-            geometry_type.get_cubit_string(), item.id(), cubit_scheme))
+        if not isinstance(item, CubitGroup):
+            cubit_scheme, cubit_element_type = el_type.get_cubit_names()
 
-        # Execute the block commands in cubit.
-        self.cubit.cmd('block {} {} {}'.format(
-            n_blocks + 1,
-            geometry_type.get_cubit_string(),
-            item.id()
-            ))
-        self.cubit.cmd('block {} element type {}'.format(
-            n_blocks + 1,
-            cubit_element_type
-            ))
+            # Set the meshing scheme for this element type.
+            self.cubit.cmd('{} {} scheme {}'.format(
+                geometry_type.get_cubit_string(), item.id(), cubit_scheme))
+
+            self.cubit.cmd('block {} {} {}'.format(
+                n_blocks + 1,
+                geometry_type.get_cubit_string(),
+                item.id()
+                ))
+            self.cubit.cmd('block {} element type {}'.format(
+                n_blocks + 1,
+                cubit_element_type
+                ))
+        else:
+            item.add_to_block(n_blocks + 1, el_type)
+
         self._name_created_set('block', n_blocks + 1, name, item)
 
-        # If the used does not give a bc_description, load the default one.
+        # If the user does not give a bc_description, load the default one.
         if bc_description is None:
             bc_description = el_type.get_default_baci_description()
 
@@ -253,6 +258,7 @@ class CubitPy(object):
         if geometry_type is None:
             geometry_type = item.get_geometry_type()
 
+        self.cubit.cmd('create nodeset {}'.format(n_node_sets + 1))
         if not isinstance(item, CubitGroup):
             # Add the geometries to the node set in cubit.
             self.cubit.cmd('nodeset {} {} {}'.format(
@@ -262,7 +268,7 @@ class CubitPy(object):
                 ))
         else:
             # Add the group to the node set in cubit.
-            item.add_nodes_to_nodeset(n_node_sets + 1)
+            item.add_to_nodeset(n_node_sets + 1)
 
         self._name_created_set('nodeset', n_node_sets + 1, name, item)
 
@@ -298,7 +304,7 @@ class CubitPy(object):
         """
         return self.get_entities(geometry_type.get_cubit_string())
 
-    def get_items(self, geometry_type):
+    def get_items(self, geometry_type, item_ids=None):
         """
         Get a list with all available cubit objects of a certain geometry type.
         """
@@ -314,7 +320,9 @@ class CubitPy(object):
         else:
             raise ValueError('Got unexpected geometry type!')
 
-        return [funct(index) for index in self.get_ids(geometry_type)]
+        if item_ids is None:
+            item_ids = self.get_ids(geometry_type)
+        return [funct(index) for index in item_ids]
 
     def set_line_interval(self, item, n_el):
         """

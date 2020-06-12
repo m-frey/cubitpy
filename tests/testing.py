@@ -645,8 +645,8 @@ class TestCubitPy(unittest.TestCase):
             cupy.finite_element_object.edge,
             cupy.finite_element_object.face,
             cupy.finite_element_object.triangle,
-            cupy.finite_element_object.hex_elements,
-            cupy.finite_element_object.tet_elements
+            cupy.finite_element_object.hex,
+            cupy.finite_element_object.tet
             ], testing=True)
         with open(journal_path, 'r') as journal:
             journal_text = journal.read()

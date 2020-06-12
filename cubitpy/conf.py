@@ -9,7 +9,7 @@ import os
 
 # Cubitpy imports.
 from .cubitpy_types import (FiniteElementObject, GeometryType, ElementType,
-    BoundaryConditionType)
+    CubitItems, BoundaryConditionType)
 
 
 class CubitOptions(object):
@@ -31,6 +31,9 @@ class CubitOptions(object):
 
         # Element shape types.
         self.element_type = ElementType
+
+        # Cubit internal items.
+        self.cubit_items = CubitItems
 
         # Boundary condition type.
         self.bc_type = BoundaryConditionType
