@@ -472,10 +472,30 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, 'test_point_coupling')
 
-    def test_groups(self):
+    def test_groups_block_with_volume(self):
+        """
+        Test the group functions where the block is created by adding the
+        volume.
+        """
+        self.xtest_groups(True)
+
+    def test_groups_block_with_hex(self):
+        """
+        Test the group functions where the block is created by adding the hex
+        elements directly.
+        """
+        self.xtest_groups(False)
+
+    def xtest_groups(self, block_with_volume):
         """
         Test that groups are handled correctly when creating node sets and
         element blocks.
+
+        Args
+        ----
+        block_with_volume: bool
+            If the element block should be added via a group containing the
+            geometry volume or via a group containing the hex elements.
         """
 
         # Create a solid brick.
@@ -507,9 +527,10 @@ class TestCubitPy(unittest.TestCase):
         group_explicit_type.add('add curve 1')
         group_explicit_type.add('add vertex 3')
 
-        # Set element type.
-        cubit.add_element_type(volume, cupy.element_type.hex8,
-            material='MAT 1', bc_description='KINEM nonlinear EAS none')
+        if block_with_volume:
+            # Set element type.
+            cubit.add_element_type(volume, cupy.element_type.hex8,
+                material='MAT 1', bc_description='KINEM nonlinear EAS none')
 
         # Add BCs.
         cubit.add_node_set(surface_fix,
@@ -534,6 +555,11 @@ class TestCubitPy(unittest.TestCase):
         # Mesh the model.
         cubit.cmd('volume {} size auto factor 8'.format(volume.id()))
         cubit.cmd('mesh {}'.format(volume))
+
+        if not block_with_volume:
+            all_hex = cubit.group(add_value='add hex all')
+            cubit.add_element_type(all_hex, cupy.element_type.hex8,
+                material='MAT 1', bc_description='KINEM nonlinear EAS none')
 
         # Add a group containing elements and nodes.
         mesh_group = cubit.group(name='mesh_group')
