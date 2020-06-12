@@ -19,7 +19,7 @@ testing_temp = os.path.join(testing_path, 'testing-tmp')
 sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
 
 # Cubitpy imports.
-from cubitpy import CubitPy, cupy
+from cubitpy import CubitPy, cupy, get_surface_center
 from cubitpy.mesh_creation_functions import create_brick
 
 
@@ -158,7 +158,7 @@ class TestCubitPy(unittest.TestCase):
 
         # Create node sets.
         for i, surf in enumerate(block.surfaces()):
-            normal = np.array(surf.normal_at(cubit.get_surface_center(surf)))
+            normal = np.array(surf.normal_at(get_surface_center(surf)))
             if np.dot(normal, [0, 0, -1]) == 1:
                 cubit.add_node_set(surf, name='fix',
                     bc_section='DESIGN SURF DIRICH CONDITIONS',
