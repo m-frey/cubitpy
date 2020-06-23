@@ -12,10 +12,15 @@ from .conf import cupy
 # Global object.
 from .cubitpy import CubitPy
 
+# Utility functions.
+from .cubit_utility import get_surface_center
+
 # Define the itCouplingems that will be exported by default.
 __all__ = [
     # cubit options.
     'cupy',
     # Cubit objects.
     'CubitPy'
+    # Utility functions.
+    'get_surface_center'
     ]
