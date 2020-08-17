@@ -34,6 +34,9 @@ class CubitGroup(object):
         self._id = group_id
         self.cubit = cubit
 
+        self.n_node_sets = 0
+        self.n_blocks = 0
+
         if self._id is None:
             # Create a new group.
             self._id = cubit.create_new_group()
@@ -263,6 +266,36 @@ class CubitGroup(object):
         # Add all nodes to the node set.
         for i_node in nodes:
             self.cubit.cmd('nodeset {} node {}'.format(nodeset_id, i_node))
+
+    def get_name(self, set_type):
+        """
+        Return the name for this set to be used in cubit.
+
+        Args
+        ----
+        set_type: str
+            Type of the set this group is added to. Can be one of the
+            following:
+              - 'nodeset'
+              - 'block'
+        """
+
+        return_string = None
+        if set_type == 'nodeset':
+            if self.n_node_sets == 0:
+                return_string = self.name
+            else:
+                return_string = '{}_{}'.format(self.name, self.n_node_sets)
+            self.n_node_sets += 1
+        elif set_type == 'block':
+            if self.n_blocks > 0:
+                raise ValueError('Only one block can be created from a single '
+                    'group object.')
+            return_string = self.name
+            self.n_blocks += 1
+        else:
+            raise ValueError('Got unexpected set_type "{}"'.format(set_type))
+        return return_string
 
     def id(self):
         """Return the string with all ids of the types in this object."""
