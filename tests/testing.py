@@ -579,6 +579,42 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, 'test_groups')
 
+    def test_groups_multiple_sets(self):
+        """
+        Test that multiple sets can be created from a single group object.
+        """
+
+        # Create a solid brick.
+        cubit = CubitPy()
+        cubit.brick(4, 2, 1)
+
+        # Add to group by string.
+        volume = cubit.group(name='all_vol')
+        volume.add('add volume all')
+
+        # Add BCs.
+        cubit.add_node_set(volume,
+            bc_type=cupy.bc_type.dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
+        cubit.add_node_set(volume,
+            bc_type=cupy.bc_type.neumann,
+            bc_description='NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0')
+
+        # Add blocks.
+        cubit.add_element_type(volume, cupy.element_type.hex8)
+
+        # Mesh the model.
+        cubit.cmd('volume {} size auto factor 8'.format(volume.id()))
+        cubit.cmd('mesh {}'.format(volume))
+
+        # Set the head string.
+        cubit.head = '''
+            ----------------------------------------------------------MATERIALS
+            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0'''
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_groups_multiple_sets')
+
     def test_reset_block(self):
         """
         Test that the block counter can be reset in cubit.

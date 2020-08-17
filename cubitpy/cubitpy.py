@@ -114,7 +114,7 @@ class CubitPy(object):
 
         # Check if the item is a group and if it has a name.
         if isinstance(item, CubitGroup) and item.name is not None:
-            group_name = item.name
+            group_name = item.get_name(set_type)
         else:
             group_name = None
 
