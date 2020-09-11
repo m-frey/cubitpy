@@ -5,6 +5,9 @@ cubitpy-testing:
         - "pwd"
         # Source the virtual environment
         - source "${PYTHON_ENV}/bin/activate"
+        # Print information on the python environment.
+        - "python --version"
+        - "pip list"
         # Run tests.
         - "cd tests"
         - "coverage run --rcfile=coverage.config -m unittest discover"
@@ -18,10 +21,10 @@ cubitpy-testing:
     variables:
         # Indicated the testing script, that it is performed on GitLab.
         TESTING_GITLAB: 1
-        
+
         # Path to the virtual python environment on the testing machine.
         PYTHON_ENV: "/hdd/gitlab-runner/lib/python-interpreter/cubitpy-env"
-        
+
         # Define variables for cubit and pre exodus.
         BACI_PRE_EXODUS: "/hdd/gitlab-runner/lib/baci-master/release/pre_exodus"
         CUBIT: "/rzhome/nas/compsim/public/opt/cubit-13.2"
