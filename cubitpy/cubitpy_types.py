@@ -5,70 +5,70 @@ convert them to strings for cubit or baci commands or the python2 wrapper.
 """
 
 # Python imports.
-from enum import IntEnum
+from enum import Enum, auto
 
 
-class GeometryType(IntEnum):
+class GeometryType(Enum):
     """Enum for geometry types."""
-    vertex = 1
-    curve = 2
-    surface = 3
-    volume = 4
+    vertex = auto()
+    curve = auto()
+    surface = auto()
+    volume = auto()
 
     def get_cubit_string(self):
         """Return the string that represents this item in cubit."""
 
-        if self.value == self.vertex:
+        if self == self.vertex:
             return 'vertex'
-        elif self.value == self.curve:
+        elif self == self.curve:
             return 'curve'
-        elif self.value == self.surface:
+        elif self == self.surface:
             return 'surface'
-        elif self.value == self.volume:
+        elif self == self.volume:
             return 'volume'
         else:
-            raise ValueError('Got unexpected type {}!'.format(self.value))
+            raise ValueError('Got unexpected type {}!'.format(self))
 
     def get_dat_bc_section_string(self):
         """
         Return the string that represents this item in a dat file section.
         """
 
-        if self.value == self.vertex:
+        if self == self.vertex:
             return 'POINT'
-        elif self.value == self.curve:
+        elif self == self.curve:
             return 'LINE'
-        elif self.value == self.surface:
+        elif self == self.surface:
             return 'SURF'
-        elif self.value == self.volume:
+        elif self == self.volume:
             return 'VOL'
         else:
-            raise ValueError('Got unexpected type {}!'.format(self.value))
+            raise ValueError('Got unexpected type {}!'.format(self))
 
 
-class FiniteElementObject(IntEnum):
+class FiniteElementObject(Enum):
     """Enum for finite element objects."""
-    hex = 101
-    tet = 102
-    face = 103
-    triangle = 104
-    edge = 105
-    node = 106
+    hex = auto()
+    tet = auto()
+    face = auto()
+    triangle = auto()
+    edge = auto()
+    node = auto()
 
     def get_cubit_string(self):
         """Return the string that represents this item in cubit."""
 
-        if self.value == self.hex:
+        if self == self.hex:
             return 'hex'
-        elif self.value == self.tet:
+        elif self == self.tet:
             return 'tet'
-        elif self.value == self.face:
+        elif self == self.face:
             return 'face'
-        elif self.value == self.triangle:
+        elif self == self.triangle:
             return 'tri'
-        elif self.value == self.edge:
+        elif self == self.edge:
             return 'edge'
-        elif self.value == self.node:
+        elif self == self.node:
             return 'node'
 
     def get_dat_bc_section_string(self):
@@ -77,37 +77,37 @@ class FiniteElementObject(IntEnum):
         Currently this only makes sense for the node type, when explicitly
         defining boundary conditions on nodes.
         """
-        if self.value == self.node:
+        if self == self.node:
             return 'POINT'
         else:
-            raise ValueError('Got unexpected type {}!'.format(self.value))
+            raise ValueError('Got unexpected type {}!'.format(self))
 
 
-class CubitItems(IntEnum):
+class CubitItems(Enum):
     """Enum for cubit internal items such as groups."""
-    group = 201
+    group = auto()
 
 
-class ElementType(IntEnum):
+class ElementType(Enum):
     """Enum for finite element shape types."""
-    hex8 = 1
-    hex20 = 2
-    hex27 = 3
-    tet4 = 4
-    tet10 = 5
-    hex8sh = 6
+    hex8 = auto()
+    hex20 = auto()
+    hex27 = auto()
+    tet4 = auto()
+    tet10 = auto()
+    hex8sh = auto()
 
     def get_string(self):
         """Get the string representation of this element type."""
-        if self.value == self.hex8:
+        if self == self.hex8:
             return 'hex8'
-        elif self.value == self.hex20:
+        elif self == self.hex20:
             return 'hex20'
-        elif self.value == self.hex27:
+        elif self == self.hex27:
             return 'hex27'
-        elif self.value == self.tet4:
+        elif self == self.tet4:
             return 'tet4'
-        elif self.value == self.tet10:
+        elif self == self.tet10:
             return 'tet10'
 
     def get_cubit_names(self):
@@ -117,23 +117,23 @@ class ElementType(IntEnum):
         """
 
         # Get the element type parameters.
-        if (self.value == self.hex8 or self.value == self.hex8sh):
+        if (self == self.hex8 or self == self.hex8sh):
             cubit_scheme = 'Auto'
             cubit_element_type = 'HEX8'
-        elif self.value == self.hex20:
+        elif self == self.hex20:
             cubit_scheme = 'Auto'
             cubit_element_type = 'HEX20'
-        elif self.value == self.hex27:
+        elif self == self.hex27:
             cubit_scheme = 'Auto'
             cubit_element_type = 'HEX27'
-        elif self.value == self.tet4:
+        elif self == self.tet4:
             cubit_scheme = 'Tetmesh'
             cubit_element_type = 'TETRA4'
-        elif self.value == self.tet10:
+        elif self == self.tet10:
             cubit_scheme = 'Tetmesh'
             cubit_element_type = 'TETRA10'
         else:
-            raise ValueError('Got wrong element type {}!'.format(self.value))
+            raise ValueError('Got wrong element type {}!'.format(self))
 
         return cubit_scheme, cubit_element_type
 
@@ -141,20 +141,20 @@ class ElementType(IntEnum):
         """Get the name of this element in baci."""
 
         # Get the element type parameters.
-        if self.value == self.hex8:
+        if self == self.hex8:
             return 'SOLIDH8'
-        elif self.value == self.hex20:
+        elif self == self.hex20:
             return 'SOLIDH20'
-        elif self.value == self.hex27:
+        elif self == self.hex27:
             return 'SOLIDH27'
-        elif self.value == self.tet4:
+        elif self == self.tet4:
             return 'SOLIDT4'
-        elif self.value == self.tet10:
+        elif self == self.tet10:
             return 'SOLIDT10'
-        elif self.value == self.hex8sh:
+        elif self == self.hex8sh:
             return 'SOLIDSH8'
         else:
-            raise ValueError('Got wrong element type {}!'.format(self.value))
+            raise ValueError('Got wrong element type {}!'.format(self))
 
     def get_default_baci_description(self):
         """
@@ -163,26 +163,26 @@ class ElementType(IntEnum):
         """
 
         # Get the element type parameters.
-        if self.value == self.hex8:
+        if self == self.hex8:
             return 'KINEM nonlinear EAS none'
-        elif (self.value == self.hex20
-                or self.value == self.hex27
-                or self.value == self.tet4
-                or self.value == self.tet10):
+        elif (self == self.hex20
+                or self == self.hex27
+                or self == self.tet4
+                or self == self.tet10):
             return 'KINEM nonlinear'
-        elif self.value == self.hex8sh:
+        elif self == self.hex8sh:
             return 'KINEM nonlinear EAS none ANS none THICKDIR auto'
         else:
-            raise ValueError('Got wrong element type {}!'.format(self.value))
+            raise ValueError('Got wrong element type {}!'.format(self))
 
 
-class BoundaryConditionType(IntEnum):
+class BoundaryConditionType(Enum):
     """Enum for boundary conditions types."""
-    dirichlet = 1
-    neumann = 2
-    point_coupling = 3
-    beam_to_solid_volume_meshtying = 4
-    beam_to_solid_surface_meshtying = 5
+    dirichlet = auto()
+    neumann = auto()
+    point_coupling = auto()
+    beam_to_solid_volume_meshtying = auto()
+    beam_to_solid_surface_meshtying = auto()
 
     def get_dat_bc_section_header(self, geometry_type):
         """
@@ -190,8 +190,8 @@ class BoundaryConditionType(IntEnum):
         dat file.
         """
 
-        if self.value == self.dirichlet or self.value == self.neumann:
-            if self.value == self.dirichlet:
+        if self == self.dirichlet or self == self.neumann:
+            if self == self.dirichlet:
                 self_string = 'DIRICH'
             else:
                 self_string = 'NEUMANN'
@@ -200,16 +200,16 @@ class BoundaryConditionType(IntEnum):
                 geometry_type.get_dat_bc_section_string(),
                 self_string
                 )
-        elif (self.value == self.beam_to_solid_volume_meshtying and
+        elif (self == self.beam_to_solid_volume_meshtying and
                 geometry_type == GeometryType.volume):
             return 'BEAM INTERACTION/BEAM TO SOLID VOLUME MESHTYING VOLUME'
-        elif (self.value == self.beam_to_solid_surface_meshtying and
+        elif (self == self.beam_to_solid_surface_meshtying and
                 geometry_type == GeometryType.surface):
             return 'BEAM INTERACTION/BEAM TO SOLID SURFACE MESHTYING SURFACE'
-        elif (self.value == self.point_coupling and
+        elif (self == self.point_coupling and
                 (geometry_type == GeometryType.vertex
                     or geometry_type == FiniteElementObject.node)):
             return 'DESIGN POINT COUPLING CONDITIONS'
         else:
             raise ValueError('No implemented case for {} and {}!'.format(
-                self.value, geometry_type))
+                self, geometry_type))
