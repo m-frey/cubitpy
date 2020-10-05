@@ -109,7 +109,7 @@ class TestCubitPy(unittest.TestCase):
         self.assertTrue(
             compare_strings(string1, string2), name)
 
-    def create_block(self, cubit, dat_lines_compare=False):
+    def create_block(self, cubit, dat_lines_compare=False, np_arrays=False):
         """
         Create a block with cubit.
 
@@ -118,6 +118,8 @@ class TestCubitPy(unittest.TestCase):
         dat_lines_compare: bool
             If the created dat file should be compared or the list of lines
             returned by get_dat_lines.
+        np_arrays: bool
+            If the move operations sent to cubit are numpy or python arrays.
         """
 
         # Set head
@@ -135,7 +137,10 @@ class TestCubitPy(unittest.TestCase):
         block = cubit.brick(lx, ly, lz)
 
         # Move the block.
-        cubit.move(block, [0, 0, block.bounding_box()[2]])
+        move_array = [0, 0, block.bounding_box()[2]]
+        if np_arrays:
+            move_array = np.array(move_array)
+        cubit.move(block, move_array)
 
         # Set the meshing parameters for the curves.
         for line in block.curves():
@@ -190,6 +195,15 @@ class TestCubitPy(unittest.TestCase):
         # Initialize cubit.
         cubit = CubitPy()
         self.create_block(cubit)
+
+    def test_create_block_numpy_arrays(self):
+        """
+        Test the creation of a cubit block.
+        """
+
+        # Initialize cubit.
+        cubit = CubitPy()
+        self.create_block(cubit, np_arrays=True)
 
     def test_create_block_multiple(self):
         """

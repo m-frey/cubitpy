@@ -8,6 +8,7 @@ and python3.
 # Import python modules.
 import execnet
 import os
+import numpy as np
 
 # Import global options.
 from .conf import cupy
@@ -144,6 +145,16 @@ class CubitConnect(object):
                     return arguments
                 elif isinstance(item, CubitObject):
                     return item.cubit_id
+                elif isinstance(item, np.ndarray):
+                    array = []
+                    for i in item:
+                        if isinstance(i, np.float):
+                            array.append(float(i))
+                        elif isinstance(i, np.float):
+                            array.append(int(i))
+                        else:
+                            raise TypeError('Got unexpected numpy type.')
+                    return array
                 else:
                     return item
 
