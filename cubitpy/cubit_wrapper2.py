@@ -37,7 +37,8 @@ def out(string):
         out_console = parameters['tty']
     else:
         out_console = '/dev/pts/18'
-    os.system('echo "{}" > {}'.format(string, out_console))
+    escaped_string = '{}'.format(string).replace('"', '\\"')
+    os.system('echo "{}" > {}'.format(escaped_string, out_console))
 
 
 def is_cubit_type(obj):
