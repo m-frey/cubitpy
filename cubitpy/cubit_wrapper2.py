@@ -119,18 +119,24 @@ while 1:
         call_object = cubit_objects[cubit_item_to_id(receive[0])]
         function = receive[1]
 
-        # Get the function arguments. It is checked if one of the arguments is
-        # an cubit object.
-        args = []
-        for item in receive[2]:
+        def deserialize_item(item):
+            """
+            Deserialize the item, also if it contains nested nested lists.
+            """
             item_id = cubit_item_to_id(item)
-            if item_id is None:
-                args.append(item)
+            if item_id is not None:
+                return cubit_objects[item_id]
+            elif isinstance(item, tuple) or isinstance(item, list):
+                arguments = []
+                for sub_item in item:
+                    arguments.append(deserialize_item(sub_item))
+                return arguments
             else:
-                args.append(cubit_objects[item_id])
+                return item
 
         # Call the function.
-        cubit_return = call_object.__getattribute__(function)(*args)
+        arguments = deserialize_item(receive[2])
+        cubit_return = call_object.__getattribute__(function)(*arguments)
 
         # Check what to return.
         if is_base_type(cubit_return):
@@ -199,7 +205,6 @@ while 1:
 
         # Return to python3.
         channel.send(None)
-
 
     else:
         raise ValueError('The case of "{}" is not implemented!'.format(

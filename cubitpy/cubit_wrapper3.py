@@ -102,10 +102,10 @@ class CubitConnect(object):
         argument_list: list
             First item is either a string with the action, or a cubit item id.
             In the second case a method will be called on the item, with the
-            arguments stored in the seciont entry in argument_list.
+            arguments stored in the second entry in argument_list.
         check_number_of_channels: bool
             If true it is checked if the channel still exists. This is
-            neccesary in cases where we delete items after the connection has
+            necessary in cases where we delete items after the connection has
             been closed.
         """
 
@@ -132,6 +132,21 @@ class CubitConnect(object):
         def function(*args):
             """This function gets returned from the parent method."""
 
+            def serialize_item(item):
+                """
+                Serialize an item, also nested lists.
+                """
+
+                if isinstance(item, tuple) or isinstance(item, list):
+                    arguments = []
+                    for sub_item in item:
+                        arguments.append(serialize_item(sub_item))
+                    return arguments
+                elif isinstance(item, CubitObject):
+                    return item.cubit_id
+                else:
+                    return item
+
             if self.log_check:
                 # Check if the log file is empty. If it is not, empty it.
                 if os.stat(cupy.temp_log).st_size != 0:
@@ -139,12 +154,7 @@ class CubitConnect(object):
                         pass
 
             # Check if there are cubit objects in the arguments.
-            arguments = []
-            for item in (args):
-                if isinstance(item, CubitObject):
-                    arguments.append(item.cubit_id)
-                else:
-                    arguments.append(item)
+            arguments = serialize_item(args)
 
             # Call the method on the cubit object.
             cubit_return = self.send_and_return(
