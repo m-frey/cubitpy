@@ -686,6 +686,23 @@ class TestCubitPy(unittest.TestCase):
         node_ids.sort()
         self.assertEqual(node_ids, [15])
 
+    def test_nested_lists(self):
+        """
+        Test that nested lists can be send to cubit correctly.
+        """
+
+        cubit = CubitPy()
+        block_1 = cubit.brick(1, 1, 0.25)
+        block_2 = cubit.brick(0.5, 0.5, 0.5)
+        subtracted_block = cubit.subtract([block_2], [block_1])
+        cubit.cmd('volume {} size auto factor 10'.format(
+            subtracted_block[0].volumes()[0].id()))
+        subtracted_block[0].volumes()[0].mesh()
+        cubit.add_element_type(subtracted_block[0].volumes()[0],
+            cupy.element_type.hex8)
+        self.compare(cubit, 'test_nested_lists',
+            dat_lines_compare=False)
+
     def test_display_in_cubit(self):
         """
         Call the display_in_cubit function without actually opening the graphic
