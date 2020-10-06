@@ -274,11 +274,23 @@ class CubitObject(object):
         return self.cubit_connect.send_and_return(
             ['isinstance', self.cubit_id, geom_type])
 
+    def get_self_dir(self):
+        """
+        Return a list of all cubit child items of this object. Also return a
+        flag if the child item is callable or not.
+        """
+        return self.cubit_connect.send_and_return(
+            ['get_self_dir', self.cubit_id]
+            )
+
     def get_methods(self):
         """Return a list of all callable cubit methods for this object."""
-        return self.cubit_connect.send_and_return(
-            ['get_methods', self.cubit_id]
-            )
+        return [method for method, callable in self.get_self_dir() if callable]
+
+    def get_attributes(self):
+        """Return a list of all non callable cubit methods for this object."""
+        return [method for method, callable in self.get_self_dir()
+            if not callable]
 
     def get_geometry_type(self):
         """Return the type of this item."""

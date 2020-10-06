@@ -182,12 +182,12 @@ while 1:
             raise ValueError('Wrong compare type given! Expected vertex, '
                 + 'curve, surface or volume, got{}'.format(receive[2]))
 
-    elif receive[0] == 'get_methods':
+    elif receive[0] == 'get_self_dir':
         # Return a list with all callable methods of this object.
         cubit_object = cubit_objects[cubit_item_to_id(receive[1])]
         channel.send([
-            method_name for method_name in dir(cubit_object)
-            if callable(getattr(cubit_object, method_name))
+            [method_name, callable(getattr(cubit_object, method_name))]
+            for method_name in dir(cubit_object)
             ])
 
     elif receive[0] == 'delete':
