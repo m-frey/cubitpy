@@ -45,7 +45,7 @@ def is_cubit_type(obj):
     """Check if the object is of a cubit base."""
     if (isinstance(obj, cubit.Body) or isinstance(obj, cubit.Vertex)
             or isinstance(obj, cubit.Curve) or isinstance(obj, cubit.Surface)
-            or isinstance(obj, cubit.Volume)
+            or isinstance(obj, cubit.Volume) or isinstance(obj, cubit.MeshImport)
             ):
         return True
     else:
