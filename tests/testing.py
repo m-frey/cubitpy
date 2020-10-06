@@ -717,6 +717,26 @@ class TestCubitPy(unittest.TestCase):
         self.compare(cubit, 'test_nested_lists',
             dat_lines_compare=False)
 
+    def test_mesh_import(self):
+        """
+        Test that the cubit class MeshImport works properly.
+
+        Code mainly taken from:
+        https://cubit.sandia.gov/public/13.2/help_manual/WebHelp/appendix/python/class_mesh_import.htm
+        """
+
+        cubit = CubitPy()
+        mi = cubit.MeshImport()
+        mi.add_nodes(3, 8, [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0,
+            1, 1, 1, 1, 0, 1, 0])
+        mi.add_elements(cubit.HEX, 1, [1, 2, 3, 4, 5, 6, 7, 8])
+
+        element_group = cubit.group(add_value='add HEX 1')
+        cubit.add_element_type(element_group, cupy.element_type.hex8)
+
+        self.compare(cubit, 'test_mesh_import',
+            dat_lines_compare=False)
+
     def test_display_in_cubit(self):
         """
         Call the display_in_cubit function without actually opening the graphic
