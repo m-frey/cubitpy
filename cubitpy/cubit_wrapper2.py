@@ -100,9 +100,10 @@ while 1:
     # The first argument decides that functionality will be performed.
     # cubit_object: call a method on a cubit object, with parameters
     #       [[cubit_object], 'method', ['parameters']]
-    # isinstance:  Check if the cubit object is of a cerain instance.
-    # get_methods: Return the callable methods in the cubit_object.
-    # delete: Delete the cubit pbject from the dictionary.
+    # 'iscallable': Check if a name is callable or not.
+    # 'isinstance': Check if the cubit object is of a cerain instance.
+    # 'get_self_dir': Return the attributes in a cubit_object.
+    # 'delete': Delete the cubit pbject from the dictionary.
 
     if cubit_item_to_id(receive[0]) is not None:
         # The first item is an id for a cubit object. Call a method on this
@@ -165,6 +166,10 @@ while 1:
         else:
             raise TypeError('Expected string, int, float, cubit object or '
                 + 'tuple! Got {}!'.format(cubit_return))
+
+    elif receive[0] == 'iscallable':
+        cubit_object = cubit_objects[cubit_item_to_id(receive[1])]
+        channel.send(callable(getattr(cubit_object, receive[2])))
 
     elif receive[0] == 'isinstance':
         # Compare the second item with a predefined cubit class.
