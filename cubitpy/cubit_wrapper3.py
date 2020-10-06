@@ -117,10 +117,11 @@ class CubitConnect(object):
         self.channel.send(argument_list)
         return self.channel.receive()
 
-    def get_function(self, cubit_object, name):
+    def get_attribute(self, cubit_object, name):
         """
-        Return a callable function that executes the method 'name' on the
-        object 'cubit_object' in python2.
+        Return the attribute 'name' of cubit_object. If the attribute is
+        callable a function is returned, otherwise the attribute value is
+        returned.
 
         Args
         ----
@@ -201,7 +202,12 @@ class CubitConnect(object):
 
             return cubit_return
 
-        return function
+        # Depending on the type of attribute, return the attribute value or a
+        # callable function.
+        if self.send_and_return(['iscallable', cubit_object.cubit_id, name]):
+            return function
+        else:
+            return function()
 
 
 class CubitObject(object):
@@ -245,8 +251,7 @@ class CubitObject(object):
         try:
             return object.__getattribute__(self, name, *args, **kwargs)
         except AttributeError:
-            # Create a callable function in python2.
-            return self.cubit_connect.get_function(self, name)
+            return self.cubit_connect.get_attribute(self, name)
 
     def __del__(self):
         """
