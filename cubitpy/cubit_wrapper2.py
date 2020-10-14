@@ -45,7 +45,7 @@ def is_cubit_type(obj):
     """Check if the object is of a cubit base."""
     if (isinstance(obj, cubit.Body) or isinstance(obj, cubit.Vertex)
             or isinstance(obj, cubit.Curve) or isinstance(obj, cubit.Surface)
-            or isinstance(obj, cubit.Volume)
+            or isinstance(obj, cubit.Volume) or isinstance(obj, cubit.MeshImport)
             ):
         return True
     else:
@@ -98,26 +98,29 @@ while 1:
         break
 
     # The first argument decides that functionality will be performed.
-    # cubit_object: call a method on a cubit object, with parameters
-    #       [[cubit_object], 'method', ['parameters']]
-    # isinstance:  Check if the cubit object is of a cerain instance.
-    # get_methods: Return the callable methods in the cubit_object.
-    # delete: Delete the cubit pbject from the dictionary.
+    # cubit_object: return an attribute of a cubit object. If the attribute is
+    #       callable, it is executed with the given arguments.
+    #       [[cubit_object], 'name', ['arguments']]
+    # 'iscallable': Check if a name is callable or not.
+    # 'isinstance': Check if the cubit object is of a cerain instance.
+    # 'get_self_dir': Return the attributes in a cubit_object.
+    # 'delete': Delete the cubit pbject from the dictionary.
 
     if cubit_item_to_id(receive[0]) is not None:
-        # The first item is an id for a cubit object. Call a method on this
-        # object.
+        # The first item is an id for a cubit object. Return an attribute of
+        # this object.
 
-        # Check the length of the cubit_objects dictionary and return an error
-        # if it gets very long.
+        # This check is actually obsolete because the cubit objects are deleted
+        # if they are deleted in python3. However this check is kept as a
+        # safety measure.
         if len(cubit_objects) > 10000:
             raise OverflowError(
                 'The cubit_objects has {} items, that is too much!'.format(
                     len(cubit_objects)))
 
-        # Get object and function name.
+        # Get object and attribute name.
         call_object = cubit_objects[cubit_item_to_id(receive[0])]
-        function = receive[1]
+        name = receive[1]
 
         def deserialize_item(item):
             """
@@ -134,9 +137,13 @@ while 1:
             else:
                 return item
 
-        # Call the function.
-        arguments = deserialize_item(receive[2])
-        cubit_return = call_object.__getattribute__(function)(*arguments)
+        if callable(getattr(call_object, name)):
+            # Call the function.
+            arguments = deserialize_item(receive[2])
+            cubit_return = call_object.__getattribute__(name)(*arguments)
+        else:
+            # Get the attribute value.
+            cubit_return = call_object.__getattribute__(name)
 
         # Check what to return.
         if is_base_type(cubit_return):
@@ -166,6 +173,10 @@ while 1:
             raise TypeError('Expected string, int, float, cubit object or '
                 + 'tuple! Got {}!'.format(cubit_return))
 
+    elif receive[0] == 'iscallable':
+        cubit_object = cubit_objects[cubit_item_to_id(receive[1])]
+        channel.send(callable(getattr(cubit_object, receive[2])))
+
     elif receive[0] == 'isinstance':
         # Compare the second item with a predefined cubit class.
         compare_object = cubit_objects[cubit_item_to_id(receive[1])]
@@ -182,12 +193,12 @@ while 1:
             raise ValueError('Wrong compare type given! Expected vertex, '
                 + 'curve, surface or volume, got{}'.format(receive[2]))
 
-    elif receive[0] == 'get_methods':
+    elif receive[0] == 'get_self_dir':
         # Return a list with all callable methods of this object.
         cubit_object = cubit_objects[cubit_item_to_id(receive[1])]
         channel.send([
-            method_name for method_name in dir(cubit_object)
-            if callable(getattr(cubit_object, method_name))
+            [method_name, callable(getattr(cubit_object, method_name))]
+            for method_name in dir(cubit_object)
             ])
 
     elif receive[0] == 'delete':

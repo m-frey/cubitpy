@@ -117,10 +117,11 @@ class CubitConnect(object):
         self.channel.send(argument_list)
         return self.channel.receive()
 
-    def get_function(self, cubit_object, name):
+    def get_attribute(self, cubit_object, name):
         """
-        Return a callable function that executes the method 'name' on the
-        object 'cubit_object' in python2.
+        Return the attribute 'name' of cubit_object. If the attribute is
+        callable a function is returned, otherwise the attribute value is
+        returned.
 
         Args
         ----
@@ -201,7 +202,12 @@ class CubitConnect(object):
 
             return cubit_return
 
-        return function
+        # Depending on the type of attribute, return the attribute value or a
+        # callable function.
+        if self.send_and_return(['iscallable', cubit_object.cubit_id, name]):
+            return function
+        else:
+            return function()
 
 
 class CubitObject(object):
@@ -245,8 +251,7 @@ class CubitObject(object):
         try:
             return object.__getattribute__(self, name, *args, **kwargs)
         except AttributeError:
-            # Create a callable function in python2.
-            return self.cubit_connect.get_function(self, name)
+            return self.cubit_connect.get_attribute(self, name)
 
     def __del__(self):
         """
@@ -274,11 +279,23 @@ class CubitObject(object):
         return self.cubit_connect.send_and_return(
             ['isinstance', self.cubit_id, geom_type])
 
+    def get_self_dir(self):
+        """
+        Return a list of all cubit child items of this object. Also return a
+        flag if the child item is callable or not.
+        """
+        return self.cubit_connect.send_and_return(
+            ['get_self_dir', self.cubit_id]
+            )
+
     def get_methods(self):
         """Return a list of all callable cubit methods for this object."""
-        return self.cubit_connect.send_and_return(
-            ['get_methods', self.cubit_id]
-            )
+        return [method for method, callable in self.get_self_dir() if callable]
+
+    def get_attributes(self):
+        """Return a list of all non callable cubit methods for this object."""
+        return [method for method, callable in self.get_self_dir()
+            if not callable]
 
     def get_geometry_type(self):
         """Return the type of this item."""
