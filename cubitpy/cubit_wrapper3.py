@@ -139,23 +139,18 @@ class CubitConnect(object):
                 Serialize an item, also nested lists.
                 """
 
-                if isinstance(item, tuple) or isinstance(item, list):
+                if (isinstance(item, tuple) or isinstance(item, list) or
+                        isinstance(item, np.ndarray)):
                     arguments = []
                     for sub_item in item:
                         arguments.append(serialize_item(sub_item))
                     return arguments
                 elif isinstance(item, CubitObject):
                     return item.cubit_id
-                elif isinstance(item, np.ndarray):
-                    array = []
-                    for i in item:
-                        if isinstance(i, np.float):
-                            array.append(float(i))
-                        elif isinstance(i, np.float):
-                            array.append(int(i))
-                        else:
-                            raise TypeError('Got unexpected numpy type.')
-                    return array
+                elif isinstance(item, np.float):
+                    return float(item)
+                elif isinstance(item, np.float):
+                    return int(item)
                 else:
                     return item
 
