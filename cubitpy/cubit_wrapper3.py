@@ -149,7 +149,7 @@ class CubitConnect(object):
                     return item.cubit_id
                 elif isinstance(item, np.float):
                     return float(item)
-                elif isinstance(item, np.float):
+                elif isinstance(item, np.int):
                     return int(item)
                 else:
                     return item
