@@ -119,7 +119,7 @@ class TestCubitPy(unittest.TestCase):
             If the created dat file should be compared or the list of lines
             returned by get_dat_lines.
         np_arrays: bool
-            If the move operations sent to cubit are numpy or python arrays.
+            If the cubit interaction is with numpy or python arrays.
         """
 
         # Set head
@@ -127,11 +127,15 @@ class TestCubitPy(unittest.TestCase):
             // Header processed by cubit.
             '''
 
-        # Dimensions of the block.
-        lx, ly, lz = [0.1, 1, 10]
-
-        # Number of elements in the directions.
-        [nx, ny, nz] = [2, 4, 8]
+        # Dimensions and mesh size of the block.
+        block_size = [0.1, 1, 10]
+        n_elements = [2, 4, 8]
+        if np_arrays:
+            lx, ly, lz = np.array(block_size)
+            nx, ny, nz = np.array(n_elements)
+        else:
+            lx, ly, lz = block_size
+            nx, ny, nz = n_elements
 
         # Create the block.
         block = cubit.brick(lx, ly, lz)
