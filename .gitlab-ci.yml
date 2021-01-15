@@ -27,7 +27,7 @@ cubitpy-testing:
 
         # Define variables for cubit and pre exodus.
         BACI_PRE_EXODUS: "/hdd/gitlab-runner/lib/baci-master/release/pre_exodus"
-        CUBIT: "/rzhome/nas/compsim/public/opt/cubit-13.2"
+        CUBIT: "/imcs/public/compsim/opt/cubit-13.2"
     tags:
         - "imcs-all"
 
