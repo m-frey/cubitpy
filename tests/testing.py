@@ -767,7 +767,7 @@ class TestCubitPy(unittest.TestCase):
             ], testing=True)
         with open(journal_path, 'r') as journal:
             journal_text = journal.read()
-        ref_text = ('open "/tmp/cubitpy/state.cub"\n'
+        ref_text = ('open "{}/state.cub"\n'
             'label volume On\n'
             'label surface On\n'
             'label curve On\n'
@@ -778,7 +778,7 @@ class TestCubitPy(unittest.TestCase):
             'label tri On\n'
             'label edge On\n'
             'label node On\n'
-            'display')
+            'display').format(cupy.temp_dir)
         self.assertTrue(journal_text.strip() == ref_text.strip())
 
 
