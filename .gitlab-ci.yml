@@ -12,6 +12,7 @@ cubitpy-testing:
         - "cd tests"
         - "coverage run --rcfile=coverage.config -m unittest discover"
         - "coverage html"
+        - "coverage report"
         - coverage-badge -o htmlcov/coverage.svg
         # This tests that if cubit is completely closed everything works.
         - "./test_configurations.sh"
