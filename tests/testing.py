@@ -721,6 +721,28 @@ class TestCubitPy(unittest.TestCase):
         self.compare(cubit, 'test_serialize_nested_lists',
             dat_lines_compare=False)
 
+    def test_serialize_geometry_types(self):
+        """
+        Test that geometry types can be send to cubit correctly.
+        """
+
+        cubit = CubitPy()
+
+        cubit.cmd('create vertex -1 -1 -1')
+        cubit.cmd('create vertex 1 2 3')
+        geo_id = cubit.get_last_id(cupy.geometry.vertex)
+        boundig_box = cubit.get_bounding_box(cupy.geometry.vertex, geo_id)
+        boundig_box_ref = np.array([1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 3.0, 3.0,
+            0.0, 0.0])
+        self.assertTrue(np.linalg.norm(boundig_box - boundig_box_ref) < 1e-10)
+
+        cubit.cmd('create curve vertex 1 2')
+        geo_id = cubit.get_last_id(cupy.geometry.curve)
+        boundig_box = cubit.get_bounding_box(cupy.geometry.curve, geo_id)
+        boundig_box_ref = np.array([-1.0, 1.0, 2.0, -1.0, 2.0, 3.0, -1.0, 3.0,
+            4.0, 5.385164807134504])
+        self.assertTrue(np.linalg.norm(boundig_box - boundig_box_ref) < 1e-10)
+
     def test_mesh_import(self):
         """
         Test that the cubit class MeshImport works properly.
