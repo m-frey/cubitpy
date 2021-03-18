@@ -151,6 +151,8 @@ class CubitConnect(object):
                     return float(item)
                 elif isinstance(item, int):
                     return int(item)
+                elif isinstance(item, cupy.geometry):
+                    return item.get_cubit_string()
                 else:
                     return item
 
