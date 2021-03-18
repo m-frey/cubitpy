@@ -704,7 +704,7 @@ class TestCubitPy(unittest.TestCase):
         node_ids.sort()
         self.assertEqual(node_ids, [15])
 
-    def test_nested_lists(self):
+    def test_serialize_nested_lists(self):
         """
         Test that nested lists can be send to cubit correctly.
         """
@@ -718,7 +718,7 @@ class TestCubitPy(unittest.TestCase):
         subtracted_block[0].volumes()[0].mesh()
         cubit.add_element_type(subtracted_block[0].volumes()[0],
             cupy.element_type.hex8)
-        self.compare(cubit, 'test_nested_lists',
+        self.compare(cubit, 'test_serialize_nested_lists',
             dat_lines_compare=False)
 
     def test_mesh_import(self):
