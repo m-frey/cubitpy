@@ -60,7 +60,7 @@ def compare_strings(string_ref, string_compare):
             subprocess.run(['diff', files[0], files[1]])
         else:
             child = subprocess.Popen(
-                ['kompare', files[0], files[1]], stderr=subprocess.PIPE)
+                ['meld', files[0], files[1]], stderr=subprocess.PIPE)
             child.communicate()
     return compare
 
@@ -597,9 +597,11 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, 'test_groups')
 
-    def test_groups_multiple_sets(self):
+    def xtest_groups_multiple_sets_get_by(self, group_get_by_name=False,
+            group_get_by_id=False):
         """
         Test that multiple sets can be created from a single group object.
+        Also test that a group can be obtained by name and id.
         """
 
         # Create a solid brick.
@@ -609,6 +611,16 @@ class TestCubitPy(unittest.TestCase):
         # Add to group by string.
         volume = cubit.group(name='all_vol')
         volume.add('add volume all')
+
+        # Get group.
+        if group_get_by_name or group_get_by_id:
+            volume_old = volume
+            if group_get_by_name:
+                volume = cubit.group(group_from_name=volume_old.name)
+            elif group_get_by_id:
+                volume = cubit.group(group_from_id=volume_old._id)
+            self.assertEqual(volume._id, volume_old._id)
+            self.assertEqual(volume.name, volume_old.name)
 
         # Add BCs.
         cubit.add_node_set(volume,
@@ -632,6 +644,24 @@ class TestCubitPy(unittest.TestCase):
 
         # Compare the input file created for baci.
         self.compare(cubit, 'test_groups_multiple_sets')
+
+    def test_groups_multiple_sets(self):
+        """
+        Test that multiple sets can be created from a single group object.
+        """
+        self.xtest_groups_multiple_sets_get_by()
+
+    def test_groups_get_by_id(self):
+        """
+        Test that groups can be obtained by id.
+        """
+        self.xtest_groups_multiple_sets_get_by(group_get_by_id=True)
+
+    def test_groups_get_by_name(self):
+        """
+        Test that groups can be obtained by name.
+        """
+        self.xtest_groups_multiple_sets_get_by(group_get_by_name=True)
 
     def test_reset_block(self):
         """
