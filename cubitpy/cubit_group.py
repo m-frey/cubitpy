@@ -13,7 +13,8 @@ class CubitGroup(object):
     This object helps to represent groups in cubit.
     """
 
-    def __init__(self, cubit, *, name=None, add_value=None, group_id=None):
+    def __init__(self, cubit, *, name=None, add_value=None, group_from_id=None,
+            group_from_name=None):
         """
         Set up the group object.
 
@@ -25,19 +26,21 @@ class CubitGroup(object):
             Name of the group in cubit.
         add_value: str
             If this argument is given, it is added to the group.
-        groupid: int
-            Id of a existing group in cubit. If this parameter is given, the
+        group_from_id: int
+            Id of an existing group in cubit. If this parameter is given, the
+            other optional parameters have to be empty.
+        group_from_name: str
+            Name of an existing group in cubit. If this parameter is given, the
             other optional parameters have to be empty.
         """
 
         self.name = name
-        self._id = group_id
         self.cubit = cubit
 
         self.n_node_sets = 0
         self.n_blocks = 0
 
-        if self._id is None:
+        if group_from_id is None and group_from_name is None:
             # Create a new group.
             self._id = cubit.create_new_group()
 
@@ -52,12 +55,30 @@ class CubitGroup(object):
 
             if add_value is not None:
                 self.add(add_value)
-        else:
-            if add_value is not None or self.name is not None:
-                raise ValueError('A group can not be initiated with a' +
-                    '"group_id" and "add_value" or "name".')
-
+        elif group_from_id is not None:
+            if (add_value is not None
+                    or self.name is not None
+                    or group_from_name is not None):
+                raise ValueError('A group can not be initiated with a'
+                    + '"group_from_id" and "add_value" or "name" or '
+                    + '"group_from_id".')
+            self._id = group_from_id
             self.name = self.cubit.cubit.get_entity_name('group', self._id)
+        elif group_from_name is not None:
+            if (add_value is not None
+                    or self.name is not None
+                    or group_from_id is not None):
+                raise ValueError('A group can not be initiated with a'
+                    + '"group_from_id" and "add_value" or "name" or '
+                    + '"group_from_id".')
+            self._id = cubit.get_id_from_name(group_from_name)
+            self.name = group_from_name
+            if self._id == 0:
+                raise NameError(
+                    'No group with the name "{}" could be found'.format(
+                        group_from_name))
+        else:
+            raise NotImplementedError('This case is not implemented')
 
     def add(self, add_value):
         """
