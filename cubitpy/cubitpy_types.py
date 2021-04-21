@@ -183,6 +183,7 @@ class BoundaryConditionType(Enum):
     point_coupling = auto()
     beam_to_solid_volume_meshtying = auto()
     beam_to_solid_surface_meshtying = auto()
+    beam_to_solid_surface_contact = auto()
 
     def get_dat_bc_section_header(self, geometry_type):
         """
@@ -206,6 +207,9 @@ class BoundaryConditionType(Enum):
         elif (self == self.beam_to_solid_surface_meshtying and
                 geometry_type == GeometryType.surface):
             return 'BEAM INTERACTION/BEAM TO SOLID SURFACE MESHTYING SURFACE'
+        elif (self == self.beam_to_solid_surface_contact and
+                geometry_type == GeometryType.surface):
+            return 'BEAM INTERACTION/BEAM TO SOLID CONTACT SURFACE'
         elif (self == self.point_coupling and
                 (geometry_type == GeometryType.vertex
                     or geometry_type == FiniteElementObject.node)):
