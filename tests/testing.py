@@ -20,7 +20,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
 
 # Cubitpy imports.
 from cubitpy import CubitPy, cupy, get_surface_center
-from cubitpy.mesh_creation_functions import create_brick
+from cubitpy.mesh_creation_functions import (create_brick,
+    extrude_mesh_normal_to_surface)
 
 
 # Global variable if this test is run by GitLab.
@@ -363,6 +364,50 @@ class TestCubitPy(unittest.TestCase):
 
         # Compare the input file created for baci.
         self.compare(cubit, 'test_block_function', single_precision=True)
+
+    def test_extrude_mesh_function(self):
+        """Test the extrude mesh function."""
+
+        # Initialize cubit.
+        cubit = CubitPy()
+
+        # Create dummy geometry.
+        cubit.cmd('create surface circle radius 1 zplane')
+        cubit.cmd('mesh surface 1')
+        cubit.cmd('create brick x 1')
+        cubit.cmd('mesh volume 2')
+
+        # Create and cut torus.
+        cubit.cmd('create torus major radius 1.0 minor radius 0.5')
+        torus_vol_id = cubit.get_entities(cupy.geometry.volume)[-1]
+        cut_text = 'webcut volume {} with plane {}plane offset {} imprint merge'
+        cubit.cmd(cut_text.format(torus_vol_id, 'x', 1.0))
+        cubit.cmd(cut_text.format(torus_vol_id, 'y', 0.0))
+        surface_ids = cubit.get_entities(cupy.geometry.surface)
+        cut_surface_ids = [surface_ids[-4], surface_ids[-1]]
+        cut_surface_ids_string = ' '.join(map(str, cut_surface_ids))
+        cubit.cmd('surface {} size auto factor 9'.format(cut_surface_ids_string))
+        cubit.cmd('mesh surface {}'.format(cut_surface_ids_string))
+
+        # Extrude the surface.
+        volume = extrude_mesh_normal_to_surface(
+            cubit,
+            [cubit.surface(i) for i in cut_surface_ids],
+            0.3,
+            n_layer=3, extrude_dir='symmetric', offset=[1, 2, 3])
+
+        # Check the created volume.
+        self.assertTrue(
+            np.abs(
+                cubit.get_meshed_volume_or_area('volume', [volume.id()])
+                - 0.6917513525525543) < 1e-10)
+
+        # Set the mesh for output.
+        cubit.add_element_type(volume, cupy.element_type.hex8)
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_extrude_mesh_function',
+            single_precision=False)
 
     def test_node_set_geometry_type(self):
         """Create the boundary conditions via the bc_type enum."""
