@@ -275,14 +275,10 @@ class CubitGroup(object):
         # Add all nodes that are part of faces and elements to the node set.
         group_items = self.get_item_ids()
         nodes = []
-        for i in group_items[cupy.finite_element_object.triangle]:
-            nodes.extend(self.cubit.get_tri_nodes(i))
-        for i in group_items[cupy.finite_element_object.face]:
-            nodes.extend(self.cubit.get_face_nodes(i))
-        for i in group_items[cupy.finite_element_object.tet]:
-            nodes.extend(self.cubit.get_tet_nodes(i))
-        for i in group_items[cupy.finite_element_object.hex]:
-            nodes.extend(self.cubit.get_hex_nodes(i))
+        for mesh_item in cupy.finite_element_object:
+            for i in group_items[mesh_item]:
+                nodes.extend(self.cubit.get_connectivity(
+                    mesh_item.get_cubit_string(), i))
 
         # Add all nodes to the node set.
         for i_node in nodes:
