@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# MeshPy: A beam finite element input generator.
+# CubitPy: A cubit utility funcitons and a cubit wrapper for python3.
 #
 # Copyright (c) 2021 Ivo Steinbrecher
 #                    Institute for Mathematics and Computer-Based Simulation
