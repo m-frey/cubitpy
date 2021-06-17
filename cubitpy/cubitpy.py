@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# CubitPy: A cubit utility funcitons and a cubit wrapper for python3.
+#
+# Copyright (c) 2021 Ivo Steinbrecher
+#                    Institute for Mathematics and Computer-Based Simulation
+#                    Universitaet der Bundeswehr Muenchen
+#                    https://www.unibw.de/imcs-en
+#
+# TODO: Add license.
+# -----------------------------------------------------------------------------
 """
 Implements a class that helps create meshes with cubit. Since the cubit
 interface works only with Python2, a wrapper for the cubit methods is used.
