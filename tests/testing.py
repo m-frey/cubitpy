@@ -399,7 +399,8 @@ class TestCubitPy(unittest.TestCase):
         # Initialize cubit.
         cubit = CubitPy()
 
-        # Create dummy geometry.
+        # Create dummy geometry to check, that the extrude functions work with
+        # already existing geometry.
         cubit.cmd('create surface circle radius 1 zplane')
         cubit.cmd('mesh surface 1')
         cubit.cmd('create brick x 1')
