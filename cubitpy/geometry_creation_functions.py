@@ -90,7 +90,7 @@ def create_parametric_surface(cubit, f, interval, n_segments=[10, 10]):
         parameter_points = [
             interval[other_dim][0] + i * (interval[other_dim][1] -
                 interval[other_dim][0]) / float(n_segments[other_dim])
-            for i in range(n_segments[dim] + 1)]
+            for i in range(n_segments[other_dim] + 1)]
 
         # Create all curves along this parameter coordinate.
         for point in parameter_points:
