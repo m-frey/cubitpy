@@ -917,8 +917,8 @@ class TestCubitPy(unittest.TestCase):
         def f(u, v):
             return [u, v, np.sin(u) + np.cos(v)]
 
-        surface = create_parametric_surface(cubit, f, [[-1, 1], [-1, 1]],
-            n_segments=[3, 2])
+        surface = create_parametric_surface(cubit, f,
+            [[-1, 1], [-1, 1]], n_segments=[3, 2])
 
         cubit.cmd('surface {} size auto factor 9'.format(surface.id()))
         surface.mesh()
