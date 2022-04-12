@@ -237,7 +237,7 @@ class BoundaryConditionType(Enum):
             return 'BEAM INTERACTION/BEAM TO SOLID SURFACE MESHTYING SURFACE'
         elif (self == self.beam_to_solid_surface_contact and
                 geometry_type == GeometryType.surface):
-            return 'BEAM INTERACTION/BEAM TO SOLID CONTACT SURFACE'
+            return 'BEAM INTERACTION/BEAM TO SOLID SURFACE CONTACT SURFACE'
         elif (self == self.point_coupling and
                 (geometry_type == GeometryType.vertex
                     or geometry_type == FiniteElementObject.node)):
