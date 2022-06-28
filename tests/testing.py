@@ -506,6 +506,61 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, 'test_node_set_geometry_type')
 
+    def test_contact_condition(self):
+
+        cubit = CubitPy()
+
+        #Create the mesh
+
+        solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        solid2 = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        cubit.move(solid2, [-1, 0, 0])
+
+        # Test contact conditions
+        cubit.add_node_set(
+            solid.surfaces()[0],
+            name='block1_contact_side',
+            bc_type=cupy.bc_type.solid_to_solid_surface_contact,
+            bc_description='0 Master')
+        cubit.add_node_set(
+            solid2.surfaces()[3],
+            name='block2_contact_side',
+            bc_type=cupy.bc_type.solid_to_solid_surface_contact,
+            bc_description='0 Slave')
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_contact_condition')
+
+    def test_fsi_functionality(self):
+        """Test fsi and ale conditions and fluid mesh creation"""
+
+        cubit = CubitPy()
+
+        # Create solif and fluid meshes
+        solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        fluid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1], element_type=cupy.element_type.hex8_fluid)
+        cubit.move(fluid, [1, 0, 0])
+
+        # Test FSI and ALE conditions
+        cubit.add_node_set(
+            fluid.surfaces()[0],
+            name='fsi_fluid_side',
+            bc_type=cupy.bc_type.fsi_coupling,
+            bc_description='1')
+        cubit.add_node_set(
+            solid.surfaces()[3],
+            name='fsi_solid_side',
+            bc_type=cupy.bc_type.fsi_coupling,
+            bc_description='1')
+        cubit.add_node_set(
+            fluid.surfaces()[3],
+            name='ale_dirichlet_side',
+            bc_type=cupy.bc_type.ale_dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_fsi_functionality')
+
     def test_coupling(self):
         """Create node-node and vertex-vertex coupling."""
 

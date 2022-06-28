@@ -233,9 +233,10 @@ class CubitPy(object):
 
         # Add data that will be written to bc file.
         self.blocks.append([
-            'STRUCTURE', ' '.join([material, bc_description]),
+            el_type.get_baci_section(), ' '.join([material, bc_description]),
             el_type.get_baci_name()
             ])
+
 
     def reset_blocks(self):
         """

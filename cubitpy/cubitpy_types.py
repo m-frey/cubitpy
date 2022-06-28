@@ -124,19 +124,7 @@ class ElementType(Enum):
     tet4 = auto()
     tet10 = auto()
     hex8sh = auto()
-
-    def get_string(self):
-        """Get the string representation of this element type."""
-        if self == self.hex8:
-            return 'hex8'
-        elif self == self.hex20:
-            return 'hex20'
-        elif self == self.hex27:
-            return 'hex27'
-        elif self == self.tet4:
-            return 'tet4'
-        elif self == self.tet10:
-            return 'tet10'
+    hex8_fluid = auto()
 
     def get_cubit_names(self):
         """
@@ -145,7 +133,8 @@ class ElementType(Enum):
         """
 
         # Get the element type parameters.
-        if (self == self.hex8 or self == self.hex8sh):
+        if (self == self.hex8 or self == self.hex8sh
+            or self == self.hex8_fluid):
             cubit_scheme = 'Auto'
             cubit_element_type = 'HEX8'
         elif self == self.hex20:
@@ -181,6 +170,24 @@ class ElementType(Enum):
             return 'SOLIDT10'
         elif self == self.hex8sh:
             return 'SOLIDSH8'
+        elif self == self.hex8_fluid:
+            return 'FLUID'
+        else:
+            raise ValueError('Got wrong element type {}!'.format(self))
+
+    def get_baci_section(self):
+        """Get the correct section name of this element in baci."""
+
+        if self == self.hex8_fluid:
+            return 'FLUID'
+        elif (self == self.hex20
+                or self == self.hex8
+                or self == self.hex20
+                or self == self.hex27
+                or self == self.tet4
+                or self == self.hex8sh
+                or self == self.tet10):
+            return 'STRUCTURE'
         else:
             raise ValueError('Got wrong element type {}!'.format(self))
 
@@ -200,6 +207,8 @@ class ElementType(Enum):
             return 'KINEM nonlinear'
         elif self == self.hex8sh:
             return 'KINEM nonlinear EAS none ANS none THICKDIR auto'
+        elif self == self.hex8_fluid:
+            return 'NA ALE'
         else:
             raise ValueError('Got wrong element type {}!'.format(self))
 
@@ -212,6 +221,9 @@ class BoundaryConditionType(Enum):
     beam_to_solid_volume_meshtying = auto()
     beam_to_solid_surface_meshtying = auto()
     beam_to_solid_surface_contact = auto()
+    solid_to_solid_surface_contact = auto()
+    fsi_coupling = auto()
+    ale_dirichlet = auto()
 
     def get_dat_bc_section_header(self, geometry_type):
         """
@@ -242,6 +254,18 @@ class BoundaryConditionType(Enum):
                 (geometry_type == GeometryType.vertex
                     or geometry_type == FiniteElementObject.node)):
             return 'DESIGN POINT COUPLING CONDITIONS'
+        elif (self == self.solid_to_solid_surface_contact and
+                (geometry_type == GeometryType.surface
+                    or geometry_type == FiniteElementObject.node)):
+            return 'DESIGN SURF MORTAR CONTACT CONDITIONS 3D'
+        elif (self == self.fsi_coupling and
+                (geometry_type == GeometryType.surface
+                    or geometry_type == FiniteElementObject.node)):
+            return 'DESIGN FSI COUPLING SURF CONDITIONS'
+        elif (self == self.ale_dirichlet and
+                (geometry_type == GeometryType.surface
+                    or geometry_type == FiniteElementObject.node)):
+            return 'DESIGN SURF ALE DIRICH CONDITIONS'
         else:
             raise ValueError('No implemented case for {} and {}!'.format(
                 self, geometry_type))
