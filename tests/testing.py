@@ -97,7 +97,7 @@ def compare_strings(string_ref, string_compare):
 class TestCubitPy(unittest.TestCase):
     """This class tests the implementation of the CubitPy class."""
 
-    def compare(self, cubit, name, dat_lines_compare=False,
+    def compare(self, cubit, *, name=None, dat_lines_compare=False,
             single_precision=False):
         """
         Write create the dat file from the cubit mesh and compare to a
@@ -108,13 +108,18 @@ class TestCubitPy(unittest.TestCase):
         cubit: Cubit object.
         name: str
             Name of the test case. A reference file 'name' + '_ref.dat' must
-            exits in the reference file folder.
+            exits in the reference file folder. If no name is given, the test
+            name will be used.
         dat_lines_compare: bool
             If the created file should be compared or the list of lines
             returned by get_dat_lines.
         single_precision: bool
             If the output of cubit is single or double precision.
         """
+
+        # Get the name for this compare operation.
+        if name is None:
+            name = unittest.TestCase.id(self).split('.')[-1]
 
         # Create the dat file for the solid.
         check_tmp_dir()
@@ -217,7 +222,7 @@ class TestCubitPy(unittest.TestCase):
                         + 'FUNCT 0 0 0 0 0 0')
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_create_block',
+        self.compare(cubit, name='test_create_block',
             dat_lines_compare=dat_lines_compare)
 
     def test_create_block(self):
@@ -355,7 +360,7 @@ class TestCubitPy(unittest.TestCase):
             '''
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_element_types', single_precision=True)
+        self.compare(cubit, single_precision=True)
 
     def test_block_function(self):
         """Create a solid block with different element types."""
@@ -391,7 +396,7 @@ class TestCubitPy(unittest.TestCase):
             cube.volumes()[0].mesh()
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_block_function', single_precision=True)
+        self.compare(cubit, single_precision=True)
 
     def test_extrude_mesh_function(self):
         """Test the extrude mesh function."""
@@ -435,8 +440,7 @@ class TestCubitPy(unittest.TestCase):
         cubit.add_element_type(volume, cupy.element_type.hex8)
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_extrude_mesh_function',
-            single_precision=False)
+        self.compare(cubit, single_precision=False)
 
     def test_node_set_geometry_type(self):
         """Create the boundary conditions via the bc_type enum."""
@@ -504,14 +508,32 @@ class TestCubitPy(unittest.TestCase):
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0'''
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_node_set_geometry_type')
+        self.compare(cubit)
 
-    def test_contact_condition(self):
+    def test_contact_condition_beam_to_surface(self):
 
         cubit = CubitPy()
 
-        #Create the mesh
+        # Create the mesh.
+        solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        solid2 = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        cubit.move(solid2, [-1, 0, 0])
 
+        # Test contact conditions
+        cubit.add_node_set(
+            solid.surfaces()[0],
+            name='block1_contact_side',
+            bc_type=cupy.bc_type.beam_to_solid_surface_contact,
+            bc_description='COUPLING_ID 1')
+
+        # Compare the input file created for baci.
+        self.compare(cubit)
+
+    def test_contact_condition_surface_to_surface(self):
+
+        cubit = CubitPy()
+
+        # Create the mesh.
         solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
         solid2 = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
         cubit.move(solid2, [-1, 0, 0])
@@ -529,7 +551,7 @@ class TestCubitPy(unittest.TestCase):
             bc_description='0 Slave')
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_contact_condition')
+        self.compare(cubit)
 
     def test_fsi_functionality(self):
         """Test fsi and ale conditions and fluid mesh creation"""
@@ -538,7 +560,8 @@ class TestCubitPy(unittest.TestCase):
 
         # Create solif and fluid meshes
         solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
-        fluid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1], element_type=cupy.element_type.hex8_fluid)
+        fluid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1],
+            element_type=cupy.element_type.hex8_fluid)
         cubit.move(fluid, [1, 0, 0])
 
         # Test FSI and ALE conditions
@@ -559,9 +582,9 @@ class TestCubitPy(unittest.TestCase):
             bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_fsi_functionality')
+        self.compare(cubit)
 
-    def test_coupling(self):
+    def test_point_coupling(self):
         """Create node-node and vertex-vertex coupling."""
 
         # First create two blocks.
@@ -617,7 +640,7 @@ class TestCubitPy(unittest.TestCase):
                         )
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_point_coupling')
+        self.compare(cubit)
 
     def test_groups_block_with_volume(self):
         """
@@ -724,7 +747,7 @@ class TestCubitPy(unittest.TestCase):
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0'''
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_groups')
+        self.compare(cubit, name='test_groups')
 
     def xtest_groups_multiple_sets_get_by(self, group_get_by_name=False,
             group_get_by_id=False):
@@ -772,7 +795,7 @@ class TestCubitPy(unittest.TestCase):
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0'''
 
         # Compare the input file created for baci.
-        self.compare(cubit, 'test_groups_multiple_sets')
+        self.compare(cubit, name='test_groups_multiple_sets')
 
     def test_groups_multiple_sets(self):
         """
@@ -807,11 +830,11 @@ class TestCubitPy(unittest.TestCase):
         cubit.cmd('mesh volume 2')
 
         cubit.add_element_type(block_1.volumes()[0], cupy.element_type.hex8)
-        self.compare(cubit, 'test_reset_block_1')
+        self.compare(cubit, name='test_reset_block_1')
 
         cubit.reset_blocks()
         cubit.add_element_type(block_2.volumes()[0], cupy.element_type.hex8)
-        self.compare(cubit, 'test_reset_block_2')
+        self.compare(cubit, name='test_reset_block_2')
 
     def test_get_id_functions(self):
         """
@@ -877,8 +900,7 @@ class TestCubitPy(unittest.TestCase):
         subtracted_block[0].volumes()[0].mesh()
         cubit.add_element_type(subtracted_block[0].volumes()[0],
             cupy.element_type.hex8)
-        self.compare(cubit, 'test_serialize_nested_lists',
-            dat_lines_compare=False)
+        self.compare(cubit, dat_lines_compare=False)
 
     def test_serialize_geometry_types(self):
         """
@@ -919,8 +941,7 @@ class TestCubitPy(unittest.TestCase):
         element_group = cubit.group(add_value='add HEX 1')
         cubit.add_element_type(element_group, cupy.element_type.hex8)
 
-        self.compare(cubit, 'test_mesh_import',
-            dat_lines_compare=False)
+        self.compare(cubit, dat_lines_compare=False)
 
     def test_display_in_cubit(self):
         """
