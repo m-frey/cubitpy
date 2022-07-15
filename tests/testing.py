@@ -50,7 +50,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
 from cubitpy import CubitPy, cupy, get_surface_center
 from cubitpy.mesh_creation_functions import (create_brick,
     extrude_mesh_normal_to_surface)
-
+from cubitpy.geometry_creation_functions import create_parametric_surface
 
 # Global variable if this test is run by GitLab.
 if ('TESTING_GITLAB' in os.environ.keys()
@@ -399,7 +399,8 @@ class TestCubitPy(unittest.TestCase):
         # Initialize cubit.
         cubit = CubitPy()
 
-        # Create dummy geometry.
+        # Create dummy geometry to check, that the extrude functions work with
+        # already existing geometry.
         cubit.cmd('create surface circle radius 1 zplane')
         cubit.cmd('mesh surface 1')
         cubit.cmd('create brick x 1')
@@ -504,6 +505,61 @@ class TestCubitPy(unittest.TestCase):
 
         # Compare the input file created for baci.
         self.compare(cubit, 'test_node_set_geometry_type')
+
+    def test_contact_condition(self):
+
+        cubit = CubitPy()
+
+        #Create the mesh
+
+        solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        solid2 = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        cubit.move(solid2, [-1, 0, 0])
+
+        # Test contact conditions
+        cubit.add_node_set(
+            solid.surfaces()[0],
+            name='block1_contact_side',
+            bc_type=cupy.bc_type.solid_to_solid_surface_contact,
+            bc_description='0 Master')
+        cubit.add_node_set(
+            solid2.surfaces()[3],
+            name='block2_contact_side',
+            bc_type=cupy.bc_type.solid_to_solid_surface_contact,
+            bc_description='0 Slave')
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_contact_condition')
+
+    def test_fsi_functionality(self):
+        """Test fsi and ale conditions and fluid mesh creation"""
+
+        cubit = CubitPy()
+
+        # Create solif and fluid meshes
+        solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        fluid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1], element_type=cupy.element_type.hex8_fluid)
+        cubit.move(fluid, [1, 0, 0])
+
+        # Test FSI and ALE conditions
+        cubit.add_node_set(
+            fluid.surfaces()[0],
+            name='fsi_fluid_side',
+            bc_type=cupy.bc_type.fsi_coupling,
+            bc_description='1')
+        cubit.add_node_set(
+            solid.surfaces()[3],
+            name='fsi_solid_side',
+            bc_type=cupy.bc_type.fsi_coupling,
+            bc_description='1')
+        cubit.add_node_set(
+            fluid.surfaces()[3],
+            name='ale_dirichlet_side',
+            bc_type=cupy.bc_type.ale_dirichlet,
+            bc_description='NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0')
+
+        # Compare the input file created for baci.
+        self.compare(cubit, 'test_fsi_functionality')
 
     def test_coupling(self):
         """Create node-node and vertex-vertex coupling."""
@@ -905,6 +961,50 @@ class TestCubitPy(unittest.TestCase):
             'label node On\n'
             'display').format(cupy.temp_dir)
         self.assertTrue(journal_text.strip() == ref_text.strip())
+
+    def test_create_parametric_surface(self):
+        """
+        Test the create_parametric_surface function.
+        """
+
+        cubit = CubitPy()
+
+        def f(u, v):
+            return [u, v, np.sin(u) + np.cos(v)]
+
+        surface = create_parametric_surface(cubit, f,
+            [[-1, 1], [-1, 1]], n_segments=[3, 2])
+
+        cubit.cmd('surface {} size auto factor 9'.format(surface.id()))
+        surface.mesh()
+
+        coordinates = [cubit.get_nodal_coordinates(i + 1)
+            for i in range(cubit.get_node_count())]
+        connectivity = [cubit.get_connectivity('quad', i + 1)
+            for i in range(cubit.get_quad_count())]
+
+        coordinates_ref = np.array([[-1.0000000000000000e+00, -1.0000000000000000e+00, -3.0116867893975674e-01],
+            [-1.0000000000000000e+00, 1.0000000000000000e+00, -3.0116867893975674e-01],
+            [-1.0000000000000000e+00, 0.0000000000000000e+00, 1.5852901519210350e-01],
+            [ 1.0000000000000000e+00, 1.0000000000000000e+00, 1.3817732906760363e+00],
+            [-3.1067314445261951e-01, 1.0000000000000000e+00, 2.3370486165350005e-01],
+            [ 3.1067314445262029e-01, 1.0000000000000000e+00, 8.4689975008277985e-01],
+            [ 1.0000000000000000e+00, -1.0000000000000000e+00, 1.3817732906760363e+00],
+            [ 1.0000000000000000e+00, 0.0000000000000000e+00, 1.8414709848078963e+00],
+            [-3.1067314445261968e-01, -1.0000000000000000e+00, 2.3370486165349993e-01],
+            [ 3.1067314445261990e-01, -1.0000000000000000e+00, 8.4689975008277962e-01],
+            [-3.1067314445261957e-01, 2.8192657259845781e-19, 6.9340255578535992e-01],
+            [ 3.1067314445261979e-01, 8.8853983481606386e-17, 1.3065974442146397e+00]])
+        connectivity_ref = np.array([[ 1,  3, 11,  9],
+               [ 3,  2,  5, 11],
+               [ 9, 11, 12, 10],
+               [11,  5,  6, 12],
+               [10, 12,  8,  7],
+               [12,  6,  4,  8]])
+
+        self.assertAlmostEqual(np.linalg.norm(coordinates - coordinates_ref),
+            0.0, delta=1e-12)
+        self.assertEqual(np.linalg.norm(connectivity - connectivity_ref), 0)
 
 
 if __name__ == '__main__':
