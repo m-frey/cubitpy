@@ -510,6 +510,25 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit)
 
+    def test_contact_condition_beam_to_surface(self):
+
+        cubit = CubitPy()
+
+        # Create the mesh.
+        solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        solid2 = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
+        cubit.move(solid2, [-1, 0, 0])
+
+        # Test contact conditions
+        cubit.add_node_set(
+            solid.surfaces()[0],
+            name='block1_contact_side',
+            bc_type=cupy.bc_type.beam_to_solid_surface_contact,
+            bc_description='COUPLING_ID 1')
+
+        # Compare the input file created for baci.
+        self.compare(cubit)
+
     def test_contact_condition_surface_to_surface(self):
 
         cubit = CubitPy()
@@ -541,7 +560,8 @@ class TestCubitPy(unittest.TestCase):
 
         # Create solif and fluid meshes
         solid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1])
-        fluid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1], element_type=cupy.element_type.hex8_fluid)
+        fluid = create_brick(cubit, 1, 1, 1, mesh_interval=[1, 1, 1],
+            element_type=cupy.element_type.hex8_fluid)
         cubit.move(fluid, [1, 0, 0])
 
         # Test FSI and ALE conditions
