@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# CubitPy: Cubit utility funcitons and a cubit wrapper for python3
+# CubitPy: Cubit utility functions and a cubit wrapper for python3
 #
 # MIT License
 #
