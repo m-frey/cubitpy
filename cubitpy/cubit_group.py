@@ -41,8 +41,15 @@ class CubitGroup(object):
     This object helps to represent groups in cubit.
     """
 
-    def __init__(self, cubit, *, name=None, add_value=None, group_from_id=None,
-            group_from_name=None):
+    def __init__(
+        self,
+        cubit,
+        *,
+        name=None,
+        add_value=None,
+        group_from_id=None,
+        group_from_name=None
+    ):
         """
         Set up the group object.
 
@@ -77,36 +84,40 @@ class CubitGroup(object):
                 # Check that the name does not already exist.
                 if not cubit.get_id_from_name(self.name) == 0:
                     raise ValueError(
-                        'The given group name "{}" already exists!'.format(
-                            self.name))
+                        'The given group name "{}" already exists!'.format(self.name)
+                    )
                 cubit.cmd("group {} rename '{}'".format(self._id, self.name))
 
             if add_value is not None:
                 self.add(add_value)
         elif group_from_id is not None:
-            if (add_value is not None
-                    or self.name is not None
-                    or group_from_name is not None):
-                raise ValueError('A group can not be initiated with a'
-                    + '"group_from_id" and "add_value" or "name" or '
-                    + '"group_from_id".')
+            if (
+                add_value is not None
+                or self.name is not None
+                or group_from_name is not None
+            ):
+                raise ValueError(
+                    'A group can not be initiated with a "group_from_id" and "add_value" or "name" or "group_from_id".'
+                )
             self._id = group_from_id
-            self.name = self.cubit.cubit.get_entity_name('group', self._id)
+            self.name = self.cubit.cubit.get_entity_name("group", self._id)
         elif group_from_name is not None:
-            if (add_value is not None
-                    or self.name is not None
-                    or group_from_id is not None):
-                raise ValueError('A group can not be initiated with a'
-                    + '"group_from_id" and "add_value" or "name" or '
-                    + '"group_from_id".')
+            if (
+                add_value is not None
+                or self.name is not None
+                or group_from_id is not None
+            ):
+                raise ValueError(
+                    'A group can not be initiated with a "group_from_id" and "add_value" or "name" or "group_from_id".'
+                )
             self._id = cubit.get_id_from_name(group_from_name)
             self.name = group_from_name
             if self._id == 0:
                 raise NameError(
-                    'No group with the name "{}" could be found'.format(
-                        group_from_name))
+                    'No group with the name "{}" could be found'.format(group_from_name)
+                )
         else:
-            raise NotImplementedError('This case is not implemented')
+            raise NotImplementedError("This case is not implemented")
 
     def add(self, add_value):
         """
@@ -124,17 +135,18 @@ class CubitGroup(object):
         """
 
         if isinstance(add_value, str):
-            self.cubit.cmd('group {} {}'.format(self._id, add_value))
+            self.cubit.cmd("group {} {}".format(self._id, add_value))
         elif isinstance(add_value, CubitObject):
             self.cubit.add_entity_to_group(
                 self._id,
                 add_value.id(),
-                add_value.get_geometry_type().get_cubit_string())
+                add_value.get_geometry_type().get_cubit_string(),
+            )
         elif isinstance(add_value, list):
             for item in add_value:
                 self.add(item)
         else:
-            raise TypeError('Got wrong type {}!'.format(type(add_value)))
+            raise TypeError("Got wrong type {}!".format(type(add_value)))
 
     def get_geometry_type(self):
         """
@@ -145,28 +157,33 @@ class CubitGroup(object):
         group_items = self.get_item_ids()
         group_keys = [key for key in group_items if len(group_items[key]) > 0]
         if not len(group_keys) == 1:
-            raise TypeError('Got wrong types in get_geometry_type')
+            raise TypeError("Got wrong types in get_geometry_type")
 
         key = group_keys[0]
         if key in cupy.geometry:
             return key
         elif key == cupy.finite_element_object.node:
             return cupy.geometry.vertex
-        elif (key == cupy.finite_element_object.triangle
-                or key == cupy.finite_element_object.face):
+        elif (
+            key == cupy.finite_element_object.triangle
+            or key == cupy.finite_element_object.face
+        ):
             return cupy.geometry.surface
-        elif (key == cupy.finite_element_object.tet
-                or key == cupy.finite_element_object.hex):
+        elif (
+            key == cupy.finite_element_object.tet
+            or key == cupy.finite_element_object.hex
+        ):
             return cupy.geometry.volume
         else:
-            raise TypeError('Error in get_geometry_type')
+            raise TypeError("Error in get_geometry_type")
 
     def get_geometry_objects(self, item_type):
         """
         Get a list of all items in the group for the given geometry_type.
         """
-        return self.cubit.get_items(item_type,
-            item_ids=self.get_item_ids_from_type(item_type))
+        return self.cubit.get_items(
+            item_type, item_ids=self.get_item_ids_from_type(item_type)
+        )
 
     def get_item_ids_from_type(self, item_type):
         """
@@ -202,7 +219,7 @@ class CubitGroup(object):
             return self.cubit.get_group_groups(self._id)
 
         else:
-            raise TypeError('Wrong item type.')
+            raise TypeError("Wrong item type.")
 
     def _get_item_ids(self, group_items):
         """
@@ -211,19 +228,20 @@ class CubitGroup(object):
         """
 
         # Add entries from subgroups.
-        sub_groups = [self.cubit.group(group_id=group_id)
-            for group_id in self.get_item_ids_from_type(
-                cupy.cubit_items.group)]
+        sub_groups = [
+            self.cubit.group(group_id=group_id)
+            for group_id in self.get_item_ids_from_type(cupy.cubit_items.group)
+        ]
         for sub_group in sub_groups:
             sub_group._get_item_ids(group_items)
 
         # Add entries from this group.
         for geometry_type in cupy.geometry:
             group_items[geometry_type].extend(
-                self.get_item_ids_from_type(geometry_type))
+                self.get_item_ids_from_type(geometry_type)
+            )
         for fe_object in cupy.finite_element_object:
-            group_items[fe_object].extend(
-                self.get_item_ids_from_type(fe_object))
+            group_items[fe_object].extend(self.get_item_ids_from_type(fe_object))
 
     def get_item_ids(self):
         """
@@ -265,20 +283,24 @@ class CubitGroup(object):
 
         # Add volumes to block.
         for i in group_items[cupy.geometry.volume]:
-            self.cubit.cmd('{} {} scheme {}'.format(
-                cupy.geometry.volume.get_cubit_string(), i, cubit_scheme))
-            self.cubit.cmd('block {} {} {}'.format(block_id,
-                cupy.geometry.volume.get_cubit_string(),
-                i
-                ))
-            self.cubit.cmd('block {} element type {}'.format(block_id,
-                cubit_element_type
-                ))
+            self.cubit.cmd(
+                "{} {} scheme {}".format(
+                    cupy.geometry.volume.get_cubit_string(), i, cubit_scheme
+                )
+            )
+            self.cubit.cmd(
+                "block {} {} {}".format(
+                    block_id, cupy.geometry.volume.get_cubit_string(), i
+                )
+            )
+            self.cubit.cmd(
+                "block {} element type {}".format(block_id, cubit_element_type)
+            )
 
         # Add explicit elements to block.
-        if cubit_element_type == 'HEX8':
+        if cubit_element_type == "HEX8":
             for i in group_items[cupy.finite_element_object.hex]:
-                self.cubit.cmd('block {} hex {}'.format(block_id, i))
+                self.cubit.cmd("block {} hex {}".format(block_id, i))
 
     def add_to_nodeset(self, nodeset_id):
         """
@@ -294,23 +316,22 @@ class CubitGroup(object):
         # Add this group. This will add all geometry and directly contained
         # nodes in this group. If there are elements in this group, there will
         # be a warning. This warning is explicitly deactivated here.
-        self.cubit.cmd('set warning off')
-        self.cubit.cmd('nodeset {} group {}'.format(
-            nodeset_id,
-            self._id))
-        self.cubit.cmd('set warning on')
+        self.cubit.cmd("set warning off")
+        self.cubit.cmd("nodeset {} group {}".format(nodeset_id, self._id))
+        self.cubit.cmd("set warning on")
 
         # Add all nodes that are part of faces and elements to the node set.
         group_items = self.get_item_ids()
         nodes = []
         for mesh_item in cupy.finite_element_object:
             for i in group_items[mesh_item]:
-                nodes.extend(self.cubit.get_connectivity(
-                    mesh_item.get_cubit_string(), i))
+                nodes.extend(
+                    self.cubit.get_connectivity(mesh_item.get_cubit_string(), i)
+                )
 
         # Add all nodes to the node set.
         for i_node in nodes:
-            self.cubit.cmd('nodeset {} node {}'.format(nodeset_id, i_node))
+            self.cubit.cmd("nodeset {} node {}".format(nodeset_id, i_node))
 
     def get_name(self, set_type):
         """
@@ -326,16 +347,17 @@ class CubitGroup(object):
         """
 
         return_string = None
-        if set_type == 'nodeset':
+        if set_type == "nodeset":
             if self.n_node_sets == 0:
                 return_string = self.name
             else:
-                return_string = '{}_{}'.format(self.name, self.n_node_sets)
+                return_string = "{}_{}".format(self.name, self.n_node_sets)
             self.n_node_sets += 1
-        elif set_type == 'block':
+        elif set_type == "block":
             if self.n_blocks > 0:
-                raise ValueError('Only one block can be created from a single '
-                    'group object.')
+                raise ValueError(
+                    "Only one block can be created from a single group object."
+                )
             return_string = self.name
             self.n_blocks += 1
         else:
@@ -345,7 +367,7 @@ class CubitGroup(object):
     def id(self):
         """Return the string with all ids of the types in this object."""
         id_list = self.get_item_ids_from_type(self.get_geometry_type())
-        return ' '.join(map(str, id_list))
+        return " ".join(map(str, id_list))
 
     def __str__(self, *args, **kwargs):
         """The string representation of a group is its name."""

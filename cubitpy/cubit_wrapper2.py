@@ -43,10 +43,10 @@ import os
 
 
 # Cubit constants.
-cubit_vertex = 'cubitpy_vertex'
-cubit_curve = 'cubitpy_curve'
-cubit_surface = 'cubitpy_surface'
-cubit_volume = 'cubitpy_volume'
+cubit_vertex = "cubitpy_vertex"
+cubit_curve = "cubitpy_curve"
+cubit_surface = "cubitpy_surface"
+cubit_volume = "cubitpy_volume"
 
 
 # Default parameters
@@ -61,20 +61,24 @@ def out(string):
     To get the current path of your console type: tty
     """
 
-    if 'tty' in parameters.keys():
-        out_console = parameters['tty']
+    if "tty" in parameters.keys():
+        out_console = parameters["tty"]
     else:
-        out_console = '/dev/pts/18'
-    escaped_string = '{}'.format(string).replace('"', '\\"')
+        out_console = "/dev/pts/18"
+    escaped_string = "{}".format(string).replace('"', '\\"')
     os.system('echo "{}" > {}'.format(escaped_string, out_console))
 
 
 def is_cubit_type(obj):
     """Check if the object is of a cubit base."""
-    if (isinstance(obj, cubit.Body) or isinstance(obj, cubit.Vertex)
-            or isinstance(obj, cubit.Curve) or isinstance(obj, cubit.Surface)
-            or isinstance(obj, cubit.Volume) or isinstance(obj, cubit.MeshImport)
-            ):
+    if (
+        isinstance(obj, cubit.Body)
+        or isinstance(obj, cubit.Vertex)
+        or isinstance(obj, cubit.Curve)
+        or isinstance(obj, cubit.Surface)
+        or isinstance(obj, cubit.Volume)
+        or isinstance(obj, cubit.MeshImport)
+    ):
         return True
     else:
         return False
@@ -90,13 +94,16 @@ cubit_objects = {}
 parameters = channel.receive()
 channel.send(None)
 if not isinstance(parameters, dict):
-    raise TypeError('The first item should be a dictionary. '
-        + 'Got {}!\nparameters={}'.format(type(parameters), parameters))
+    raise TypeError(
+        "The first item should be a dictionary. Got {}!\nparameters={}".format(
+            type(parameters), parameters
+        )
+    )
 
 # Add paths to sys and load utility functions and cubit.
-dir_name = os.path.dirname(parameters['__file__'])
+dir_name = os.path.dirname(parameters["__file__"])
 sys.path.append(dir_name)
-sys.path.append(parameters['cubit_bin_path'])
+sys.path.append(parameters["cubit_bin_path"])
 
 from cubit_wrapper_utility import object_to_id, cubit_item_to_id, is_base_type
 import cubit
@@ -105,10 +112,10 @@ import cubit
 # The second call is the initialization call for cubit.
 # init = ['init', cubit_path, [args]]
 init = channel.receive()
-if not init[0] == 'init':
-    raise ValueError('The second call must be init!')
+if not init[0] == "init":
+    raise ValueError("The second call must be init!")
 if not len(init) == 2:
-    raise ValueError('Two arguments must be given to init!')
+    raise ValueError("Two arguments must be given to init!")
 cubit.init(init[1])
 cubit_objects[id(cubit)] = cubit
 channel.send(object_to_id(cubit))
@@ -143,8 +150,10 @@ while 1:
         # safety measure.
         if len(cubit_objects) > 10000:
             raise OverflowError(
-                'The cubit_objects has {} items, that is too much!'.format(
-                    len(cubit_objects)))
+                "The cubit_objects has {} items, that is too much!".format(
+                    len(cubit_objects)
+                )
+            )
 
         # Get object and attribute name.
         call_object = cubit_objects[cubit_item_to_id(receive[0])]
@@ -188,8 +197,11 @@ while 1:
                     cubit_objects[id(item)] = item
                     return_list.append(object_to_id(item))
                 else:
-                    raise TypeError('Expected string, int, float or cubit '
-                        + 'object! Got {}!'.format(item))
+                    raise TypeError(
+                        "Expected string, int, float or cubit object! Got {}!".format(
+                            item
+                        )
+                    )
             channel.send(return_list)
 
         elif is_cubit_type(cubit_return):
@@ -198,57 +210,65 @@ while 1:
             channel.send(object_to_id(cubit_return))
 
         else:
-            raise TypeError('Expected string, int, float, cubit object or '
-                + 'tuple! Got {}!'.format(cubit_return))
+            raise TypeError(
+                "Expected string, int, float, cubit object or tuple! Got {}!".format(
+                    cubit_return
+                )
+            )
 
-    elif receive[0] == 'iscallable':
+    elif receive[0] == "iscallable":
         cubit_object = cubit_objects[cubit_item_to_id(receive[1])]
         channel.send(callable(getattr(cubit_object, receive[2])))
 
-    elif receive[0] == 'isinstance':
+    elif receive[0] == "isinstance":
         # Compare the second item with a predefined cubit class.
         compare_object = cubit_objects[cubit_item_to_id(receive[1])]
 
-        if (receive[2] == cubit_vertex):
+        if receive[2] == cubit_vertex:
             channel.send(isinstance(compare_object, cubit.Vertex))
-        elif (receive[2] == cubit_curve):
+        elif receive[2] == cubit_curve:
             channel.send(isinstance(compare_object, cubit.Curve))
-        elif (receive[2] == cubit_surface):
+        elif receive[2] == cubit_surface:
             channel.send(isinstance(compare_object, cubit.Surface))
-        elif (receive[2] == cubit_volume):
+        elif receive[2] == cubit_volume:
             channel.send(isinstance(compare_object, cubit.Volume))
         else:
-            raise ValueError('Wrong compare type given! Expected vertex, '
-                + 'curve, surface or volume, got{}'.format(receive[2]))
+            raise ValueError(
+                "Wrong compare type given! Expected vertex, curve, surface or volume, got{}".format(
+                    receive[2]
+                )
+            )
 
-    elif receive[0] == 'get_self_dir':
+    elif receive[0] == "get_self_dir":
         # Return a list with all callable methods of this object.
         cubit_object = cubit_objects[cubit_item_to_id(receive[1])]
-        channel.send([
-            [method_name, callable(getattr(cubit_object, method_name))]
-            for method_name in dir(cubit_object)
-            ])
+        channel.send(
+            [
+                [method_name, callable(getattr(cubit_object, method_name))]
+                for method_name in dir(cubit_object)
+            ]
+        )
 
-    elif receive[0] == 'delete':
+    elif receive[0] == "delete":
         # Get the id of the object to delete.
         cubit_id = cubit_item_to_id(receive[1])
         if cubit_id is None:
-            raise TypeError('Expected cubit object! Got {}!'.format(item))
+            raise TypeError("Expected cubit object! Got {}!".format(item))
 
         # Delete the object from the dictionary.
         if cubit_id in cubit_objects.keys():
             del cubit_objects[cubit_id]
         else:
-            raise ValueError('The id {} is not in the cubit_objects '
-                + 'dictionary'.format(cubit_id))
+            raise ValueError(
+                "The id {} is not in the cubit_objects dictionary".format(cubit_id)
+            )
 
         # Return to python3.
         channel.send(None)
 
     else:
-        raise ValueError('The case of "{}" is not implemented!'.format(
-            receive[0]))
+        raise ValueError('The case of "{}" is not implemented!'.format(receive[0]))
 
 
 # Send EOF.
-channel.send('EOF')
+channel.send("EOF")

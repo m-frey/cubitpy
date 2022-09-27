@@ -47,15 +47,13 @@ def check_environment_eclipse():
     # Also the console output will not be redirected to the eclipse console
     # but the path to a other console should be explicitly given if needed.
 
-    if ('PYTHONPATH' in os.environ.keys()
-            and 'pydev' in os.environ['PYTHONPATH']):
-        python_path_old = os.environ['PYTHONPATH']
+    if "PYTHONPATH" in os.environ.keys() and "pydev" in os.environ["PYTHONPATH"]:
+        python_path_old = os.environ["PYTHONPATH"]
         python_path_new_list = []
-        for item in python_path_old.split(':'):
-            if (('/input' in item) or ('/cubitpy' in item)
-                    or ('/meshpy' in item)):
+        for item in python_path_old.split(":"):
+            if ("/input" in item) or ("/cubitpy" in item) or ("/meshpy" in item):
                 python_path_new_list.append(item)
-        os.environ['PYTHONPATH'] = ':'.join(python_path_new_list)
+        os.environ["PYTHONPATH"] = ":".join(python_path_new_list)
         return True, python_path_old
     else:
-        return False, ''
+        return False, ""

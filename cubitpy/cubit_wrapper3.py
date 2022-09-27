@@ -53,8 +53,12 @@ class CubitConnect(object):
     receive the output.
     """
 
-    def __init__(self, cubit_arguments, interpreter='popen//python=python2.7',
-            cubit_bin_path=None):
+    def __init__(
+        self,
+        cubit_arguments,
+        interpreter="popen//python=python2.7",
+        cubit_bin_path=None,
+    ):
         """
         Initialize the connection between python2 and python3. And load the
         cubit module in python2.
@@ -70,7 +74,7 @@ class CubitConnect(object):
         """
 
         if cubit_bin_path is None:
-            raise ValueError('Path to cubit was not given!')
+            raise ValueError("Path to cubit was not given!")
 
         # Adapt the environment if needed.
         is_eclipse, python_path_old = check_environment_eclipse()
@@ -80,10 +84,8 @@ class CubitConnect(object):
         self.gw.reconfigure(py3str_as_py2str=True)
 
         # Load the python2 code.
-        python2_file = os.path.join(
-            os.path.dirname(__file__),
-            'cubit_wrapper2.py')
-        with open(python2_file, 'r') as myfile:
+        python2_file = os.path.join(os.path.dirname(__file__), "cubit_wrapper2.py")
+        with open(python2_file, "r") as myfile:
             data = myfile.read()
 
         # Set up the connection channel.
@@ -91,12 +93,12 @@ class CubitConnect(object):
 
         # Send parameters to the python2 interpreter
         parameters = {}
-        parameters['__file__'] = __file__
-        parameters['cubit_bin_path'] = cubit_bin_path
+        parameters["__file__"] = __file__
+        parameters["cubit_bin_path"] = cubit_bin_path
 
         # Check if a log file was given in the cubit arguments.
         for arg in cubit_arguments:
-            if arg.startswith('-log='):
+            if arg.startswith("-log="):
                 log_given = True
                 break
         else:
@@ -107,20 +109,20 @@ class CubitConnect(object):
         if not log_given:
             # Eclipse and no log given -> write the log to a temporary file and
             # check the contents after each call to cubit.
-            cubit_arguments.append('-log={}'.format(cupy.temp_log))
-            parameters['tty'] = cupy.temp_log
+            cubit_arguments.append("-log={}".format(cupy.temp_log))
+            parameters["tty"] = cupy.temp_log
             self.log_check = True
 
         # Send the parameters to python2
         self.send_and_return(parameters)
 
         # Initialize cubit.
-        cubit_id = self.send_and_return(['init', cubit_arguments])
+        cubit_id = self.send_and_return(["init", cubit_arguments])
         self.cubit = CubitObjectMain(self, cubit_id)
 
         # Restore environment path.
         if is_eclipse:
-            os.environ['PYTHONPATH'] = python_path_old
+            os.environ["PYTHONPATH"] = python_path_old
 
     def send_and_return(self, argument_list, check_number_of_channels=False):
         """
@@ -167,8 +169,11 @@ class CubitConnect(object):
                 Serialize an item, also nested lists.
                 """
 
-                if (isinstance(item, tuple) or isinstance(item, list) or
-                        isinstance(item, np.ndarray)):
+                if (
+                    isinstance(item, tuple)
+                    or isinstance(item, list)
+                    or isinstance(item, np.ndarray)
+                ):
                     arguments = []
                     for sub_item in item:
                         arguments.append(serialize_item(sub_item))
@@ -187,7 +192,7 @@ class CubitConnect(object):
             if self.log_check:
                 # Check if the log file is empty. If it is not, empty it.
                 if os.stat(cupy.temp_log).st_size != 0:
-                    with open(cupy.temp_log, 'w'):
+                    with open(cupy.temp_log, "w"):
                         pass
 
             # Check if there are cubit objects in the arguments.
@@ -196,12 +201,12 @@ class CubitConnect(object):
             # Call the method on the cubit object.
             cubit_return = self.send_and_return(
                 [cubit_object.cubit_id, name, arguments]
-                )
+            )
 
             if self.log_check:
                 # Print the content of the log file.
-                with open(cupy.temp_log, 'r') as log_file:
-                    print(log_file.read(), end='')
+                with open(cupy.temp_log, "r") as log_file:
+                    print(log_file.read(), end="")
 
             # Check if the return value is a cubit object.
             if cubit_item_to_id(cubit_return) is not None:
@@ -216,20 +221,24 @@ class CubitConnect(object):
                     elif is_base_type(item):
                         return_list.append(item)
                     else:
-                        raise TypeError('Expected cubit object, or base_type, '
-                            + 'got {}!'.format(item))
+                        raise TypeError(
+                            "Expected cubit object, or base_type, "
+                            + "got {}!".format(item)
+                        )
                 return return_list
             elif is_base_type(cubit_return):
                 return cubit_return
             else:
-                raise TypeError('Expected cubit object, or base_type, '
-                    + 'got {}!'.format(cubit_return))
+                raise TypeError(
+                    "Expected cubit object, or base_type, "
+                    + "got {}!".format(cubit_return)
+                )
 
             return cubit_return
 
         # Depending on the type of attribute, return the attribute value or a
         # callable function.
-        if self.send_and_return(['iscallable', cubit_object.cubit_id, name]):
+        if self.send_and_return(["iscallable", cubit_object.cubit_id, name]):
             return function
         else:
             return function()
@@ -257,7 +266,7 @@ class CubitObject(object):
 
         # Check formating of cubit_id.
         if cubit_item_to_id(cubit_data_list) is None:
-            raise TypeError('Wrong type {}'.format(cubit_data_list))
+            raise TypeError("Wrong type {}".format(cubit_data_list))
 
         self.cubit_connect = cubit_connect
         self.cubit_id = cubit_data_list
@@ -283,8 +292,9 @@ class CubitObject(object):
         When this object is deleted, the object in the wraper can also be
         deleted.
         """
-        self.cubit_connect.send_and_return(['delete', self.cubit_id],
-            check_number_of_channels=True)
+        self.cubit_connect.send_and_return(
+            ["delete", self.cubit_id], check_number_of_channels=True
+        )
 
     def __str__(self):
         """Return the string from python2."""
@@ -302,16 +312,15 @@ class CubitObject(object):
 
         # Compare in python2.
         return self.cubit_connect.send_and_return(
-            ['isinstance', self.cubit_id, geom_type])
+            ["isinstance", self.cubit_id, geom_type]
+        )
 
     def get_self_dir(self):
         """
         Return a list of all cubit child items of this object. Also return a
         flag if the child item is callable or not.
         """
-        return self.cubit_connect.send_and_return(
-            ['get_self_dir', self.cubit_id]
-            )
+        return self.cubit_connect.send_and_return(["get_self_dir", self.cubit_id])
 
     def get_methods(self):
         """Return a list of all callable cubit methods for this object."""
@@ -319,23 +328,22 @@ class CubitObject(object):
 
     def get_attributes(self):
         """Return a list of all non callable cubit methods for this object."""
-        return [method for method, callable in self.get_self_dir()
-            if not callable]
+        return [method for method, callable in self.get_self_dir() if not callable]
 
     def get_geometry_type(self):
         """Return the type of this item."""
 
-        if self.isinstance('cubitpy_vertex'):
+        if self.isinstance("cubitpy_vertex"):
             return cupy.geometry.vertex
-        elif self.isinstance('cubitpy_curve'):
+        elif self.isinstance("cubitpy_curve"):
             return cupy.geometry.curve
-        elif self.isinstance('cubitpy_surface'):
+        elif self.isinstance("cubitpy_surface"):
             return cupy.geometry.surface
-        elif self.isinstance('cubitpy_volume'):
+        elif self.isinstance("cubitpy_volume"):
             return cupy.geometry.volume
 
         # Default value -> not a valid geometry.
-        raise TypeError('The item is not a valid geometry!')
+        raise TypeError("The item is not a valid geometry!")
 
     def get_node_ids(self):
         """
@@ -351,19 +359,19 @@ class CubitObject(object):
         temp_node_set_id = max(node_set_ids) + 1
 
         # Add a temporary node set with this geometry.
-        self.cubit_connect.cubit.cmd('nodeset {} {} {}'.format(
-            temp_node_set_id,
-            self.get_geometry_type().get_cubit_string(),
-            self.id()
-            ))
+        self.cubit_connect.cubit.cmd(
+            "nodeset {} {} {}".format(
+                temp_node_set_id, self.get_geometry_type().get_cubit_string(), self.id()
+            )
+        )
 
         # Get the nodes in the created node set.
         node_ids = self.cubit_connect.cubit.get_nodeset_nodes_inclusive(
-            temp_node_set_id)
+            temp_node_set_id
+        )
 
         # Delete the temp node set and return the node list.
-        self.cubit_connect.cubit.cmd('delete nodeset {}'.format(
-            temp_node_set_id))
+        self.cubit_connect.cubit.cmd("delete nodeset {}".format(temp_node_set_id))
         return node_ids
 
 
@@ -371,5 +379,6 @@ class CubitObjectMain(CubitObject):
     """
     The main cubit object will be of this type, it can not delete itself.
     """
+
     def __del__(self):
         pass
