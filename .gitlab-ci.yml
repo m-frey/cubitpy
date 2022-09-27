@@ -3,6 +3,7 @@ cubitpy-testing:
     script:
         - "whoami"
         - "pwd"
+        - CUBITPY_PATH=$(pwd)
         # Source the virtual environment
         - source "${PYTHON_ENV}/bin/activate"
         # Print information on the python environment.
@@ -16,6 +17,11 @@ cubitpy-testing:
         - coverage-badge -o htmlcov/coverage.svg
         # This tests that if cubit is completely closed everything works.
         - "./test_configurations.sh"
+        # Check codestyle
+        - "cd $CUBITPY_PATH"
+        - "black . --check && exit 0"
+        # If we did not exit earlier, raise an error here
+        - "exit 1"
     artifacts:
         paths:
           - tests/htmlcov/
