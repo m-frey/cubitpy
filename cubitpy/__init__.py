@@ -46,9 +46,9 @@ from .cubit_utility import get_surface_center
 # Define the itCouplingems that will be exported by default.
 __all__ = [
     # cubit options.
-    'cupy',
+    "cupy",
     # Cubit objects.
-    'CubitPy'
+    "CubitPy"
     # Utility functions.
-    'get_surface_center'
-    ]
+    "get_surface_center",
+]

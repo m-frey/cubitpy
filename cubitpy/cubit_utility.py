@@ -43,7 +43,7 @@ def get_surface_center(surf):
     """
 
     if not surf.get_geometry_type() == cupy.geometry.surface:
-        raise TypeError('Did not expect {}'.format(type(surf)))
+        raise TypeError("Did not expect {}".format(type(surf)))
 
     range_u = surf.get_param_range_U()
     u = 0.5 * (range_u[1] + range_u[0])

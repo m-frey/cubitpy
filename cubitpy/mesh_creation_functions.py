@@ -38,8 +38,18 @@ import numpy as np
 from . import cupy
 
 
-def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
-        mesh_interval=None, mesh_factor=None, mesh=True, **kwargs):
+def create_brick(
+    cubit,
+    h_x,
+    h_y,
+    h_z,
+    *,
+    element_type=None,
+    mesh_interval=None,
+    mesh_factor=None,
+    mesh=True,
+    **kwargs
+):
     """
     Create a cube in cubit.
 
@@ -69,10 +79,11 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
 
     # Check the input parameters.
     if h_x < 0 or h_y < 0 or h_z < 0:
-        raise ValueError('Only positive lengths are possible!')
-    if (mesh_interval is not None and mesh_factor is not None):
-        raise ValueError('The keywords mesh_interval and mesh_factor are '
-            + 'mutually exclusive!')
+        raise ValueError("Only positive lengths are possible!")
+    if mesh_interval is not None and mesh_factor is not None:
+        raise ValueError(
+            "The keywords mesh_interval and mesh_factor are mutually exclusive!"
+        )
 
     # Create the block in cubit.
     solid = cubit.brick(h_x, h_y, h_z)
@@ -98,26 +109,29 @@ def create_brick(cubit, h_x, h_y, h_z, *, element_type=None,
 
         # Set the number of elements in x, y and z direction.
         for direction in range(3):
-            string = ''
+            string = ""
             for curve in dir_curves[direction]:
-                string += ' {}'.format(curve.id())
-            cubit.cmd('curve {} interval {} scheme equal'.format(string,
-                mesh_interval[direction]))
+                string += " {}".format(curve.id())
+            cubit.cmd(
+                "curve {} interval {} scheme equal".format(
+                    string, mesh_interval[direction]
+                )
+            )
 
     if mesh_factor is not None:
         # Set a cubit factor for the mesh size.
-        cubit.cmd('volume {} size auto factor {}'.format(
-            volume_id, mesh_factor))
+        cubit.cmd("volume {} size auto factor {}".format(volume_id, mesh_factor))
 
     # Mesh the created block.
     if mesh:
-        cubit.cmd('mesh volume {}'.format(volume_id))
+        cubit.cmd("mesh volume {}".format(volume_id))
 
     return solid
 
 
-def extrude_mesh_normal_to_surface(cubit, surfaces, thickness, n_layer=2,
-        offset=[0, 0, 0], extrude_dir='outside'):
+def extrude_mesh_normal_to_surface(
+    cubit, surfaces, thickness, n_layer=2, offset=[0, 0, 0], extrude_dir="outside"
+):
     """
     Extrude multiple meshed surfaces in normal direction of the surfaces.
 
@@ -146,14 +160,14 @@ def extrude_mesh_normal_to_surface(cubit, surfaces, thickness, n_layer=2,
 
     # Calculate the offset depending on the extrude direction. The algorithm
     # always extrudes outside.
-    if extrude_dir == 'outside':
+    if extrude_dir == "outside":
         extrude_offset = 0.0
-    elif extrude_dir == 'inside':
+    elif extrude_dir == "inside":
         extrude_offset = -thickness
-    elif extrude_dir == 'symmetric':
+    elif extrude_dir == "symmetric":
         extrude_offset = -0.5 * thickness
     else:
-        raise ValueError('Got wrong extrude_type!')
+        raise ValueError("Got wrong extrude_type!")
 
     # Get a dictionary of all nodes on the surfaces, their positions and their
     # normals.
@@ -166,11 +180,11 @@ def extrude_mesh_normal_to_surface(cubit, surfaces, thickness, n_layer=2,
         surface_nodes = []
         for quad in surface_quads:
             # Get all nodes on this face element.
-            surface_nodes.extend(cubit.get_connectivity('quad', quad))
+            surface_nodes.extend(cubit.get_connectivity("quad", quad))
         # Remove double entries in node list.
         surface_nodes = list(set(surface_nodes))
         if len(surface_nodes) == 0:
-            raise ValueError('Each surface must be meshed!')
+            raise ValueError("Each surface must be meshed!")
 
         # Get normals and positions of the nodes.
         for node_id in surface_nodes:
@@ -180,9 +194,11 @@ def extrude_mesh_normal_to_surface(cubit, surfaces, thickness, n_layer=2,
                 # Check that the normal and position are equal.
                 other_coordinates = node_id_pos_normal_map[node_id][0]
                 other_normal = node_id_pos_normal_map[node_id][1]
-                if (np.linalg.norm(my_coordinates - other_coordinates) > 1e-10
-                        or (np.linalg.norm(my_normal - other_normal)) > 1e-10):
-                    raise ValueError('Positions or normals do not match!')
+                if (
+                    np.linalg.norm(my_coordinates - other_coordinates) > 1e-10
+                    or (np.linalg.norm(my_normal - other_normal)) > 1e-10
+                ):
+                    raise ValueError("Positions or normals do not match!")
             else:
                 node_id_pos_normal_map[node_id] = [my_coordinates, my_normal]
 
@@ -199,39 +215,45 @@ def extrude_mesh_normal_to_surface(cubit, surfaces, thickness, n_layer=2,
         position = node_id_pos_normal_map[node_id][0]
         normal = node_id_pos_normal_map[node_id][1]
         for i_layer in range(n_layer + 1):
-            new_nodes[n_nodes * i_layer + i_node, :] = (offset + position
-                + normal * (extrude_offset + thickness * i_layer / n_layer))
+            new_nodes[n_nodes * i_layer + i_node, :] = (
+                offset
+                + position
+                + normal * (extrude_offset + thickness * i_layer / n_layer)
+            )
     mi = cubit.MeshImport()
-    new_node_id = mi.add_nodes(3, (n_layer + 1) * n_nodes,
-        new_nodes.reshape([(n_layer + 1) * n_nodes * 3]))
+    new_node_id = mi.add_nodes(
+        3, (n_layer + 1) * n_nodes, new_nodes.reshape([(n_layer + 1) * n_nodes * 3])
+    )
     if not new_node_id == 0:
-        raise ValueError('Should not happen!')
+        raise ValueError("Should not happen!")
 
     # Get hex topology.
     n_quads = len(quads)
     element_topology = np.zeros([n_quads * n_layer, 8])
     for i_quad, quad in enumerate(quads):
-        quad_nodes = cubit.get_connectivity('quad', quad)
+        quad_nodes = cubit.get_connectivity("quad", quad)
         quad_new_node_ids = [node_id_map[node] for node in quad_nodes]
 
         for i_layer in range(n_layer):
             element_topology[i_layer * n_quads + i_quad, :4] = np.add(
-                quad_new_node_ids, i_layer * n_nodes + 1)
+                quad_new_node_ids, i_layer * n_nodes + 1
+            )
             element_topology[i_layer * n_quads + i_quad, 4:] = np.add(
-                quad_new_node_ids, (i_layer + 1) * n_nodes + 1)
+                quad_new_node_ids, (i_layer + 1) * n_nodes + 1
+            )
 
     # Create the elements.
     n_elements_old = cubit.get_hex_count()
-    topology_list = list(
-        map(int, element_topology.reshape(n_quads * n_layer * 8)))
+    topology_list = list(map(int, element_topology.reshape(n_quads * n_layer * 8)))
     mi.add_elements(cubit.HEX, n_quads * n_layer, topology_list)
 
     # Create a volume from the created elements and return a reference to that
     # volume.
-    ball_hex_ids = range(
-        n_elements_old + 1,
-        n_elements_old + n_quads * n_layer + 1)
-    cubit.cmd('create mesh geometry hex {} feature_angle 135.0'.format(
-        ' '.join(map(str, ball_hex_ids))))
+    ball_hex_ids = range(n_elements_old + 1, n_elements_old + n_quads * n_layer + 1)
+    cubit.cmd(
+        "create mesh geometry hex {} feature_angle 135.0".format(
+            " ".join(map(str, ball_hex_ids))
+        )
+    )
     last_id = cubit.get_entities(cupy.geometry.volume)[-1]
     return cubit.volume(last_id)

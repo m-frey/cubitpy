@@ -38,7 +38,7 @@ import os, sys
 testing_path = os.path.abspath(os.path.dirname(__file__))
 
 # Set path to find cubitpy.
-sys.path.insert(0, os.path.abspath(os.path.join(testing_path, '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(testing_path, "..")))
 
 # Import cubit module.
 from cubitpy import CubitPy
@@ -52,7 +52,7 @@ cylinder = cubit.cylinder(1, 1, 1, 1)
 # Set the mesh size.
 for curve in cylinder.curves():
     cubit.set_line_interval(curve, 10)
-cubit.cmd('surface 1 size 0.5')
+cubit.cmd("surface 1 size 0.5")
 
 # Mesh the geometry.
 cylinder.volumes()[0].mesh()

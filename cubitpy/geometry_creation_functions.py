@@ -35,8 +35,7 @@ Implements functions that create geometries in cubit.
 from . import cupy
 
 
-def create_parametric_curve(cubit, f, interval, n_segments=10,
-        delete_points=True):
+def create_parametric_curve(cubit, f, interval, n_segments=10, delete_points=True):
     """
     Create a parametric curve in space.
 
@@ -58,16 +57,21 @@ def create_parametric_curve(cubit, f, interval, n_segments=10,
     # Create the vertices along the curve.
     parameter_points = [
         interval[0] + i * (interval[1] - interval[0]) / float(n_segments)
-        for i in range(n_segments + 1)]
+        for i in range(n_segments + 1)
+    ]
     vertices = [cubit.create_vertex(*f(t)) for t in parameter_points]
     vertices_ids = [str(vertex.id()) for vertex in vertices]
-    cubit.cmd('create curve spline vertex {} {}'.format(
-        ' '.join(vertices_ids), ('delete' if delete_points else '')))
+    cubit.cmd(
+        "create curve spline vertex {} {}".format(
+            " ".join(vertices_ids), ("delete" if delete_points else "")
+        )
+    )
     return cubit.curve(cubit.get_last_id(cupy.geometry.curve))
 
 
-def create_parametric_surface(cubit, f, interval, n_segments=[10, 10],
-        delete_curves=True, delete_points=True):
+def create_parametric_surface(
+    cubit, f, interval, n_segments=[10, 10], delete_curves=True, delete_points=True
+):
     """
     Create a parametric surface in space.
 
@@ -96,12 +100,16 @@ def create_parametric_surface(cubit, f, interval, n_segments=[10, 10],
         # direction.
         other_dim = 1 - dim
         parameter_points = [
-            interval[other_dim][0] + i * (interval[other_dim][1] -
-                interval[other_dim][0]) / float(n_segments[other_dim])
-            for i in range(n_segments[other_dim] + 1)]
+            interval[other_dim][0]
+            + i
+            * (interval[other_dim][1] - interval[other_dim][0])
+            / float(n_segments[other_dim])
+            for i in range(n_segments[other_dim] + 1)
+        ]
 
         # Create all curves along this parameter coordinate.
         for point in parameter_points:
+
             def f_temp(t):
                 """
                 Temporary function that is evaluated at a constant value of one
@@ -112,18 +120,27 @@ def create_parametric_surface(cubit, f, interval, n_segments=[10, 10],
                 else:
                     return f(point, t)
 
-            curves[dim].append(create_parametric_curve(cubit, f_temp,
-                interval[dim], n_segments=n_segments[dim],
-                delete_points=delete_points))
+            curves[dim].append(
+                create_parametric_curve(
+                    cubit,
+                    f_temp,
+                    interval[dim],
+                    n_segments=n_segments[dim],
+                    delete_points=delete_points,
+                )
+            )
 
     # Create the surface.
-    curve_u_ids = ' '.join([str(curve.id()) for curve in curves[0]])
-    curve_v_ids = ' '.join([str(curve.id()) for curve in curves[1]])
-    cubit.cmd('create surface net U curve {} V curve {} noheal'.format(
-        curve_u_ids, curve_v_ids))
+    curve_u_ids = " ".join([str(curve.id()) for curve in curves[0]])
+    curve_v_ids = " ".join([str(curve.id()) for curve in curves[1]])
+    cubit.cmd(
+        "create surface net U curve {} V curve {} noheal".format(
+            curve_u_ids, curve_v_ids
+        )
+    )
 
     if delete_curves:
         for id_string in [curve_u_ids, curve_v_ids]:
-            cubit.cmd('delete curve {}'.format(id_string))
+            cubit.cmd("delete curve {}".format(id_string))
 
     return cubit.surface(cubit.get_last_id(cupy.geometry.surface))

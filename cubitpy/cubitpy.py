@@ -68,38 +68,41 @@ class CubitPy(object):
 
         # Get filepaths.
         if cubit_path is None:
-            cubit_path = cupy.get_default_paths('cubit')
+            cubit_path = cupy.get_default_paths("cubit")
         if pre_exodus is None:
-            pre_exodus = cupy.get_default_paths('pre_exodus', False)
+            pre_exodus = cupy.get_default_paths("pre_exodus", False)
 
         # Arguments for cubit.
         if cubit_args is None:
-            arguments = ['cubit',
-#                '-log=/dev/null',    # Write the log to a file.
-                '-information=Off',  # Do not output information of cubit.
-                '-nojournal',        # Do write a journal file.
-                '-noecho'            # Do not output commands used in cubit.
-                ]
+            arguments = [
+                "cubit",
+                # '-log=/dev/null',    # Write the log to a file.
+                "-information=Off",  # Do not output information of cubit.
+                "-nojournal",  # Do write a journal file.
+                "-noecho",  # Do not output commands used in cubit.
+            ]
         else:
-            arguments = ['cubit']
+            arguments = ["cubit"]
             for arg in cubit_args:
                 arguments.append(arg)
 
         # Load the cubit wrapper.
         from .cubit_wrapper3 import CubitConnect
-        cubit_connect = CubitConnect(arguments,
-            cubit_bin_path=os.path.join(cubit_path, 'bin'))
+
+        cubit_connect = CubitConnect(
+            arguments, cubit_bin_path=os.path.join(cubit_path, "bin")
+        )
         self.cubit = cubit_connect.cubit
 
         # Reset cubit.
-        self.cubit.cmd('reset')
-        self.cubit.cmd('set geometry engine acis')
+        self.cubit.cmd("reset")
+        self.cubit.cmd("set geometry engine acis")
 
         # Set lists and counters for blocks and sets.
         self._default_cubit_variables()
 
         # Content of head file.
-        self.head = ''
+        self.head = ""
 
         # Other parameters.
         self.cubit_path = cubit_path
@@ -150,11 +153,11 @@ class CubitPy(object):
         # intended case.
         rename_name = None
         if name is not None and group_name is not None:
-            warnings.warn(('A {} is added for the group "{}" and an explicit '
-                'name of "{}" is given. This might be unintended, as usually '
-                'if a group is given, we expect to use the name of the group.'
-                ' In the current case we will use the given name.').format(
-                    set_type, item.name, name))
+            warnings.warn(
+                'A {} is added for the group "{}" and an explicit name of "{}" is given. This might be unintended, as usually if a group is given, we expect to use the name of the group. In the current case we will use the given name.'.format(
+                    set_type, item.name, name
+                )
+            )
             rename_name = name
         elif group_name is not None:
             rename_name = group_name
@@ -163,11 +166,11 @@ class CubitPy(object):
 
         # Rename the item.
         if rename_name is not None:
-            self.cubit.cmd('{} {} name "{}"'.format(set_type, set_id,
-                rename_name))
+            self.cubit.cmd('{} {} name "{}"'.format(set_type, set_id, rename_name))
 
-    def add_element_type(self, item, el_type, *, name=None, material='MAT 1',
-            bc_description=None):
+    def add_element_type(
+        self, item, el_type, *, name=None, material="MAT 1", bc_description=None
+    ):
         """
         Add a block to cubit that contains the geometry in item. Also set the
         element type of block.
@@ -191,52 +194,56 @@ class CubitPy(object):
         # Check that all blocks in cubit are created with this function.
         n_blocks = len(self.blocks)
         if not len(self.cubit.get_block_id_list()) == n_blocks:
-            raise ValueError(('The block counter is {1}, but the number of '
-                + 'blocks in cubit is {0}, all blocks should be created with '
-                + 'this function!').format(
-                    len(self.cubit.get_block_id_list()), n_blocks))
+            raise ValueError(
+                "The block counter is {1}, but the number of blocks in cubit is {0}, all blocks should be created with this function!".format(
+                    len(self.cubit.get_block_id_list()), n_blocks
+                )
+            )
 
         # Get element type of item.
         geometry_type = item.get_geometry_type()
 
         # For now only 3D elements are allowed.
         if geometry_type is not cupy.geometry.volume:
-            raise TypeError('For now element types can only be set for '
-                + 'volumes!')
+            raise TypeError("For now element types can only be set for volumes!")
 
-        self.cubit.cmd('create block {}'.format(n_blocks + 1))
+        self.cubit.cmd("create block {}".format(n_blocks + 1))
 
         if not isinstance(item, CubitGroup):
             cubit_scheme, cubit_element_type = el_type.get_cubit_names()
 
             # Set the meshing scheme for this element type.
-            self.cubit.cmd('{} {} scheme {}'.format(
-                geometry_type.get_cubit_string(), item.id(), cubit_scheme))
+            self.cubit.cmd(
+                "{} {} scheme {}".format(
+                    geometry_type.get_cubit_string(), item.id(), cubit_scheme
+                )
+            )
 
-            self.cubit.cmd('block {} {} {}'.format(
-                n_blocks + 1,
-                geometry_type.get_cubit_string(),
-                item.id()
-                ))
-            self.cubit.cmd('block {} element type {}'.format(
-                n_blocks + 1,
-                cubit_element_type
-                ))
+            self.cubit.cmd(
+                "block {} {} {}".format(
+                    n_blocks + 1, geometry_type.get_cubit_string(), item.id()
+                )
+            )
+            self.cubit.cmd(
+                "block {} element type {}".format(n_blocks + 1, cubit_element_type)
+            )
         else:
             item.add_to_block(n_blocks + 1, el_type)
 
-        self._name_created_set('block', n_blocks + 1, name, item)
+        self._name_created_set("block", n_blocks + 1, name, item)
 
         # If the user does not give a bc_description, load the default one.
         if bc_description is None:
             bc_description = el_type.get_default_baci_description()
 
         # Add data that will be written to bc file.
-        self.blocks.append([
-            el_type.get_baci_section(), ' '.join([material, bc_description]),
-            el_type.get_baci_name()
-            ])
-
+        self.blocks.append(
+            [
+                el_type.get_baci_section(),
+                " ".join([material, bc_description]),
+                el_type.get_baci_name(),
+            ]
+        )
 
     def reset_blocks(self):
         """
@@ -249,11 +256,18 @@ class CubitPy(object):
 
         # Delete all blocks.
         for block_id in self.get_block_id_list():
-            self.cmd('delete Block {}'.format(block_id))
+            self.cmd("delete Block {}".format(block_id))
 
-    def add_node_set(self, item, *, name=None, bc_type=None,
-            bc_description='NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0',
-            bc_section=None, geometry_type=None):
+    def add_node_set(
+        self,
+        item,
+        *,
+        name=None,
+        bc_type=None,
+        bc_description="NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0",
+        bc_section=None,
+        geometry_type=None
+    ):
         """
         Add a node set to cubit. This node set can have a boundary condition.
 
@@ -278,39 +292,43 @@ class CubitPy(object):
         # Check that all node sets in cubit are created with this function.
         n_node_sets = len(self.node_sets)
         if not len(self.cubit.get_nodeset_id_list()) == n_node_sets:
-            raise ValueError(('The node set counter is {1}, but the number of '
-                + 'node sets in cubit is {0}, all node sets should be created '
-                + 'with this function!').format(
-                    len(self.cubit.get_nodeset_id_list()), n_node_sets))
+            raise ValueError(
+                "The node set counter is {1}, but the number of node sets in cubit is {0}, all node sets should be created with this function!".format(
+                    len(self.cubit.get_nodeset_id_list()), n_node_sets
+                )
+            )
 
         # Get element type of item if it was not explicitly given.
         if geometry_type is None:
             geometry_type = item.get_geometry_type()
 
-        self.cubit.cmd('create nodeset {}'.format(n_node_sets + 1))
+        self.cubit.cmd("create nodeset {}".format(n_node_sets + 1))
         if not isinstance(item, CubitGroup):
             # Add the geometries to the node set in cubit.
-            self.cubit.cmd('nodeset {} {} {}'.format(
-                n_node_sets + 1,
-                geometry_type.get_cubit_string(),
-                item.id()
-                ))
+            self.cubit.cmd(
+                "nodeset {} {} {}".format(
+                    n_node_sets + 1, geometry_type.get_cubit_string(), item.id()
+                )
+            )
         else:
             # Add the group to the node set in cubit.
             item.add_to_nodeset(n_node_sets + 1)
 
-        self._name_created_set('nodeset', n_node_sets + 1, name, item)
+        self._name_created_set("nodeset", n_node_sets + 1, name, item)
 
         # Add data that will be written to bc file.
-        if ((bc_section is None and bc_type is None)
-                or bc_section is not None and bc_type is not None):
-            raise ValueError('One of the two arguments "bc_section" and '
-                + '"bc_type" has to be set!')
+        if (
+            (bc_section is None and bc_type is None)
+            or bc_section is not None
+            and bc_type is not None
+        ):
+            raise ValueError(
+                'One of the two arguments "bc_section" and '
+                + '"bc_type" has to be set!'
+            )
         if bc_section is None:
             bc_section = bc_type.get_dat_bc_section_header(geometry_type)
-        self.node_sets.append([
-            bc_section,
-            bc_description])
+        self.node_sets.append([bc_section, bc_description])
 
     def get_ids(self, geometry_type):
         """
@@ -332,7 +350,7 @@ class CubitPy(object):
         elif geometry_type == cupy.geometry.volume:
             funct = self.volume
         else:
-            raise ValueError('Got unexpected geometry type!')
+            raise ValueError("Got unexpected geometry type!")
 
         if item_ids is None:
             item_ids = self.get_ids(geometry_type)
@@ -352,11 +370,8 @@ class CubitPy(object):
 
         # Check if item is line.
         if not item.get_geometry_type() == cupy.geometry.curve:
-            raise TypeError('Expected line, got {}'.format(type(item)))
-        self.cubit.cmd('curve {} interval {} scheme equal'.format(
-            item.id(),
-            n_el
-            ))
+            raise TypeError("Expected line, got {}".format(type(item)))
+        self.cubit.cmd("curve {} interval {} scheme equal".format(item.id(), n_el))
 
     def export_cub(self, path):
         """Export the cubit input."""
@@ -369,23 +384,25 @@ class CubitPy(object):
     def write_head_bc(self, head_path, bc_path):
         """Write the head and bc files that will be used with pre_exodus."""
 
-        with open(head_path, 'w') as head_file:
-            for line in self.head.split('\n'):
+        with open(head_path, "w") as head_file:
+            for line in self.head.split("\n"):
                 head_file.write(line.strip())
-                head_file.write('\n')
+                head_file.write("\n")
 
-        with open(bc_path, 'w') as bc_file:
-            bc_file.write('---------------------------------------BCSPECS\n\n')
+        with open(bc_path, "w") as bc_file:
+            bc_file.write("---------------------------------------BCSPECS\n\n")
             for i, block in enumerate(self.blocks):
-                bc_file.write((
-                    '*eb{}="ELEMENT"\nsectionname="{}"\n'
-                    + 'description="{}"\nelementname="{}"\n\n').format(
-                        i + 1, block[0], block[1], block[2]))
+                bc_file.write(
+                    '*eb{}="ELEMENT"\nsectionname="{}"\ndescription="{}"\nelementname="{}"\n\n'.format(
+                        i + 1, block[0], block[1], block[2]
+                    )
+                )
             for i, node_set in enumerate(self.node_sets):
-                bc_file.write((
-                    '*ns{}="CONDITION"\nsectionname="{}"\n'
-                    + 'description="{}"\n\n').format(
-                        i + 1, node_set[0], node_set[1]))
+                bc_file.write(
+                    '*ns{}="CONDITION"\nsectionname="{}"\ndescription="{}"\n\n'.format(
+                        i + 1, node_set[0], node_set[1]
+                    )
+                )
 
     def create_dat(self, dat_path):
         """
@@ -395,7 +412,7 @@ class CubitPy(object):
         # Check if output path exists.
         dat_dir = os.path.dirname(dat_path)
         if not os.path.exists(dat_dir):
-            raise ValueError('Path {} does not exist!'.format(dat_dir))
+            raise ValueError("Path {} does not exist!".format(dat_dir))
 
         # Create the dat file.
         temp_dat_file = self._create_dat()
@@ -421,33 +438,35 @@ class CubitPy(object):
 
         # Check if the path to pre_exodus is valid.
         if self.pre_exodus is None:
-            raise ValueError('The path to pre_exodus is None!')
+            raise ValueError("The path to pre_exodus is None!")
 
         os.makedirs(cupy.temp_dir, exist_ok=True)
 
         # Create files
-        self.export_exo(os.path.join(cupy.temp_dir, 'cubitpy.exo'))
+        self.export_exo(os.path.join(cupy.temp_dir, "cubitpy.exo"))
         self.write_head_bc(
-            os.path.join(cupy.temp_dir, 'cubitpy.head'),
-            os.path.join(cupy.temp_dir, 'cubitpy.bc')
-            )
+            os.path.join(cupy.temp_dir, "cubitpy.head"),
+            os.path.join(cupy.temp_dir, "cubitpy.bc"),
+        )
 
         # For debugging write the command to the temp folder.
-        with open(os.path.join(cupy.temp_dir, 'cmd.sh'), 'w') as cmd_file:
+        with open(os.path.join(cupy.temp_dir, "cmd.sh"), "w") as cmd_file:
             cmd_file.write(self.pre_exodus)
-            cmd_file.write(' --exo=cubitpy.exo --bc=cubitpy.bc '
-                + '--head=cubitpy.head')
+            cmd_file.write(" --exo=cubitpy.exo --bc=cubitpy.bc --head=cubitpy.head")
 
         # Run pre_exodus.
-        _out = subprocess.check_output([
-            self.pre_exodus,
-            '--exo=cubitpy.exo',
-            '--bc=cubitpy.bc',
-            '--head=cubitpy.head'
-            ], cwd=cupy.temp_dir)
+        _out = subprocess.check_output(
+            [
+                self.pre_exodus,
+                "--exo=cubitpy.exo",
+                "--bc=cubitpy.bc",
+                "--head=cubitpy.head",
+            ],
+            cwd=cupy.temp_dir,
+        )
 
         # Return the path to the dat file.
-        return os.path.join(cupy.temp_dir, 'cubitpy.dat')
+        return os.path.join(cupy.temp_dir, "cubitpy.dat")
 
     def group(self, **kwargs):
         """
@@ -491,36 +510,47 @@ class CubitPy(object):
         # TODO: find a way to do this without the wait command, but to check if
         # the file is readable.
         os.makedirs(cupy.temp_dir, exist_ok=True)
-        state_path = os.path.join(cupy.temp_dir, 'state.cub')
+        state_path = os.path.join(cupy.temp_dir, "state.cub")
         self.export_cub(state_path)
         time.sleep(delay)
 
         # Write file that opens the state in cubit.
-        journal_path = os.path.join(cupy.temp_dir, 'open_state.jou')
-        with open(journal_path, 'w') as journal:
+        journal_path = os.path.join(cupy.temp_dir, "open_state.jou")
+        with open(journal_path, "w") as journal:
             journal.write('open "{}"\n'.format(state_path))
 
             # Get the cubit names of the desired display items.
             cubit_names = [label.get_cubit_string() for label in labels]
 
             # Label items in cubit, per default all labels are deactivated.
-            cubit_labels = ['volume', 'surface', 'curve', 'vertex', 'hex',
-                'tet', 'face', 'tri', 'edge', 'node']
+            cubit_labels = [
+                "volume",
+                "surface",
+                "curve",
+                "vertex",
+                "hex",
+                "tet",
+                "face",
+                "tri",
+                "edge",
+                "node",
+            ]
             for item in cubit_labels:
                 if item in cubit_names:
-                    on_off = 'On'
+                    on_off = "On"
                 else:
-                    on_off = 'Off'
-                journal.write('label {} {}\n'.format(item, on_off))
-            journal.write('display\n')
+                    on_off = "Off"
+                journal.write("label {} {}\n".format(item, on_off))
+            journal.write("display\n")
 
         # Get the command and arguments to open cubit with.
         cubit_command = [
-            os.path.join(self.cubit_path, 'cubit'),
-            '-nojournal',
-            '-information=Off',
-            '-input', 'open_state.jou'
-            ]
+            os.path.join(self.cubit_path, "cubit"),
+            "-nojournal",
+            "-information=Off",
+            "-input",
+            "open_state.jou",
+        ]
 
         if not testing:
             # Adapt the environment if needed.
@@ -531,6 +561,6 @@ class CubitPy(object):
 
             # Restore environment path.
             if is_eclipse:
-                os.environ['PYTHONPATH'] = python_path_old
+                os.environ["PYTHONPATH"] = python_path_old
         else:
             return journal_path
