@@ -2,6 +2,11 @@
 
 A `python3` wrapper for Cubit. It is tested with Cubit13.2.
 
+## Code formating
+
+CubitPy uses the python code formater [black](https://github.com/psf/black).
+The testsuite checks if all files are formated accordingly.
+
 ## Installation
 
 Cubitpy is developed with `python3.8`.
