@@ -28,23 +28,13 @@
 # SOFTWARE.
 # -----------------------------------------------------------------------------
 """
-Test if the last element is deleted correctly.
+This file imports the cubitpy module for all testing purposes.
 """
 
-# Import cubit module.
-from testing_context import cubitpy
-from cubitpy import CubitPy
+import os
+import sys
 
-# Initialize cubit
-cubit = CubitPy()
+# Add the root directory of the package to the python path.
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# Create cylinder.
-cylinder = cubit.cylinder(1, 1, 1, 1)
-
-# Set the mesh size.
-for curve in cylinder.curves():
-    cubit.set_line_interval(curve, 10)
-cubit.cmd("surface 1 size 0.5")
-
-# Mesh the geometry.
-cylinder.volumes()[0].mesh()
+import cubitpy
