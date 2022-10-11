@@ -43,10 +43,8 @@ testing_path = os.path.abspath(os.path.dirname(__file__))
 testing_input = os.path.join(testing_path, "input-files-ref")
 testing_temp = os.path.join(testing_path, "testing-tmp")
 
-# Set path to find cubitpy.
-sys.path.insert(0, os.path.abspath(os.path.join(testing_path, "..")))
-
-# Cubitpy imports.
+# CubitPy imports.
+from testing_context import cubitpy
 from cubitpy import CubitPy, cupy, get_surface_center
 from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
 from cubitpy.geometry_creation_functions import create_parametric_surface
