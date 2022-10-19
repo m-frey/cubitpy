@@ -28,4 +28,21 @@
 # SOFTWARE.
 # -----------------------------------------------------------------------------
 
-from .check_header import check_license
+from setuptools import setup
+
+setup(
+    name="cubitpy",
+    version="0.1",
+    author="Ivo Steinbrecher",
+    author_email="ivo.steinbrecher@unibw.de",
+    description="CubitPy: A python3 wrapper for Cubit",
+    install_requires=[
+        "numpy",
+        "execnet",
+    ],
+    extras_require={
+        "CI-CD": ["coverage", "coverage-badge", "black"],
+    },
+    license_files=["LICENSE"],
+    packages=["cubitpy"],
+)

@@ -1,45 +1,49 @@
-# Test cubitpy.
+# Test cubitpy
 cubitpy-testing:
     script:
         - "whoami"
         - "pwd"
         - CUBITPY_PATH=$(pwd)
-        # Source the virtual environment
-        - source "${PYTHON_ENV}/bin/activate"
-        # Print information on the python environment.
+        # Create the virtual environment
+        - "${PYTHON_EXE} -m venv ${PYTHON_VENV}"
+        - source "${PYTHON_VENV}/bin/activate"
+        # Install cubitpy
+        - "pip install .[CI-CD]"
+        # Print information on the python environment
         - "python --version"
         - "pip list"
-        # Run tests.
+        # Run tests
         - "cd tests"
         - "coverage run --rcfile=coverage.config -m unittest discover"
         - "coverage html"
         - "coverage report"
         - coverage-badge -o htmlcov/coverage.svg
-        # This tests that if cubit is completely closed everything works.
+        # This tests that if cubit is completely closed everything works
         - "./test_configurations.sh"
         # Check codestyle
         - "cd $CUBITPY_PATH"
-        - "black . --check && exit 0"
+        - 'black . --check --exclude="${PYTHON_VENV}" && exit 0'
         # If we did not exit earlier, raise an error here
         - "exit 1"
     artifacts:
         paths:
           - tests/htmlcov/
     variables:
-        # Indicated the testing script, that it is performed on GitLab.
+        # Indicated the testing script, that it is performed on GitLab
         TESTING_GITLAB: 1
 
-        # Path to the virtual python environment on the testing machine.
-        PYTHON_ENV: "/hdd/gitlab-runner/lib/python-interpreter/cubitpy-env"
+        # Python executable and virtual environment name
+        PYTHON_EXE: "python3"
+        PYTHON_VENV: "python-testing-environment"
 
-        # Define variables for cubit and pre exodus.
+        # Define variables for cubit and pre exodus
         BACI_PRE_EXODUS: "/hdd/gitlab-runner/lib/baci-master/release/pre_exodus"
         CUBIT: "/imcs/public/compsim/opt/cubit-13.2"
     tags:
         - "imcs-all"
 
 
-# For the master branch add the coverage report.
+# For the master branch add the coverage report
 pages:
     stage: deploy
     dependencies:
