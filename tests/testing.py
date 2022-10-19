@@ -34,7 +34,6 @@ This script is used to test the functionality of the cubitpy module.
 # Python imports.
 import unittest
 import os
-import sys
 import subprocess
 import numpy as np
 
@@ -44,7 +43,6 @@ testing_input = os.path.join(testing_path, "input-files-ref")
 testing_temp = os.path.join(testing_path, "testing-tmp")
 
 # CubitPy imports.
-from testing_context import cubitpy
 from cubitpy import CubitPy, cupy, get_surface_center
 from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
 from cubitpy.geometry_creation_functions import create_parametric_surface

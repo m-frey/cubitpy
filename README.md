@@ -12,54 +12,50 @@ The testsuite checks if all files are formated accordingly.
 Cubitpy is developed with `python3.8`.
 Other versions of Python might lead to issues.
 It is recommended to use virtual environments with `python`.
-On Debian systems the package `python3-venv` has to be installed.
+On Debian systems the following packages have to be installed
 
 ```bash
 sudo apt-get install python3-venv python3-dev
 ```
 
-Now a virtual environment can be created (for example in the home directory)
+Now a virtual environment can be created (chose an appropriate directory for this, e.g., `/home/user/opt`)
 
 ```bash
-cd ~
-mkdir opt
-cd opt
 python3 -m venv cubitpy-env
 ```
 
 The created virtual environment can be loaded with
 
 ```bash
-source ~/opt/cubitpy-env/bin/activate
+source cubitpy-env/bin/activate
 ```
 
 From now on we assume that the virtual enviroment is loaded.
-To install `cubitpy` go to the repository directory
+To install `cubitpy` go to the repository root directory
 
 ```bash
 cd path_to_cubitpy
 ```
 
-Run the following command to install the required packages
+And install `cubitpy` via `pip`
 
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 
-Add the cubitpy path to `PYTHONPATH`
+If you intend to actively develop `cubitpy`, install it in *editable mode*
 
 ```bash
-export PYTHONPATH=path_to_cubitpy:$PYTHONPATH
+pip install -e .
 ```
 
-Additionally paths to cubit and `pre_exodus` have to be set.
+The path to `pre_exodus` has to be set (to avoid having to type this in each terminal session, you can put this into `.bashrc`)
 
 ```bash
 export BACI_PRE_EXODUS=path_to_pre-exodus
-export CUBIT=path_to_cubit_directory
 ```
 
-To check if everything worked as expected, run the tests
+To check if everything worked as expected, run the tests from within the `tests` directory
 
 ```bash
 cd path_to_cubitpy/tests
