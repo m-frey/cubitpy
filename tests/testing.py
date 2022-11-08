@@ -361,7 +361,7 @@ class TestCubitPy(unittest.TestCase):
         # Set the head string.
         cubit.head = """
             -------------------------------------------------------------FUNCT1
-            COMPONENT 0 FUNCTION t
+            SYMBOLIC_FUNCTION_OF_TIME t
             ----------------------------------------------------------MATERIALS
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 1.0e+09 NUE 0.3 DENS 0.0
             ------------------------------------IO/RUNTIME VTK OUTPUT/STRUCTURE
