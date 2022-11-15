@@ -412,11 +412,11 @@ class TestCubitPy(unittest.TestCase):
                 1.1,
                 element_type=element_type,
                 mesh_interval=[3, 2, 1],
-                name=str(element_type) + str(i + 5),
+                name=str(element_type) + str(i + len(element_type_list)),
                 mesh=False,
                 material="test material string",
             )
-            cubit.move(cube, [i + 5, 0, 0])
+            cubit.move(cube, [i + len(element_type_list), 0, 0])
             cube.volumes()[0].mesh()
 
         # Compare the input file created for baci.
@@ -461,7 +461,7 @@ class TestCubitPy(unittest.TestCase):
         self.assertTrue(
             np.abs(
                 cubit.get_meshed_volume_or_area("volume", [volume.id()])
-                - 0.6917513525525543
+                - 0.6917559630511103
             )
             < 1e-10
         )
