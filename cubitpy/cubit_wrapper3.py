@@ -109,7 +109,7 @@ class CubitConnect(object):
         if not log_given:
             # Eclipse and no log given -> write the log to a temporary file and
             # check the contents after each call to cubit.
-            cubit_arguments.append("-log={}".format(cupy.temp_log))
+            cubit_arguments.extend(["-log", cupy.temp_log])
             parameters["tty"] = cupy.temp_log
             self.log_check = True
 

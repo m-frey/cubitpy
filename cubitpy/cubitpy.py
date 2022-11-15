@@ -76,15 +76,15 @@ class CubitPy(object):
         if cubit_args is None:
             arguments = [
                 "cubit",
-                # '-log=/dev/null',    # Write the log to a file.
-                "-information=Off",  # Do not output information of cubit.
-                "-nojournal",  # Do write a journal file.
-                "-noecho",  # Do not output commands used in cubit.
+                # "-log",  # Write the log to a file
+                # "dev/null",
+                "-information",  # Do not output information of cubit
+                "Off",
+                "-nojournal",  # Do write a journal file
+                "-noecho",  # Do not output commands used in cubit
             ]
         else:
-            arguments = ["cubit"]
-            for arg in cubit_args:
-                arguments.append(arg)
+            arguments = ["cubit"] + cubit_args
 
         # Load the cubit wrapper.
         from .cubit_wrapper3 import CubitConnect
@@ -490,6 +490,9 @@ class CubitPy(object):
         Additionally labels can be displayed in cubit to simplify the mesh
         creation process.
 
+        Attention - displays for stls not the same as an export_exo (TODO: maybe
+        use import instead of open).
+
         Args
         ----
         labels: [GeometryType, FiniteElementObject]
@@ -547,7 +550,8 @@ class CubitPy(object):
         cubit_command = [
             os.path.join(self.cubit_path, "cubit"),
             "-nojournal",
-            "-information=Off",
+            "-information",
+            "Off",
             "-input",
             "open_state.jou",
         ]
