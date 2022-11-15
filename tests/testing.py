@@ -61,7 +61,7 @@ def check_tmp_dir():
 
 def compare_strings(string_ref, string_compare):
     """
-    Compare two stings. If they are not identical open kompare and show
+    Compare two stings. If they are not identical open meld and show
     differences.
     """
 
