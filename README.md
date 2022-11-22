@@ -1,6 +1,6 @@
 # Cubitpy
 
-A `python3` wrapper for Cubit. It is tested with Cubit13.2.
+A `python3` wrapper for Cubit. It is tested with Cubit15.2.
 
 ## Code formating
 
