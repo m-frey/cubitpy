@@ -49,10 +49,11 @@ If you intend to actively develop `cubitpy`, install it in *editable mode*
 pip install -e .
 ```
 
-The path to `pre_exodus` has to be set (to avoid having to type this in each terminal session, you can put this into `.bashrc`)
+The path to `pre_exodus` and to Cubit 15.2 has to be set (to avoid having to type this in each terminal session, you can put this into `.bashrc`)
 
 ```bash
 export BACI_PRE_EXODUS=path_to_pre-exodus
+export CUBIT=path_to_cubit_directory
 ```
 
 To check if everything worked as expected, run the tests from within the `tests` directory
