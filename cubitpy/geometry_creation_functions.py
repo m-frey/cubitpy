@@ -35,7 +35,15 @@ Implements functions that create geometries in cubit.
 from . import cupy
 
 
-def create_parametric_curve(cubit, f, interval, n_segments=10, delete_points=True):
+def create_parametric_curve(
+    cubit,
+    f,
+    interval,
+    n_segments=10,
+    delete_points=True,
+    function_args=[],
+    function_kwargs={},
+):
     """
     Create a parametric curve in space.
 
@@ -52,6 +60,10 @@ def create_parametric_curve(cubit, f, interval, n_segments=10, delete_points=Tru
         Number of segments for the interval.#
     delete_points: bool
         If the created vertices should be kept or should be deleted.
+    function_args: list
+        Additional arguments for the function.
+    function_kwargs: dir
+        Additional keyword arguments for the function.
     """
 
     # Create the vertices along the curve.
@@ -59,7 +71,10 @@ def create_parametric_curve(cubit, f, interval, n_segments=10, delete_points=Tru
         interval[0] + i * (interval[1] - interval[0]) / float(n_segments)
         for i in range(n_segments + 1)
     ]
-    vertices = [cubit.create_vertex(*f(t)) for t in parameter_points]
+    vertices = [
+        cubit.create_vertex(*f(t, *function_args, **function_kwargs))
+        for t in parameter_points
+    ]
     vertices_ids = [str(vertex.id()) for vertex in vertices]
     cubit.cmd(
         "create curve spline vertex {} {}".format(
@@ -70,7 +85,14 @@ def create_parametric_curve(cubit, f, interval, n_segments=10, delete_points=Tru
 
 
 def create_parametric_surface(
-    cubit, f, interval, n_segments=[10, 10], delete_curves=True, delete_points=True
+    cubit,
+    f,
+    interval,
+    n_segments=[10, 10],
+    delete_curves=True,
+    delete_points=True,
+    function_args=[],
+    function_kwargs={},
 ):
     """
     Create a parametric surface in space.
@@ -90,6 +112,10 @@ def create_parametric_surface(
         If the created curves should be kept or should be deleted.
     delete_points: bool
         If the created vertices should be kept or should be deleted.
+    function_args: list
+        Additional arguments for the function.
+    function_kwargs: dir
+        Additional keyword arguments for the function.
     """
 
     # Loop over the parameter coordinates dimension.
@@ -116,9 +142,9 @@ def create_parametric_surface(
                 of the two parameter coordinates.
                 """
                 if dim == 0:
-                    return f(t, point)
+                    return f(t, point, *function_args, **function_kwargs)
                 else:
-                    return f(point, t)
+                    return f(point, t, *function_args, **function_kwargs)
 
             curves[dim].append(
                 create_parametric_curve(
