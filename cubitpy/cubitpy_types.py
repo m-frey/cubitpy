@@ -129,6 +129,7 @@ class ElementType(Enum):
     tet10 = auto()
     hex8sh = auto()
     hex8_fluid = auto()
+    quad4 = auto()
 
     def get_cubit_names(self):
         """
@@ -152,6 +153,9 @@ class ElementType(Enum):
         elif self == self.tet10:
             cubit_scheme = "Tetmesh"
             cubit_element_type = "TETRA10"
+        elif self == self.quad4:
+            cubit_scheme = "Auto"
+            cubit_element_type = "QUAD4"
         else:
             raise ValueError("Got wrong element type {}!".format(self))
 
@@ -175,6 +179,8 @@ class ElementType(Enum):
             return "SOLIDSH8"
         elif self == self.hex8_fluid:
             return "FLUID"
+        if self == self.quad4:
+            return "WALL"
         else:
             raise ValueError("Got wrong element type {}!".format(self))
 
@@ -191,6 +197,7 @@ class ElementType(Enum):
             or self == self.tet4
             or self == self.hex8sh
             or self == self.tet10
+            or self == self.quad4
         ):
             return "STRUCTURE"
         else:
