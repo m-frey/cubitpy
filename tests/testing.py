@@ -372,6 +372,27 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, single_precision=True)
 
+    def test_element_types_quad4(self):
+        """Create quad4 mesh."""
+
+        # Initialize cubit.
+        cubit = CubitPy()
+
+        # Create the plate.
+        cubit.cmd("create surface rectangle width 1 height 2 zplane")
+        cubit.cmd("curve 1 3 interval 3")
+        cubit.cmd("curve 2 4 interval 2")
+        cubit.cmd("mesh surface 1")
+        cubit.add_element_type(
+            cubit.surface(1),
+            cupy.element_type.quad4,
+            material="MAT 1",
+            bc_description="KINEM nonlinear EAS none THICK 1.0 STRESS_STRAIN plane_stress GP 3 3",
+        )
+
+        # Compare the input file created for baci.
+        self.compare(cubit, single_precision=True)
+
     def test_block_function(self):
         """Create a solid block with different element types."""
 

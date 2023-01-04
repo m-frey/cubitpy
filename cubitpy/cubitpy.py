@@ -203,10 +203,6 @@ class CubitPy(object):
         # Get element type of item.
         geometry_type = item.get_geometry_type()
 
-        # For now only 3D elements are allowed.
-        if geometry_type is not cupy.geometry.volume:
-            raise TypeError("For now element types can only be set for volumes!")
-
         self.cubit.cmd("create block {}".format(n_blocks + 1))
 
         if not isinstance(item, CubitGroup):
