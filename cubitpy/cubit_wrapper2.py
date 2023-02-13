@@ -124,7 +124,6 @@ channel.send(object_to_id(cubit))
 # Now start an endless loop (until None is sent) and perform the cubit
 # functions.
 while 1:
-
     # Get input from python3.
     receive = channel.receive()
 

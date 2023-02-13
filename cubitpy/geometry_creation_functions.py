@@ -121,7 +121,6 @@ def create_parametric_surface(
     # Loop over the parameter coordinates dimension.
     curves = [[], []]
     for dim in range(2):
-
         # Get the constant values for the other parameter coordinate in this
         # direction.
         other_dim = 1 - dim
