@@ -46,9 +46,3 @@ jobs:
           black . --check --exclude=$PYTHON_VENV && exit 0
           # If we did not exit earlier, raise an error here
           exit 1
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        with:
-          name: code-coverage-report
-          path: tests/htmlcov/coverage.svg
-          retention-days: 30
