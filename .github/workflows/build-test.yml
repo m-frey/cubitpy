@@ -50,5 +50,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: code-coverage-report
-          path: htmlcov/coverage.svg
+          path: tests/htmlcov/coverage.svg
           retention-days: 30
