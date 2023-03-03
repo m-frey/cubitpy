@@ -35,6 +35,7 @@ interface works only with Python2, a wrapper for the cubit methods is used.
 
 # Python modules.
 import os
+import sys
 import shutil
 import subprocess
 import time
@@ -451,15 +452,18 @@ class CubitPy(object):
             cmd_file.write(" --exo=cubitpy.exo --bc=cubitpy.bc --head=cubitpy.head")
 
         # Run pre_exodus.
-        _out = subprocess.check_output(
-            [
-                self.pre_exodus,
-                "--exo=cubitpy.exo",
-                "--bc=cubitpy.bc",
-                "--head=cubitpy.head",
-            ],
-            cwd=cupy.temp_dir,
-        )
+        try:
+            _out = subprocess.check_output(
+                [
+                    self.pre_exodus,
+                    "--exo=cubitpy.exo",
+                    "--bc=cubitpy.bc",
+                    "--head=cubitpy.head",
+                ],
+                cwd=cupy.temp_dir,
+            )
+        except subprocess.CalledProcessError as e:
+            print(e.output.decode(sys.stdout.encoding))
 
         # Return the path to the dat file.
         return os.path.join(cupy.temp_dir, "cubitpy.dat")
