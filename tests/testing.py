@@ -300,7 +300,6 @@ class TestCubitPy(unittest.TestCase):
         ]
 
         for i, element_type in enumerate(element_type_list):
-
             # Offset for the next volume.
             offset_point = i * 12
             offset_curve = i * 12
@@ -571,7 +570,6 @@ class TestCubitPy(unittest.TestCase):
         self.compare(cubit)
 
     def test_contact_condition_beam_to_surface(self):
-
         cubit = CubitPy()
 
         # Create the mesh.
@@ -591,7 +589,6 @@ class TestCubitPy(unittest.TestCase):
         self.compare(cubit)
 
     def test_contact_condition_surface_to_surface(self):
-
         cubit = CubitPy()
 
         # Create the mesh.
@@ -698,7 +695,6 @@ class TestCubitPy(unittest.TestCase):
             for point_2 in solid_2.vertices():
                 coordinates_2 = np.array(point_2.coordinates())
                 if np.linalg.norm(coordinates_2 - coordinates_1) < cupy.eps_pos:
-
                     # Here a group has to be created.
                     group = cubit.group()
                     group.add([point_1, point_2])
