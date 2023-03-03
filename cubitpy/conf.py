@@ -50,7 +50,6 @@ class CubitOptions(object):
     """Object for types in cubitpy."""
 
     def __init__(self):
-
         # Temporary directory for cubitpy.
         self.temp_dir = os.path.join(
             "/tmp/cubitpy_{}".format(getpass.getuser()), "pid_{}".format(os.getpid())
