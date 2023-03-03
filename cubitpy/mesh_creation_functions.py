@@ -94,7 +94,6 @@ def create_brick(
 
     # Set mesh properties.
     if mesh_interval is not None:
-
         # Get the lines in x, y and z direction.
         dir_curves = [[] for _i in range(3)]
         for curve in solid.curves():
