@@ -721,6 +721,37 @@ class TestCubitPy(unittest.TestCase):
         """
         self.xtest_groups(False)
 
+    def test_group_of_surfaces(self):
+        """
+        Test the proper creation of a group of surfaces and assign them an element type
+        """
+        cubit = CubitPy()
+
+        # create a rectangle and imprint it
+        cubit.cmd("create surface rectangle width 1 height 2 zplane")
+        cubit.cmd("create curve location -0.5 0 0  location 0.5 0 0")
+        cubit.cmd("imprint tolerant surface 1 with curve 5 merge")
+
+        # define mesh size
+        cubit.cmd("surface all size 0.3")
+
+        # create mesh
+        cubit.cmd("mesh surface all")
+
+        # create group and assing element type
+        surfaces = cubit.group(add_value="add surface 2 3")
+
+        cubit.add_element_type(
+            surfaces,
+            cupy.element_type.quad4,
+            name="mesh",
+            material="MAT 1",
+            bc_description="KINEM linear EAS none THICK 1.0 STRESS_STRAIN plane_strain GP 3 3",
+        )
+
+        # Compare the input file created for baci.
+        self.compare(cubit, name="test_group_of_surfaces")
+
     def xtest_groups(self, block_with_volume):
         """
         Test that groups are handled correctly when creating node sets and
