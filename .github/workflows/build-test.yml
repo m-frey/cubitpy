@@ -1,0 +1,51 @@
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+    type: choice
+
+jobs:
+  testing:
+    name: cubitpy-testing
+    runs-on: self-hosted
+    env:
+      PYTHON_EXE: /hdd/gitlab-runner/lib/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.4.0/python-3.9.15-ul7tj5r5qn3unewqfwxrlu3blvmrec4u/bin/python3
+      PYTHON_VENV: python-testing-environment
+      BACI_PRE_EXODUS: /hdd/gitlab-runner/lib/baci-master/release/pre_exodus
+      CUBIT: /imcs/public/compsim/opt/cubit-15.2
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Setup virtual environment and run tests
+        run: |
+          whoami
+          pwd
+          export CUBITPY_PATH="$(pwd)"
+          # Create the virtual environment
+          $PYTHON_EXE -m venv $PYTHON_VENV
+          source $PYTHON_VENV/bin/activate
+          # Install cubitpy
+          pip install .[CI-CD]
+          # Print information on the python environment
+          python --version
+          pip list
+          # Run tests
+          cd tests
+          coverage run --rcfile=coverage.config -m unittest discover
+          coverage html
+          coverage report
+          coverage-badge -o htmlcov/coverage.svg
+          # This tests that if cubit is completely closed everything works
+          ./test_configurations.sh
+          # Check codestyle
+          cd $CUBITPY_PATH
+          black . --check --exclude=$PYTHON_VENV && exit 0
+          # If we did not exit earlier, raise an error here
+          exit 1

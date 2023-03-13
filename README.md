@@ -1,3 +1,5 @@
+[![build-test](https://github.com/imcs-compsim/cubitpy/actions/workflows/.github/workflows/build-test.yml/badge.svg)](https://github.com/imcs-compsim/cubitpy/actions/workflows/.github/workflows/build-test.yml)
+
 # Cubitpy
 
 A `python3` wrapper for Cubit. It is tested with Cubit15.2.

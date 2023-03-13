@@ -20,3 +20,6 @@ cubitpy.egg-info/*
 
 # Test file
 test.py
+
+# .github should not be ignored
+!.github
