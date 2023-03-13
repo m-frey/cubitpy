@@ -266,7 +266,7 @@ class CubitGroup(object):
 
     def add_to_block(self, block_id, el_type):
         """
-        Add the volume items of this group to a block in cubit. If there are
+        Add the items of this group to a block in cubit. If there are
         explicit elements in this group, they are also added to the block.
 
         Args
@@ -278,20 +278,25 @@ class CubitGroup(object):
             Type of the finite elements.
         """
 
+        self_geometry = self.get_geometry_type()
+        if (
+            self_geometry != cupy.geometry.surface
+            and self_geometry != cupy.geometry.volume
+        ):
+            raise NotImplementedError("This case is not implemented")
+
         group_items = self.get_item_ids()
         cubit_scheme, cubit_element_type = el_type.get_cubit_names()
 
-        # Add volumes to block.
-        for i in group_items[cupy.geometry.volume]:
+        # Add geometry to block.
+        for i in group_items[self_geometry]:
             self.cubit.cmd(
                 "{} {} scheme {}".format(
-                    cupy.geometry.volume.get_cubit_string(), i, cubit_scheme
+                    self_geometry.get_cubit_string(), i, cubit_scheme
                 )
             )
             self.cubit.cmd(
-                "block {} {} {}".format(
-                    block_id, cupy.geometry.volume.get_cubit_string(), i
-                )
+                "block {} {} {}".format(block_id, self_geometry.get_cubit_string(), i)
             )
             self.cubit.cmd(
                 "block {} element type {}".format(block_id, cubit_element_type)
