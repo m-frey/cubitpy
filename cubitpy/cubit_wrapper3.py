@@ -43,7 +43,6 @@ from .conf import cupy
 
 # Import utility functions for cubitpy.
 from .cubit_wrapper_utility import cubit_item_to_id, is_base_type
-from .utility_functions import check_environment_eclipse
 
 
 class CubitConnect(object):
@@ -76,9 +75,6 @@ class CubitConnect(object):
         if cubit_bin_path is None:
             raise ValueError("Path to cubit was not given!")
 
-        # Adapt the environment if needed.
-        is_eclipse, python_path_old = check_environment_eclipse()
-
         # Set up the python2 interpreter.
         self.gw = execnet.makegateway(interpreter)
         self.gw.reconfigure(py3str_as_py2str=True)
@@ -107,7 +103,7 @@ class CubitConnect(object):
         self.log_check = False
 
         if not log_given:
-            # Eclipse and no log given -> write the log to a temporary file and
+            # Write the log to a temporary file and
             # check the contents after each call to cubit.
             cubit_arguments.extend(["-log", cupy.temp_log])
             parameters["tty"] = cupy.temp_log
@@ -119,10 +115,6 @@ class CubitConnect(object):
         # Initialize cubit.
         cubit_id = self.send_and_return(["init", cubit_arguments])
         self.cubit = CubitObjectMain(self, cubit_id)
-
-        # Restore environment path.
-        if is_eclipse:
-            os.environ["PYTHONPATH"] = python_path_old
 
     def send_and_return(self, argument_list, check_number_of_channels=False):
         """
