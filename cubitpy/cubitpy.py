@@ -44,7 +44,6 @@ import warnings
 # Cubitpy modules.
 from .conf import cupy
 from .cubit_group import CubitGroup
-from .utility_functions import check_environment_eclipse
 
 
 class CubitPy(object):
@@ -557,14 +556,7 @@ class CubitPy(object):
         ]
 
         if not testing:
-            # Adapt the environment if needed.
-            is_eclipse, python_path_old = check_environment_eclipse()
-
             # Open the state in cubit.
             subprocess.call(cubit_command, cwd=cupy.temp_dir)
-
-            # Restore environment path.
-            if is_eclipse:
-                os.environ["PYTHONPATH"] = python_path_old
         else:
             return journal_path
