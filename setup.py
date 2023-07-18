@@ -38,7 +38,7 @@ setup(
     description="CubitPy: A python3 wrapper for Cubit",
     install_requires=[
         "numpy",
-        "execnet",
+        "execnet==1.9.0",
     ],
     extras_require={
         "CI-CD": ["coverage", "coverage-badge", "black"],

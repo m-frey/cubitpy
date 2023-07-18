@@ -32,7 +32,7 @@ package execnet (in python3) a connection is established between the two
 different python interpreters and data and commands can be exchanged. The
 exchange happens in a serial matter, items are sent to this script, and results
 are sent back, until None is sent. If cubit creates a cubit object it is saved
-in a dictionary in this script, with the key beeing the id of the object. The
+in a dictionary in this script, with the key being the id of the object. The
 python3 interpreter only knows the id of this object and can pass it to this
 script to call a function on it or use it as an argument.
 """
