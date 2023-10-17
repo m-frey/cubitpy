@@ -11,11 +11,6 @@ DIM           3
 ----------------------------------------------------------MATERIALS
 MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0
 
-------------------------------------------------DESIGN DESCRIPTION
-NDPOINT 2
-NDLINE  0
-NDSURF  4
-NDVOL   0
 ------------------------------------DESIGN SURF NEUMANN CONDITIONS
 DSURF  2
 // load_surf
