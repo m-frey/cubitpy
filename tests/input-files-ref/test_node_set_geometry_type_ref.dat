@@ -11,11 +11,6 @@ DIM           3
 ----------------------------------------------------------MATERIALS
 MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0
 
-------------------------------------------------DESIGN DESCRIPTION
-NDPOINT 3
-NDLINE  1
-NDSURF  2
-NDVOL   2
 -----------------------------------DESIGN POINT NEUMANN CONDITIONS
 DPOINT 2
 // point2
