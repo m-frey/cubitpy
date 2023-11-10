@@ -58,7 +58,7 @@ class CubitPy(object):
         cubit_args: [str]
             List of arguments to pass to cubit.init.
         cubit_path: str
-            Path to the cubit executables.
+            Path to cubit.
         cubit_log: str
             Path of the file where to write the cubit output to. The default
             value of /dev/null discards all output.
@@ -69,6 +69,12 @@ class CubitPy(object):
         # Get filepaths.
         if cubit_path is None:
             cubit_path = cupy.get_default_paths("cubit")
+            if "MacOS" in cubit_path:
+                cubit_exe = os.path.join(cubit_path, "Cubit")
+                cubit_bin = cubit_path
+            else:
+                cubit_exe = os.path.join(cubit_path, "cubit")
+                cubit_bin = os.path.join(cubit_path, "bin")
         if pre_exodus is None:
             pre_exodus = cupy.get_default_paths("pre_exodus", False)
 
@@ -89,9 +95,7 @@ class CubitPy(object):
         # Load the cubit wrapper.
         from .cubit_wrapper3 import CubitConnect
 
-        cubit_connect = CubitConnect(
-            arguments, cubit_bin_path=os.path.join(cubit_path, "bin")
-        )
+        cubit_connect = CubitConnect(arguments, cubit_bin_path=cubit_bin)
         self.cubit = cubit_connect.cubit
 
         # Reset cubit.
@@ -105,7 +109,7 @@ class CubitPy(object):
         self.head = ""
 
         # Other parameters.
-        self.cubit_path = cubit_path
+        self.cubit_exe = cubit_exe
         self.pre_exodus = pre_exodus
 
     def _default_cubit_variables(self):
@@ -547,7 +551,7 @@ class CubitPy(object):
 
         # Get the command and arguments to open cubit with.
         cubit_command = [
-            os.path.join(self.cubit_path, "cubit"),
+            self.cubit_exe,
             "-nojournal",
             "-information",
             "Off",
