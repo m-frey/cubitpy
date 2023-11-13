@@ -36,10 +36,7 @@ setup(
     author="Ivo Steinbrecher",
     author_email="ivo.steinbrecher@unibw.de",
     description="CubitPy: A python3 wrapper for Cubit",
-    install_requires=[
-        "numpy",
-        "execnet==1.9.0",
-    ],
+    install_requires=["numpy", "execnet==1.9.0", "netCDF4"],
     extras_require={
         "CI-CD": ["coverage", "coverage-badge", "black"],
     },
