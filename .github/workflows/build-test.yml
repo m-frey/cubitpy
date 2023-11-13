@@ -38,7 +38,7 @@ jobs:
           pip list
           # Run tests
           cd tests
-          coverage run --rcfile=coverage.config -m unittest discover
+          coverage run --rcfile=coverage.config -m pytest testing.py
           coverage html
           coverage report
           coverage-badge -o htmlcov/coverage.svg
