@@ -44,6 +44,7 @@ import warnings
 # Cubitpy modules.
 from .conf import cupy
 from .cubit_group import CubitGroup
+from .cubitpy_to_dat import cubit_to_dat
 
 
 class CubitPy(object):
@@ -58,7 +59,10 @@ class CubitPy(object):
         cubit_args: [str]
             List of arguments to pass to cubit.init.
         cubit_path: str
-            Path to cubit.
+            Path to the cubit directory:
+              - For Linux systems this is the path where the `cubit`
+                script is located (`bin` should be a subfolder of this path).
+              - For MacOS this is the `.../Cubit.app/Contents/MacOS`) folder.
         cubit_log: str
             Path of the file where to write the cubit output to. The default
             value of /dev/null discards all output.
@@ -116,8 +120,8 @@ class CubitPy(object):
         """
         Set the default values for the lists and counters used in cubit.
         """
-        self.node_sets = []
         self.blocks = []
+        self.node_sets = []
 
     def __getattr__(self, key, *args, **kwargs):
         """
@@ -237,13 +241,7 @@ class CubitPy(object):
             bc_description = el_type.get_default_baci_description()
 
         # Add data that will be written to bc file.
-        self.blocks.append(
-            [
-                el_type.get_baci_section(),
-                " ".join([material, bc_description]),
-                el_type.get_baci_name(),
-            ]
-        )
+        self.blocks.append([el_type, " ".join([material, bc_description])])
 
     def reset_blocks(self):
         """
@@ -266,7 +264,7 @@ class CubitPy(object):
         bc_type=None,
         bc_description="NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0",
         bc_section=None,
-        geometry_type=None
+        geometry_type=None,
     ):
         """
         Add a node set to cubit. This node set can have a boundary condition.
@@ -328,7 +326,7 @@ class CubitPy(object):
             )
         if bc_section is None:
             bc_section = bc_type.get_dat_bc_section_header(geometry_type)
-        self.node_sets.append([bc_section, bc_description])
+        self.node_sets.append([bc_section, bc_description, geometry_type])
 
     def get_ids(self, geometry_type):
         """
@@ -391,10 +389,13 @@ class CubitPy(object):
 
         with open(bc_path, "w") as bc_file:
             bc_file.write("---------------------------------------BCSPECS\n\n")
-            for i, block in enumerate(self.blocks):
+            for i, (el_type, block_string) in enumerate(self.blocks):
                 bc_file.write(
                     '*eb{}="ELEMENT"\nsectionname="{}"\ndescription="{}"\nelementname="{}"\n\n'.format(
-                        i + 1, block[0], block[1], block[2]
+                        i + 1,
+                        el_type.get_baci_section(),
+                        block_string,
+                        el_type.get_baci_name(),
                     )
                 )
             for i, node_set in enumerate(self.node_sets):
@@ -404,9 +405,13 @@ class CubitPy(object):
                     )
                 )
 
-    def create_dat(self, dat_path):
-        """
-        Create the dat file an copy it to dat_path.
+    def create_dat(self, dat_path, pre_exodus=False):
+        """Create the dat file an copy it to dat_path
+
+        Args
+        ----
+        pre_exodus: bool
+            If pre exodus should be used to generate the dat file.
         """
 
         # Check if output path exists.
@@ -414,19 +419,31 @@ class CubitPy(object):
         if not os.path.exists(dat_dir):
             raise ValueError("Path {} does not exist!".format(dat_dir))
 
-        # Create the dat file.
-        temp_dat_file = self._create_dat()
+        if pre_exodus:
+            # Create the dat file.
+            temp_dat_file = self._create_dat()
 
-        # Copy dat file.
-        shutil.copyfile(temp_dat_file, dat_path)
+            # Copy dat file.
+            shutil.copyfile(temp_dat_file, dat_path)
+        else:
+            with open(dat_path, "w") as the_file:
+                for line in self.get_dat_lines(pre_exodus=False):
+                    the_file.write(line + "\n")
 
-    def get_dat_lines(self):
+    def get_dat_lines(self, pre_exodus=False):
+        """Return a list with all lines in this input file
+
+        Args
+        ----
+        pre_exodus: bool
+            If pre_exodus should be used to generate the dat file.
         """
-        Return a list with all lines in this input file.
-        """
 
-        with open(self._create_dat()) as dat_file:
-            lines = dat_file.readlines()
+        if pre_exodus:
+            with open(self._create_dat()) as dat_file:
+                lines = dat_file.readlines()
+        else:
+            lines = cubit_to_dat(self)
         return lines
 
     def _create_dat(self):

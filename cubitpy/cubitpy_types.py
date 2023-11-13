@@ -203,6 +203,24 @@ class ElementType(Enum):
         else:
             raise ValueError("Got wrong element type {}!".format(self))
 
+    def get_baci_type(self):
+        """Get the correct element shape name of this element in baci."""
+
+        if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid:
+            return "HEX8"
+        elif self == self.hex20:
+            return "HEX20"
+        elif self == self.hex27:
+            return "HEX27"
+        elif self == self.tet4:
+            return "TET4"
+        elif self == self.tet10:
+            return "TET10"
+        elif self == self.quad4:
+            return "QUAD4"
+        else:
+            raise ValueError("Got wrong element type {}!".format(self))
+
     def get_default_baci_description(self):
         """
         Get the default text for the description in baci after the material
