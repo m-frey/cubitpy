@@ -92,7 +92,13 @@ class TestCubitPy(unittest.TestCase):
     """This class tests the implementation of the CubitPy class."""
 
     def compare(
-        self, cubit, *, name=None, dat_lines_compare=False, single_precision=False
+        self,
+        cubit,
+        *,
+        name=None,
+        single_precision=False,
+        test_pre_exodus=True,
+        test_cubitpy=True,
     ):
         """
         Write create the dat file from the cubit mesh and compare to a
@@ -105,11 +111,12 @@ class TestCubitPy(unittest.TestCase):
             Name of the test case. A reference file 'name' + '_ref.dat' must
             exits in the reference file folder. If no name is given, the test
             name will be used.
-        dat_lines_compare: bool
-            If the created file should be compared or the list of lines
-            returned by get_dat_lines.
         single_precision: bool
             If the output of cubit is single or double precision.
+        test_pre_exodus: bool
+            If the mesh should be tested with pre_exodus
+        test_cubitpy: bool
+            If the mesh should be tested with the cubitpy internal functionality
         """
 
         # Get the name for this compare operation.
@@ -122,30 +129,35 @@ class TestCubitPy(unittest.TestCase):
         if single_precision:
             cubit.cmd("set exodus single precision on")
 
-        # Get the string of the input file, depending on the chosen method.
-        if not dat_lines_compare:
+        if test_pre_exodus:
+            if cupy.get_default_paths("pre_exodus", throw_error=False) is not None:
+                dat_file = os.path.join(testing_temp, name + ".dat")
+                cubit.create_dat(dat_file, pre_exodus=True)
+                with open(dat_file, "r") as text_file:
+                    string2 = text_file.read()
+
+                ref_file = os.path.join(testing_input, name + "_pre_exodus.dat")
+                with open(ref_file, "r") as text_file:
+                    string1 = text_file.read()
+                self.assertTrue(compare_strings(string1, string2), name)
+
+        if test_cubitpy:
             dat_file = os.path.join(testing_temp, name + ".dat")
-            cubit.create_dat(dat_file)
+            cubit.create_dat(dat_file, pre_exodus=False)
             with open(dat_file, "r") as text_file:
                 string2 = text_file.read()
-        else:
-            string2 = "".join(cubit.get_dat_lines())
 
-        # Compare with the ref file.
-        ref_file = os.path.join(testing_input, name + "_ref.dat")
-        with open(ref_file, "r") as text_file:
-            string1 = text_file.read()
-        self.assertTrue(compare_strings(string1, string2), name)
+            ref_file = os.path.join(testing_input, name + "_cubitpy.dat")
+            with open(ref_file, "r") as text_file:
+                string1 = text_file.read()
+            self.assertTrue(compare_strings(string1, string2), name)
 
-    def create_block(self, cubit, dat_lines_compare=False, np_arrays=False):
+    def create_block(self, cubit, np_arrays=False):
         """
         Create a block with cubit.
 
         Args
         ----
-        dat_lines_compare: bool
-            If the created dat file should be compared or the list of lines
-            returned by get_dat_lines.
         np_arrays: bool
             If the cubit interaction is with numpy or python arrays.
         """
@@ -223,9 +235,7 @@ class TestCubitPy(unittest.TestCase):
                 )
 
         # Compare the input file created for baci.
-        self.compare(
-            cubit, name="test_create_block", dat_lines_compare=dat_lines_compare
-        )
+        self.compare(cubit, name="test_create_block")
 
     def test_create_block(self):
         """
@@ -267,17 +277,8 @@ class TestCubitPy(unittest.TestCase):
         self.create_block(cubit)
         self.create_block(cubit_2)
 
-    def test_create_block_dat_lines(self):
-        """
-        Test the creation of a cubit block, with the get_dat_lines method.
-        """
-
-        # Initialize cubit.
-        cubit = CubitPy()
-        self.create_block(cubit, dat_lines_compare=True)
-
-    def test_element_types(self):
-        """Create a curved solid with different element types."""
+    def test_element_types_hex(self):
+        """Create a curved solid with different hex element types."""
 
         # Initialize cubit.
         cubit = CubitPy()
@@ -294,8 +295,6 @@ class TestCubitPy(unittest.TestCase):
             cupy.element_type.hex8,
             cupy.element_type.hex20,
             cupy.element_type.hex27,
-            cupy.element_type.tet4,
-            cupy.element_type.tet10,
             cupy.element_type.hex8sh,
         ]
 
@@ -307,8 +306,8 @@ class TestCubitPy(unittest.TestCase):
             offset_volume = i
 
             # Add two arcs.
-            add_arc(1.1, 60)
-            add_arc(0.9, 60)
+            add_arc(1.1, 30)
+            add_arc(0.9, 30)
 
             # Add the closing lines.
             cubit.cmd(
@@ -346,7 +345,7 @@ class TestCubitPy(unittest.TestCase):
             )
 
             # Set mesh properties.
-            cubit.cmd("volume {} size auto factor 7".format(1 + offset_volume))
+            cubit.cmd("volume {} size 0.2".format(1 + offset_volume))
             cubit.cmd("mesh volume {}".format(1 + offset_volume))
 
             # Add the node sets.
@@ -371,7 +370,53 @@ class TestCubitPy(unittest.TestCase):
         # Compare the input file created for baci.
         self.compare(cubit, single_precision=True)
 
-    def test_element_types_quad4(self):
+    def test_element_types_tet(self):
+        """Create a curved solid with different tet element types."""
+
+        # Initialize cubit.
+        cubit = CubitPy()
+
+        element_type_list = [
+            cupy.element_type.tet4,
+            cupy.element_type.tet10,
+        ]
+
+        for i, element_type in enumerate(element_type_list):
+            cubit.cmd("create pyramid height 1 sides 3 radius 1.2 top 0")
+            cubit.cmd("move Volume {} x {}".format(i + 1, i))
+            volume = cubit.volume(1 + i)
+            cubit.add_element_type(
+                volume,
+                element_type,
+                name="block_" + str(i),
+                material="MAT 1",
+                bc_description=None,
+            )
+            cubit.cmd("Volume {} size 2".format(volume.id()))
+            volume.mesh()
+
+            cubit.add_node_set(
+                volume.surfaces()[1],
+                name="fix_" + str(i),
+                bc_section="DESIGN SURF DIRICH CONDITIONS",
+                bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
+            )
+
+        # Set the head string.
+        cubit.head = """
+            -------------------------------------------------------------FUNCT1
+            SYMBOLIC_FUNCTION_OF_TIME t
+            ----------------------------------------------------------MATERIALS
+            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 1.0e+09 NUE 0.3 DENS 0.0
+            ------------------------------------IO/RUNTIME VTK OUTPUT/STRUCTURE
+            OUTPUT_STRUCTURE                Yes
+            DISPLACEMENT                    Yes
+            """
+
+        # Compare the input file created for baci.
+        self.compare(cubit, single_precision=True)
+
+    def test_element_types_quad(self):
         """Create quad4 mesh."""
 
         # Initialize cubit.
@@ -402,42 +447,30 @@ class TestCubitPy(unittest.TestCase):
             cupy.element_type.hex8,
             cupy.element_type.hex20,
             cupy.element_type.hex27,
-            cupy.element_type.tet4,
-            cupy.element_type.tet10,
             cupy.element_type.hex8sh,
         ]
 
-        for i, element_type in enumerate(element_type_list):
-            # Create the cube with factor as mesh size.
-            cube = create_brick(
-                cubit,
-                0.5,
-                0.8,
-                1.1,
-                element_type=element_type,
-                mesh_factor=9,
-                name=str(element_type) + str(i),
-                mesh=False,
-                material="test material string",
-            )
-            cubit.move(cube, [i, 0, 0])
-            cube.volumes()[0].mesh()
-
-        for i, element_type in enumerate(element_type_list):
-            # Create the cube with intervals as mesh size.
-            cube = create_brick(
-                cubit,
-                0.5,
-                0.8,
-                1.1,
-                element_type=element_type,
-                mesh_interval=[3, 2, 1],
-                name=str(element_type) + str(i + len(element_type_list)),
-                mesh=False,
-                material="test material string",
-            )
-            cubit.move(cube, [i + len(element_type_list), 0, 0])
-            cube.volumes()[0].mesh()
+        count = 0
+        for interval in [True, False]:
+            for element_type in element_type_list:
+                if interval:
+                    kwargs = {"mesh_interval": [3, 2, 1]}
+                else:
+                    kwargs = {"mesh_factor": 10}
+                cube = create_brick(
+                    cubit,
+                    0.5,
+                    0.6,
+                    0.7,
+                    element_type=element_type,
+                    name=f"{element_type} {count}",
+                    mesh=False,
+                    material="test material string",
+                    **kwargs,
+                )
+                cubit.move(cube, [count, 0, 0])
+                cube.volumes()[0].mesh()
+                count += 1
 
         # Compare the input file created for baci.
         self.compare(cubit, single_precision=True)
@@ -1025,7 +1058,7 @@ class TestCubitPy(unittest.TestCase):
         )
         subtracted_block[0].volumes()[0].mesh()
         cubit.add_element_type(subtracted_block[0].volumes()[0], cupy.element_type.hex8)
-        self.compare(cubit, dat_lines_compare=False)
+        self.compare(cubit)
 
     def test_serialize_geometry_types(self):
         """
@@ -1069,7 +1102,7 @@ class TestCubitPy(unittest.TestCase):
         element_group = cubit.group(add_value="add HEX 1")
         cubit.add_element_type(element_group, cupy.element_type.hex8)
 
-        self.compare(cubit, dat_lines_compare=False)
+        self.compare(cubit)
 
     def test_display_in_cubit(self):
         """
