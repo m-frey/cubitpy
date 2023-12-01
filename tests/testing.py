@@ -41,11 +41,14 @@ import pytest
 testing_path = os.path.abspath(os.path.dirname(__file__))
 testing_input = os.path.join(testing_path, "input-files-ref")
 testing_temp = os.path.join(testing_path, "testing-tmp")
+testing_external_geometry = os.path.join(testing_path, "external-geometry")
 
 # CubitPy imports.
 from cubitpy import CubitPy, cupy, get_surface_center
 from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
 from cubitpy.geometry_creation_functions import create_parametric_surface
+from cubitpy.cubit_utility import import_fluent_geometry
+
 
 # Global variable if this test is run by GitLab.
 if "TESTING_GITLAB" in os.environ.keys() and os.environ["TESTING_GITLAB"] == "1":
@@ -1267,3 +1270,39 @@ def test_create_parametric_surface():
 
     assert 0.0 == pytest.approx(np.linalg.norm(coordinates - coordinates_ref), 1e-12)
     assert np.linalg.norm(connectivity - connectivity_ref) == 0
+
+
+def setup_and_check_import_fluent_geometry(
+    fluent_geometry, feature_angle, reference_entitys_number
+):
+    """
+    Test if cubit can import a geometry and:
+        1) proceed without error
+        2) has created the same number of the reference entitys [volumes, surfaces, blocks]
+    """
+
+    # Setup
+    cubit = CubitPy()
+    import_fluent_geometry(cubit, fluent_geometry, feature_angle)
+
+    # check if importation was successful
+    assert False == cubit.was_last_cmd_undoable()
+
+    # check number of entitys
+    assert cubit.get_volume_count() == reference_entitys_number[0]
+    assert len(cubit.get_entities("surface")) == reference_entitys_number[1]
+    assert cubit.get_block_count() == reference_entitys_number[2]
+
+
+def test_import_fluent_geometry():
+    """
+    Test if an aneurysm geometry can be imported from a fluent mesh.
+    """
+
+    fluent_geometry = os.path.join(testing_external_geometry, "fluent_aneurysm.msh")
+
+    # for a feature angle of 135, the imported geometry should consist of 1 volume, 7 surfaces and 1 block
+    setup_and_check_import_fluent_geometry(fluent_geometry, 135, [1, 7, 1])
+
+    # for a feature angle of 100, the imported geometry should consist of 1 volume, 4 surfaces and 1 block
+    setup_and_check_import_fluent_geometry(fluent_geometry, 100, [1, 4, 1])
