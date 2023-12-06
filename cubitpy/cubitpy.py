@@ -73,12 +73,12 @@ class CubitPy(object):
         # Get filepaths.
         if cubit_path is None:
             cubit_path = cupy.get_default_paths("cubit")
-            if "MacOS" in cubit_path:
-                cubit_exe = os.path.join(cubit_path, "Cubit")
-                cubit_bin = cubit_path
-            else:
-                cubit_exe = os.path.join(cubit_path, "cubit")
-                cubit_bin = os.path.join(cubit_path, "bin")
+        if "MacOS" in cubit_path:
+            cubit_exe = os.path.join(cubit_path, "Cubit")
+            cubit_bin = cubit_path
+        else:
+            cubit_exe = os.path.join(cubit_path, "cubit")
+            cubit_bin = os.path.join(cubit_path, "bin")
         if pre_exodus is None:
             pre_exodus = cupy.get_default_paths("pre_exodus", False)
 
