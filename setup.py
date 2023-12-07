@@ -41,5 +41,5 @@ setup(
         "CI-CD": ["coverage", "coverage-badge", "black", "pytest"],
     },
     license_files=["LICENSE"],
-    packages=["cubitpy"],
+    packages=["cubitpy", "cubitpy.cubit_wrapper"],
 )
