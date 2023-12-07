@@ -44,10 +44,10 @@ testing_temp = os.path.join(testing_path, "testing-tmp")
 testing_external_geometry = os.path.join(testing_path, "external-geometry")
 
 # CubitPy imports.
-from cubitpy import CubitPy, cupy, get_surface_center
+from cubitpy import CubitPy, cupy
 from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
 from cubitpy.geometry_creation_functions import create_parametric_surface
-from cubitpy.cubit_utility import import_fluent_geometry
+from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
 
 
 # Global variable if this test is run by GitLab.
