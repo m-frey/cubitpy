@@ -33,7 +33,7 @@ This file contains a class to represent groups in cubit.
 
 # Import CubitPy stuff.
 from .conf import cupy
-from .cubit_wrapper3 import CubitObject
+from .cubit_wrapper.cubit_wrapper3 import CubitObject
 
 
 class CubitGroup(object):
