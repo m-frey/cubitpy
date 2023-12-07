@@ -39,7 +39,7 @@ import os
 import numpy as np
 
 # Import global options.
-from .conf import cupy
+from ..conf import cupy
 
 # Import utility functions for cubitpy.
 from .cubit_wrapper_utility import cubit_item_to_id, is_base_type

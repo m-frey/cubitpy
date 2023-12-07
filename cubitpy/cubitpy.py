@@ -97,7 +97,7 @@ class CubitPy(object):
             arguments = ["cubit"] + cubit_args
 
         # Load the cubit wrapper.
-        from .cubit_wrapper3 import CubitConnect
+        from .cubit_wrapper.cubit_wrapper3 import CubitConnect
 
         cubit_connect = CubitConnect(arguments, cubit_bin_path=cubit_bin)
         self.cubit = cubit_connect.cubit
