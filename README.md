@@ -2,7 +2,12 @@
 
 # Cubitpy
 
-A `python3` wrapper for Cubit. It is tested with Cubit15.2.
+Cubit features and utilities functions, especially for the creation of input files for BACI.
+It is tested with Cubit15.2.
+
+## Usage
+
+A tutorial can be found in the `/tutorial` directory.
 
 ## Code formating
 
@@ -50,7 +55,7 @@ To run CubitPy it is required to set an environment variable with the path to th
 export CUBIT=path_to_cubit_directory
 ```
 
-(Optional) If the BACI preprocessor `pre_exodus` should be used the path to the executable has to be set
+(Optional) Per default CubitPy creates the BACI input file itself and does not rely `pre_exodus`. However, if for some reason `pre_exodus` shall be used, the path to the executable has to be set
 ```bash
 export BACI_PRE_EXODUS=path_to_pre-exodus
 ```
