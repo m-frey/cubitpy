@@ -46,7 +46,6 @@ from meshpy import mesh
 
 
 def cubitpy_tutorial(baci, output):
-
     # In the first step, a cubitpy object is created to connect the
     # code with the wrapper for Cubit. This also allows for direct insertion
     # of commands, which will be shown at a later stage.
