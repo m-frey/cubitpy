@@ -415,9 +415,10 @@ class CubitPy(object):
         """
 
         # Check if output path exists.
-        dat_dir = os.path.dirname(dat_path)
-        if not os.path.exists(dat_dir):
-            raise ValueError("Path {} does not exist!".format(dat_dir))
+        if os.path.isabs(dat_path):
+            dat_dir = os.path.dirname(dat_path)
+            if not os.path.exists(dat_dir):
+                raise ValueError("Path {} does not exist!".format(dat_dir))
 
         if pre_exodus:
             # Create the dat file.
