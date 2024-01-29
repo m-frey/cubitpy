@@ -1,2 +1,35 @@
 [build-system]
 requires = ["setuptools"]
+
+[tool.setuptools]
+packages = [
+  "cubitpy",
+  "cubitpy.cubit_wrapper",
+  "cubitpy_testing"
+]
+
+[tool.setuptools.package-dir]
+cubitpy_testing = "tests"
+
+[project]
+name = "CubitPy"
+authors = [
+  {name = "Ivo Steinbrecher", email = "ivo.steinbrecher@unibw.de"},
+]
+description = "CubitPy: Utility functions for the cubit python interface"
+readme = "README.md"
+license = {file = "LICENSE"}
+dependencies = [
+  "black",
+  "execnet==1.9.0",
+  "netCDF4",
+  "numpy"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+CI-CD = [
+  "coverage",
+  "coverage-badge",
+  "pytest"
+]
