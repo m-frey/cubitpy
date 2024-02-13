@@ -15,9 +15,9 @@ jobs:
     name: cubitpy-testing
     runs-on: self-hosted
     env:
-      PYTHON_EXE: /hdd/gitlab-runner/lib/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.4.0/python-3.9.15-ul7tj5r5qn3unewqfwxrlu3blvmrec4u/bin/python3
+      SPACK_ACTIVATION_SCRIPT: /home_local/github-runner/testing_lib/spack/share/spack/setup-env.sh
       PYTHON_VENV: python-testing-environment
-      BACI_PRE_EXODUS: /hdd/gitlab-runner/lib/baci-master/release/pre_exodus
+      BACI_PRE_EXODUS: /home_local/github-runner/testing_lib/baci_master/release/pre_exodus
       CUBIT: /imcs/public/compsim/opt/cubit-15.2
     steps:
       - uses: actions/checkout@v3
@@ -28,8 +28,11 @@ jobs:
           whoami
           pwd
           export CUBITPY_PATH="$(pwd)"
+          # Activate spack and load python
+          . ${SPACK_ACTIVATION_SCRIPT}
+          spack load python@3.9
           # Create the virtual environment
-          $PYTHON_EXE -m venv $PYTHON_VENV
+          python3 -m venv $PYTHON_VENV
           source $PYTHON_VENV/bin/activate
           # Install cubitpy
           pip install .[CI-CD]
