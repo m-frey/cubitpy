@@ -31,5 +31,6 @@ dynamic = ["version"]
 CI-CD = [
   "coverage",
   "coverage-badge",
+  "setuptools", # Needed for coverage-badge
   "pytest"
 ]
