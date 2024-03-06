@@ -136,7 +136,6 @@ class ElementType(Enum):
     hex27new = auto()
     tet4new = auto()
     tet10new = auto()
-    hex8shnew = auto()
 
     def get_cubit_names(self):
         """
@@ -150,7 +149,6 @@ class ElementType(Enum):
             or self == self.hex8sh
             or self == self.hex8_fluid
             or self == self.hex8new
-            or self == self.hex8shnew
         ):
             cubit_scheme = "Auto"
             cubit_element_type = "HEX8"
@@ -223,7 +221,6 @@ class ElementType(Enum):
             or self == self.hex20new
             or self == self.hex27new
             or self == self.tet4new
-            or self == self.hex8shnew
             or self == self.tet10new
             or self == self.quad4
         ):
@@ -239,7 +236,6 @@ class ElementType(Enum):
             or self == self.hex8sh
             or self == self.hex8_fluid
             or self == self.hex8new
-            or self == self.hex8shnew
         ):
             return "HEX8"
         elif self == self.hex20 or self == self.hex20new:
@@ -275,7 +271,7 @@ class ElementType(Enum):
             or self == self.tet10new
         ):
             return "KINEM nonlinear"
-        elif self == self.hex8sh or self == self.hex8shnew:
+        elif self == self.hex8sh:
             return "KINEM nonlinear EAS none ANS none THICKDIR auto"
         elif self == self.hex8_fluid:
             return "NA ALE"
