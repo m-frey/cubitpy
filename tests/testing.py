@@ -307,12 +307,50 @@ def test_create_block_multiple(kwargs):
     create_block(cubit_2, **kwargs)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_hex(kwargs):
-    """Create a curved solid with different hex element types."""
+def create_element_types_tet(cubit, element_type_list, name, **kwargs):
+    """Create a curved solid with different tet element types."""
 
     # Initialize cubit.
     cubit = CubitPy()
+
+    for i, element_type in enumerate(element_type_list):
+        cubit.cmd("create pyramid height 1 sides 3 radius 1.2 top 0")
+        cubit.cmd("move Volume {} x {}".format(i + 1, i))
+        volume = cubit.volume(1 + i)
+        cubit.add_element_type(
+            volume,
+            element_type,
+            name="block_" + str(i),
+            material="MAT 1",
+            bc_description=None,
+        )
+        cubit.cmd("Volume {} size 2".format(volume.id()))
+        volume.mesh()
+
+        cubit.add_node_set(
+            volume.surfaces()[1],
+            name="fix_" + str(i),
+            bc_section="DESIGN SURF DIRICH CONDITIONS",
+            bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
+        )
+
+    # Set the head string.
+    cubit.head = """
+            -------------------------------------------------------------FUNCT1
+            SYMBOLIC_FUNCTION_OF_TIME t
+            ----------------------------------------------------------MATERIALS
+            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 1.0e+09 NUE 0.3 DENS 0.0
+            ------------------------------------IO/RUNTIME VTK OUTPUT/STRUCTURE
+            OUTPUT_STRUCTURE                Yes
+            DISPLACEMENT                    Yes
+            """
+
+    # Compare the input file created for baci.
+    compare(cubit, name=name, single_precision=True, **kwargs)
+
+
+def create_element_types_hex(cubit, element_type_list, name, **kwargs):
+    """Create a curved solid with different hex element types."""
 
     def add_arc(radius, angle):
         """Add a arc segment."""
@@ -321,13 +359,6 @@ def test_element_types_hex(kwargs):
                 radius, angle
             )
         )
-
-    element_type_list = [
-        cupy.element_type.hex8,
-        cupy.element_type.hex20,
-        cupy.element_type.hex27,
-        cupy.element_type.hex8sh,
-    ]
 
     for i, element_type in enumerate(element_type_list):
         # Offset for the next volume.
@@ -399,7 +430,43 @@ def test_element_types_hex(kwargs):
             """
 
     # Compare the input file created for baci.
-    compare(cubit, single_precision=True, **kwargs)
+    compare(cubit, name=name, single_precision=True, **kwargs)
+
+
+@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
+def test_element_types_hex(kwargs):
+    """Create a curved solid with different hex element types."""
+
+    # Initialize cubit.
+    cubit = CubitPy()
+
+    element_type_list = [
+        cupy.element_type.hex8,
+        cupy.element_type.hex20,
+        cupy.element_type.hex27,
+        cupy.element_type.hex8sh,
+    ]
+    create_element_types_hex(
+        cubit, element_type_list, name="test_element_types_hex", **kwargs
+    )
+
+
+@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
+def test_element_types_hex_new(kwargs):
+    """Create a curved solid with different hex element types."""
+
+    # Initialize cubit.
+    cubit = CubitPy()
+
+    element_type_list = [
+        cupy.element_type.hex8_new,
+        cupy.element_type.hex20_new,
+        cupy.element_type.hex27_new,
+        cupy.element_type.hex8sh,
+    ]
+    create_element_types_hex(
+        cubit, element_type_list, name="test_element_types_hex_new", **kwargs
+    )
 
 
 @pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
@@ -414,40 +481,26 @@ def test_element_types_tet(kwargs):
         cupy.element_type.tet10,
     ]
 
-    for i, element_type in enumerate(element_type_list):
-        cubit.cmd("create pyramid height 1 sides 3 radius 1.2 top 0")
-        cubit.cmd("move Volume {} x {}".format(i + 1, i))
-        volume = cubit.volume(1 + i)
-        cubit.add_element_type(
-            volume,
-            element_type,
-            name="block_" + str(i),
-            material="MAT 1",
-            bc_description=None,
-        )
-        cubit.cmd("Volume {} size 2".format(volume.id()))
-        volume.mesh()
+    create_element_types_tet(
+        cubit, element_type_list, name="test_element_types_tet", **kwargs
+    )
 
-        cubit.add_node_set(
-            volume.surfaces()[1],
-            name="fix_" + str(i),
-            bc_section="DESIGN SURF DIRICH CONDITIONS",
-            bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
-        )
 
-    # Set the head string.
-    cubit.head = """
-            -------------------------------------------------------------FUNCT1
-            SYMBOLIC_FUNCTION_OF_TIME t
-            ----------------------------------------------------------MATERIALS
-            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 1.0e+09 NUE 0.3 DENS 0.0
-            ------------------------------------IO/RUNTIME VTK OUTPUT/STRUCTURE
-            OUTPUT_STRUCTURE                Yes
-            DISPLACEMENT                    Yes
-            """
+@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
+def test_element_types_tet_new(kwargs):
+    """Create a curved solid with different tet element types."""
 
-    # Compare the input file created for baci.
-    compare(cubit, single_precision=True, **kwargs)
+    # Initialize cubit.
+    cubit = CubitPy()
+
+    element_type_list = [
+        cupy.element_type.tet4_new,
+        cupy.element_type.tet10_new,
+    ]
+
+    create_element_types_tet(
+        cubit, element_type_list, name="test_element_types_tet_new", **kwargs
+    )
 
 
 @pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
