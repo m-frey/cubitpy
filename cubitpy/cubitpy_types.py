@@ -131,11 +131,11 @@ class ElementType(Enum):
     hex8sh = auto()
     hex8_fluid = auto()
     quad4 = auto()
-    hex8new = auto()
-    hex20new = auto()
-    hex27new = auto()
-    tet4new = auto()
-    tet10new = auto()
+    hex8_new = auto()
+    hex20_new = auto()
+    hex27_new = auto()
+    tet4_new = auto()
+    tet10_new = auto()
 
     def get_cubit_names(self):
         """
@@ -148,20 +148,20 @@ class ElementType(Enum):
             self == self.hex8
             or self == self.hex8sh
             or self == self.hex8_fluid
-            or self == self.hex8new
+            or self == self.hex8_new
         ):
             cubit_scheme = "Auto"
             cubit_element_type = "HEX8"
-        elif self == self.hex20 or self == self.hex20new:
+        elif self == self.hex20 or self == self.hex20_new:
             cubit_scheme = "Auto"
             cubit_element_type = "HEX20"
-        elif self == self.hex27 or self == self.hex27new:
+        elif self == self.hex27 or self == self.hex27_new:
             cubit_scheme = "Auto"
             cubit_element_type = "HEX27"
-        elif self == self.tet4 or self == self.tet4new:
+        elif self == self.tet4 or self == self.tet4_new:
             cubit_scheme = "Tetmesh"
             cubit_element_type = "TETRA4"
-        elif self == self.tet10 or self == self.tet10new:
+        elif self == self.tet10 or self == self.tet10_new:
             cubit_scheme = "Tetmesh"
             cubit_element_type = "TETRA10"
         elif self == self.quad4:
@@ -189,11 +189,11 @@ class ElementType(Enum):
         elif self == self.hex8sh:
             return "SOLIDSH8"
         elif (
-            self == self.hex8new
-            or self == self.hex20new
-            or self == self.hex27new
-            or self == self.tet10new
-            or self == self.tet4new
+            self == self.hex8_new
+            or self == self.hex20_new
+            or self == self.hex27_new
+            or self == self.tet10_new
+            or self == self.tet4_new
         ):
             return "SOLID"
         elif self == self.hex8_fluid:
@@ -216,12 +216,12 @@ class ElementType(Enum):
             or self == self.tet4
             or self == self.hex8sh
             or self == self.tet10
-            or self == self.hex20new
-            or self == self.hex8new
-            or self == self.hex20new
-            or self == self.hex27new
-            or self == self.tet4new
-            or self == self.tet10new
+            or self == self.hex20_new
+            or self == self.hex8_new
+            or self == self.hex20_new
+            or self == self.hex27_new
+            or self == self.tet4_new
+            or self == self.tet10_new
             or self == self.quad4
         ):
             return "STRUCTURE"
@@ -235,16 +235,16 @@ class ElementType(Enum):
             self == self.hex8
             or self == self.hex8sh
             or self == self.hex8_fluid
-            or self == self.hex8new
+            or self == self.hex8_new
         ):
             return "HEX8"
-        elif self == self.hex20 or self == self.hex20new:
+        elif self == self.hex20 or self == self.hex20_new:
             return "HEX20"
-        elif self == self.hex27 or self == self.hex27new:
+        elif self == self.hex27 or self == self.hex27_new:
             return "HEX27"
-        elif self == self.tet4 or self == self.tet4new:
+        elif self == self.tet4 or self == self.tet4_new:
             return "TET4"
-        elif self == self.tet10 or self == self.tet10new:
+        elif self == self.tet10 or self == self.tet10_new:
             return "TET10"
         elif self == self.quad4:
             return "QUAD4"
@@ -258,17 +258,17 @@ class ElementType(Enum):
         """
 
         # Get the element type parameters.
-        if self == self.hex8 or self == self.hex8new:
+        if self == self.hex8 or self == self.hex8_new:
             return "KINEM nonlinear EAS none"
         elif (
             self == self.hex20
             or self == self.hex27
             or self == self.tet4
             or self == self.tet10
-            or self == self.hex20new
-            or self == self.hex27new
-            or self == self.tet4new
-            or self == self.tet10new
+            or self == self.hex20_new
+            or self == self.hex27_new
+            or self == self.tet4_new
+            or self == self.tet10_new
         ):
             return "KINEM nonlinear"
         elif self == self.hex8sh:
