@@ -17,6 +17,7 @@
 # Python stuff
 */__pycache__
 cubitpy.egg-info/*
+*-wheel-metadata/*
 
 # Test file
 test.py
