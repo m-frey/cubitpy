@@ -28,17 +28,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-Utility functions for the python2 to 3 wrapper.
-"""
+"""Utility functions for the cubit wrapper"""
 
 
 def object_to_id(obj):
-    """
-    Return list representing the cubit object. The first entry is the python id
+    """Return list representing the cubit object. The first entry is the python id
     of the object, the second entry is the string representation.
     """
-    return ["cp2t3id_" + str(id(obj)), str(obj)]
+    return ["cubitpy_id_" + str(id(obj)), str(obj)]
 
 
 def cubit_item_to_id(cubit_data_list):
@@ -49,16 +46,16 @@ def cubit_item_to_id(cubit_data_list):
         return None
     if not isinstance(cubit_data_list[0], str):
         return None
-    if cubit_data_list[0].startswith("cp2t3id_"):
-        return int(cubit_data_list[0][8:])
+    start_string = "cubitpy_id_"
+    if cubit_data_list[0].startswith(start_string):
+        return int(cubit_data_list[0][len(start_string) :])
     else:
         return None
 
 
 def is_base_type(obj):
-    """
-    Check if the object is of a base type that does not need conversion for the
-    connection between python2 and python3.
+    """Check if the object is of a base type that does not need conversion for the
+    connection between the different python interpreters.
     """
     if (
         isinstance(obj, str)

@@ -47,6 +47,19 @@ from .cubitpy_types import (
 )
 
 
+def get_path(environment_variable, test_function, *, throw_error=True):
+    """Check if he environment variable is set and the path exits."""
+    if environment_variable in os.environ.keys():
+        if test_function(os.environ[environment_variable]):
+            return os.environ[environment_variable]
+
+    # No valid path found or given.
+    if throw_error:
+        raise ValueError("Path for {} not found!".format(environment_variable))
+    else:
+        return None
+
+
 class CubitOptions(object):
     """Object for types in cubitpy."""
 
@@ -82,25 +95,22 @@ class CubitOptions(object):
     def get_default_paths(name, throw_error=True):
         """Look for and return a path to cubit or pre_exodus."""
 
-        if name == "cubit":
-            environment_variable = "CUBIT"
-            test_function = os.path.isdir
+        if name == "cubit_exe":
+            cubit_path = get_path("CUBIT", os.path.isdir, throw_error=throw_error)
+            if "MacOS" in cubit_path:
+                return os.path.join(cubit_path, "Cubit")
+            else:
+                return os.path.join(cubit_path, "cubit")
+        elif name == "cubit_lib":
+            cubit_path = get_path("CUBIT", os.path.isdir, throw_error=throw_error)
+            if "MacOS" in cubit_path:
+                return cubit_path
+            else:
+                return os.path.join(cubit_path, "bin")
         elif name == "pre_exodus":
-            environment_variable = "BACI_PRE_EXODUS"
-            test_function = os.path.isfile
+            return get_path("BACI_PRE_EXODUS", os.path.isfile, throw_error=throw_error)
         else:
             raise ValueError("Type {} not implemented!".format(name))
-
-        # Check if he environment variable is set and the path exits.
-        if environment_variable in os.environ.keys():
-            if test_function(os.environ[environment_variable]):
-                return os.environ[environment_variable]
-
-        # No valid path found or given.
-        if throw_error:
-            raise ValueError("Path for {} not found!".format(name))
-        else:
-            return None
 
 
 # Global object with options for cubitpy.

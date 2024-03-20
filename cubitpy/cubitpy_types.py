@@ -30,7 +30,7 @@
 # -----------------------------------------------------------------------------
 """
 This module contains ENums for types used in cubitpy as well as functions to
-convert them to strings for cubit or baci commands or the python2 wrapper.
+convert them to strings for cubit or baci commands or the wrapper.
 """
 
 # Python imports.
