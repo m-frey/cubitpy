@@ -63,15 +63,13 @@ class CubitPy(object):
             Arguments passed on to the creation of the python wrapper
         """
 
-        # Get paths
+        # Set paths
         if cubit_exe is None:
-            self.cubit_exe = cupy.get_default_paths("cubit_exe")
-        else:
-            self.cubit_exe = cubit_exe
+            cubit_exe = cupy.get_cubit_exe_path()
         if pre_exodus is None:
-            self.pre_exodus = cupy.get_default_paths("pre_exodus", False)
-        else:
-            self.pre_exodus = pre_exodus
+            pre_exodus = cupy.get_pre_exodus_path(throw_error=False)
+        self.cubit_exe = cubit_exe
+        self.pre_exodus = pre_exodus
 
         # Set the "real" cubit object
         self.cubit = CubitConnect(**kwargs).cubit

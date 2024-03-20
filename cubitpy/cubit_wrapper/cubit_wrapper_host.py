@@ -74,7 +74,7 @@ class CubitConnect(object):
         """
 
         if cubit_lib is None:
-            cubit_lib = cupy.get_default_paths("cubit_lib")
+            cubit_lib = cupy.get_cubit_lib_path()
 
         # Set up the client python interpreter
         self.gw = execnet.makegateway(interpreter)

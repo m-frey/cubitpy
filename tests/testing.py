@@ -150,7 +150,7 @@ def compare(
         cubit.cmd("set exodus single precision on")
 
     if test_pre_exodus:
-        if cupy.get_default_paths("pre_exodus", throw_error=False) is not None:
+        if cupy.get_pre_exodus_path(throw_error=False) is not None:
             dat_file = os.path.join(testing_temp, name + ".dat")
             cubit.create_dat(dat_file, pre_exodus=True)
             with open(dat_file, "r") as text_file:

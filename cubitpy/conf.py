@@ -36,6 +36,7 @@ cubitpy.
 # Python imports.
 import os
 import getpass
+from sys import platform
 
 # Cubitpy imports.
 from .cubitpy_types import (
@@ -92,25 +93,32 @@ class CubitOptions(object):
         self.eps_pos = 1e-10
 
     @staticmethod
-    def get_default_paths(name, throw_error=True):
-        """Look for and return a path to cubit or pre_exodus."""
+    def get_pre_exodus_path(**kwargs):
+        return get_path("BACI_PRE_EXODUS", os.path.isfile, **kwargs)
 
-        if name == "cubit_exe":
-            cubit_path = get_path("CUBIT", os.path.isdir, throw_error=throw_error)
-            if "MacOS" in cubit_path:
-                return os.path.join(cubit_path, "Cubit")
-            else:
-                return os.path.join(cubit_path, "cubit")
-        elif name == "cubit_lib":
-            cubit_path = get_path("CUBIT", os.path.isdir, throw_error=throw_error)
-            if "MacOS" in cubit_path:
-                return cubit_path
-            else:
-                return os.path.join(cubit_path, "bin")
-        elif name == "pre_exodus":
-            return get_path("BACI_PRE_EXODUS", os.path.isfile, throw_error=throw_error)
+    @staticmethod
+    def get_cubit_root_path(**kwargs):
+        return get_path("CUBIT_ROOT", os.path.isdir, **kwargs)
+
+    @classmethod
+    def get_cubit_exe_path(cls, **kwargs):
+        cubit_root = cls.get_cubit_root_path(**kwargs)
+        if platform == "linux" or platform == "linux2":
+            return os.path.join(cubit_root, "cubit")
+        elif platform == "darwin":
+            return os.path.join(cubit_root, "Cubit.app/Contents/MacOS/Cubit")
         else:
-            raise ValueError("Type {} not implemented!".format(name))
+            raise ValueError("Got unexpected platform")
+
+    @classmethod
+    def get_cubit_lib_path(cls, **kwargs):
+        cubit_root = cls.get_cubit_root_path(**kwargs)
+        if platform == "linux" or platform == "linux2":
+            return os.path.join(cubit_root, "bin")
+        elif platform == "darwin":
+            return os.path.join(cubit_root, "Cubit.app/Contents/MacOS")
+        else:
+            raise ValueError("Got unexpected platform")
 
 
 # Global object with options for cubitpy.
