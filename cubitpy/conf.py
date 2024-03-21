@@ -36,6 +36,7 @@ cubitpy.
 # Python imports.
 import os
 import getpass
+from sys import platform
 
 # Cubitpy imports.
 from .cubitpy_types import (
@@ -45,6 +46,19 @@ from .cubitpy_types import (
     CubitItems,
     BoundaryConditionType,
 )
+
+
+def get_path(environment_variable, test_function, *, throw_error=True):
+    """Check if he environment variable is set and the path exits."""
+    if environment_variable in os.environ.keys():
+        if test_function(os.environ[environment_variable]):
+            return os.environ[environment_variable]
+
+    # No valid path found or given.
+    if throw_error:
+        raise ValueError("Path for {} not found!".format(environment_variable))
+    else:
+        return None
 
 
 class CubitOptions(object):
@@ -79,28 +93,32 @@ class CubitOptions(object):
         self.eps_pos = 1e-10
 
     @staticmethod
-    def get_default_paths(name, throw_error=True):
-        """Look for and return a path to cubit or pre_exodus."""
+    def get_pre_exodus_path(**kwargs):
+        return get_path("BACI_PRE_EXODUS", os.path.isfile, **kwargs)
 
-        if name == "cubit":
-            environment_variable = "CUBIT"
-            test_function = os.path.isdir
-        elif name == "pre_exodus":
-            environment_variable = "BACI_PRE_EXODUS"
-            test_function = os.path.isfile
+    @staticmethod
+    def get_cubit_root_path(**kwargs):
+        return get_path("CUBIT_ROOT", os.path.isdir, **kwargs)
+
+    @classmethod
+    def get_cubit_exe_path(cls, **kwargs):
+        cubit_root = cls.get_cubit_root_path(**kwargs)
+        if platform == "linux" or platform == "linux2":
+            return os.path.join(cubit_root, "cubit")
+        elif platform == "darwin":
+            return os.path.join(cubit_root, "Cubit.app/Contents/MacOS/Cubit")
         else:
-            raise ValueError("Type {} not implemented!".format(name))
+            raise ValueError("Got unexpected platform")
 
-        # Check if he environment variable is set and the path exits.
-        if environment_variable in os.environ.keys():
-            if test_function(os.environ[environment_variable]):
-                return os.environ[environment_variable]
-
-        # No valid path found or given.
-        if throw_error:
-            raise ValueError("Path for {} not found!".format(name))
+    @classmethod
+    def get_cubit_lib_path(cls, **kwargs):
+        cubit_root = cls.get_cubit_root_path(**kwargs)
+        if platform == "linux" or platform == "linux2":
+            return os.path.join(cubit_root, "bin")
+        elif platform == "darwin":
+            return os.path.join(cubit_root, "Cubit.app/Contents/MacOS")
         else:
-            return None
+            raise ValueError("Got unexpected platform")
 
 
 # Global object with options for cubitpy.

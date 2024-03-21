@@ -50,9 +50,9 @@ If you intend to actively develop `cubitpy`, install it in *editable mode*
 pip install -e .
 ```
 
-To run CubitPy it is required to set an environment variable with the path to the Cubit directory (on Linux the directory containing the main cubit executable and on MacOS to the binary directory)
+To run CubitPy it is required to set an environment variable with the path to the Cubit directory. This should be the "root" directory for the installation.
 ```bash
-export CUBIT=path_to_cubit_directory
+export CUBIT_ROOT=path_to_cubit_root_directory
 ```
 
 (Optional) Per default CubitPy creates the BACI input file itself and does not rely `pre_exodus`. However, if for some reason `pre_exodus` shall be used, the path to the executable has to be set

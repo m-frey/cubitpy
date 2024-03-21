@@ -28,10 +28,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-Implements a class that helps create meshes with cubit. Since the cubit
-interface works only with Python2, a wrapper for the cubit methods is used.
-"""
+"""Implements a class that helps create meshes with cubit."""
 
 
 # Python modules.
@@ -46,74 +43,48 @@ import warnings
 from .conf import cupy
 from .cubit_group import CubitGroup
 from .cubitpy_to_dat import cubit_to_dat
+from .cubit_wrapper.cubit_wrapper_host import CubitConnect
 
 
 class CubitPy(object):
-    """A wrapper class for cubit."""
+    """A wrapper class with additional functionality for cubit."""
 
-    def __init__(self, *, cubit_args=None, cubit_path=None, pre_exodus=None):
-        """
-        Initialize cubit.
+    def __init__(self, *, cubit_exe=None, pre_exodus=None, **kwargs):
+        """Initialize CubitPy.
 
         Args
         ----
-        cubit_args: [str]
-            List of arguments to pass to cubit.init.
-        cubit_path: str
-            Path to the cubit directory:
-              - For Linux systems this is the path where the `cubit`
-                script is located (`bin` should be a subfolder of this path).
-              - For MacOS this is the `.../Cubit.app/Contents/MacOS`) folder.
-        cubit_log: str
-            Path of the file where to write the cubit output to. The default
-            value of /dev/null discards all output.
+        cubit_exe: str
+            Path to the cubit executable
         pre_exodus: str
-            Path to the pre_exodus pre-processor of baci.
+            Path to the pre_exodus pre-processor of BACI
+
+        kwargs:
+            Arguments passed on to the creation of the python wrapper
         """
 
-        # Get filepaths.
-        if cubit_path is None:
-            cubit_path = cupy.get_default_paths("cubit")
-        if "MacOS" in cubit_path:
-            cubit_exe = os.path.join(cubit_path, "Cubit")
-            cubit_bin = cubit_path
-        else:
-            cubit_exe = os.path.join(cubit_path, "cubit")
-            cubit_bin = os.path.join(cubit_path, "bin")
+        # Set paths
+        if cubit_exe is None:
+            cubit_exe = cupy.get_cubit_exe_path()
         if pre_exodus is None:
-            pre_exodus = cupy.get_default_paths("pre_exodus", False)
+            pre_exodus = cupy.get_pre_exodus_path(throw_error=False)
+        self.cubit_exe = cubit_exe
+        self.pre_exodus = pre_exodus
 
-        # Arguments for cubit.
-        if cubit_args is None:
-            arguments = [
-                "cubit",
-                # "-log",  # Write the log to a file
-                # "dev/null",
-                "-information",  # Do not output information of cubit
-                "Off",
-                "-nojournal",  # Do write a journal file
-                "-noecho",  # Do not output commands used in cubit
-            ]
-        else:
-            arguments = ["cubit"] + cubit_args
+        # Set the "real" cubit object
+        self.cubit = CubitConnect(**kwargs).cubit
 
-        # Load the cubit wrapper.
-        from .cubit_wrapper.cubit_wrapper3 import CubitConnect
-
-        cubit_connect = CubitConnect(arguments, cubit_bin_path=cubit_bin)
-        self.cubit = cubit_connect.cubit
-
-        # Reset cubit.
+        # Reset cubit
         self.cubit.cmd("reset")
         self.cubit.cmd("set geometry engine acis")
 
-        # Set lists and counters for blocks and sets.
+        # Set lists and counters for blocks and sets
         self._default_cubit_variables()
 
-        # Content of head file.
+        # Content of head file
         self.head = ""
 
-        # Other parameters.
+        # Other parameters
         self.cubit_exe = cubit_exe
         self.pre_exodus = pre_exodus
 
