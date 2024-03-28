@@ -52,10 +52,10 @@ from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
 
 
 # Global variable if this test is run by GitLab.
-if "TESTING_GITLAB" in os.environ.keys() and os.environ["TESTING_GITLAB"] == "1":
-    TESTING_GITLAB = True
+if "TESTING_GITHUB" in os.environ.keys() and os.environ["TESTING_GITHUB"] == "1":
+    TESTING_GITHUB = True
 else:
-    TESTING_GITLAB = False
+    TESTING_GITHUB = False
 
 
 def check_tmp_dir():
@@ -82,7 +82,7 @@ def compare_strings(string_ref, string_compare):
         for i, file in enumerate(files):
             with open(file, "w") as input_file:
                 input_file.write(strings[i])
-        if TESTING_GITLAB:
+        if TESTING_GITHUB:
             subprocess.run(["diff", files[0], files[1]])
         else:
             child = subprocess.Popen(
@@ -503,15 +503,11 @@ def test_element_types_tet_new(kwargs):
     )
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_quad(kwargs):
-    """Create quad4 mesh."""
+def create_quad_mesh(plane):
+    """Create a quad mesh on the given plane"""
 
-    # Initialize cubit.
     cubit = CubitPy()
-
-    # Create the plate.
-    cubit.cmd("create surface rectangle width 1 height 2 zplane")
+    cubit.cmd(f"create surface rectangle width 1 height 2 {plane}")
     cubit.cmd("curve 1 3 interval 3")
     cubit.cmd("curve 2 4 interval 2")
     cubit.cmd("mesh surface 1")
@@ -521,9 +517,21 @@ def test_element_types_quad(kwargs):
         material="MAT 1",
         bc_description="KINEM nonlinear EAS none THICK 1.0 STRESS_STRAIN plane_stress GP 3 3",
     )
+    return cubit
 
-    # Compare the input file created for baci.
-    compare(cubit, single_precision=True, **kwargs)
+
+@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
+def test_element_types_quad_z_plane(kwargs):
+    """Create the mesh on the z plane"""
+    compare(create_quad_mesh("zplane"), single_precision=True, **kwargs)
+
+
+@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
+def test_element_types_quad_y_plane(kwargs):
+    """Create quad4 mesh, with non-zero z-values to check that they are correctly output.
+    This is not the case if the automatic option from cubit while exporting the exo file
+    is chosen."""
+    compare(create_quad_mesh("yplane"), single_precision=True, **kwargs)
 
 
 @pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
