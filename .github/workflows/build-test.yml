@@ -15,10 +15,11 @@ jobs:
     name: cubitpy-testing
     runs-on: self-hosted
     env:
-      SPACK_ACTIVATION_SCRIPT: /home_local/github-runner/testing_lib/spack/share/spack/setup-env.sh
-      PYTHON_VENV: python-testing-environment
       BACI_PRE_EXODUS: /home_local/github-runner/testing_lib/baci_master/release/pre_exodus
       CUBIT_ROOT: /imcs/public/compsim/opt/cubit-15.2
+      PYTHON_VENV: python-testing-environment
+      SPACK_ACTIVATION_SCRIPT: /home_local/github-runner/testing_lib/spack/share/spack/setup-env.sh
+      TESTING_GITHUB: 1
     steps:
       - uses: actions/checkout@v3
         with:

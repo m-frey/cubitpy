@@ -52,10 +52,10 @@ from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
 
 
 # Global variable if this test is run by GitLab.
-if "TESTING_GITLAB" in os.environ.keys() and os.environ["TESTING_GITLAB"] == "1":
-    TESTING_GITLAB = True
+if "TESTING_GITHUB" in os.environ.keys() and os.environ["TESTING_GITHUB"] == "1":
+    TESTING_GITHUB = True
 else:
-    TESTING_GITLAB = False
+    TESTING_GITHUB = False
 
 
 def check_tmp_dir():
@@ -82,7 +82,7 @@ def compare_strings(string_ref, string_compare):
         for i, file in enumerate(files):
             with open(file, "w") as input_file:
                 input_file.write(strings[i])
-        if TESTING_GITLAB:
+        if TESTING_GITHUB:
             subprocess.run(["diff", files[0], files[1]])
         else:
             child = subprocess.Popen(
