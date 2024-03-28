@@ -6,7 +6,7 @@ created by pre_exodus
 ------------------------------------------------------PROBLEM SIZE
 //ELEMENTS    18
 //NODES       28
-DIM           2
+DIM           3
 
 
 -----------------------------------------------DNODE-NODE TOPOLOGY
