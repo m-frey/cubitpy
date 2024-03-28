@@ -349,7 +349,7 @@ class CubitPy(object):
 
     def export_exo(self, path):
         """Export the mesh."""
-        self.cubit.cmd('export mesh "{}" overwrite'.format(path))
+        self.cubit.cmd('export mesh "{}" dimension 3 overwrite'.format(path))
 
     def write_head_bc(self, head_path, bc_path):
         """Write the head and bc files that will be used with pre_exodus."""
