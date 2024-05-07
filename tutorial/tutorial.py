@@ -51,7 +51,7 @@ def cubit_step_by_step_tutorial_cli(input_file_path, *, display=True):
     # The first step is to setup a CubitPy object. This object is derived from the
     # cubit python interface and provides all functionality of the direct cubit
     # python interface and also adds some additional functionality to make the
-    # creation of BACI input files easier.
+    # creation of 4C input files easier.
     cubit = CubitPy()
 
     # Once the CubitPy object is initialized, we can create our first brick

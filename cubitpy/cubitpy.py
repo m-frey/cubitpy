@@ -57,7 +57,7 @@ class CubitPy(object):
         cubit_exe: str
             Path to the cubit executable
         pre_exodus: str
-            Path to the pre_exodus pre-processor of BACI
+            Path to the pre_exodus pre-processor of 4C
 
         kwargs:
             Arguments passed on to the creation of the python wrapper
@@ -210,7 +210,7 @@ class CubitPy(object):
 
         # If the user does not give a bc_description, load the default one.
         if bc_description is None:
-            bc_description = el_type.get_default_baci_description()
+            bc_description = el_type.get_default_four_c_description()
 
         # Add data that will be written to bc file.
         self.blocks.append([el_type, " ".join([material, bc_description])])
@@ -365,9 +365,9 @@ class CubitPy(object):
                 bc_file.write(
                     '*eb{}="ELEMENT"\nsectionname="{}"\ndescription="{}"\nelementname="{}"\n\n'.format(
                         i + 1,
-                        el_type.get_baci_section(),
+                        el_type.get_four_c_section(),
                         block_string,
-                        el_type.get_baci_name(),
+                        el_type.get_four_c_name(),
                     )
                 )
             for i, node_set in enumerate(self.node_sets):
@@ -421,7 +421,7 @@ class CubitPy(object):
 
     def _create_dat(self):
         """
-        This function creates a finished baci input *.dat file. First the mesh,
+        This function creates a finished 4C input *.dat file. First the mesh,
         head and bc files are written to a temp directory and then pre_exodus
         is called to create the *.dat file.
         """

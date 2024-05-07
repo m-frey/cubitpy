@@ -94,7 +94,7 @@ class CubitOptions(object):
 
     @staticmethod
     def get_pre_exodus_path(**kwargs):
-        return get_path("BACI_PRE_EXODUS", os.path.isfile, **kwargs)
+        return get_path("FOUR_C_PRE_EXODUS", os.path.isfile, **kwargs)
 
     @staticmethod
     def get_cubit_root_path(**kwargs):

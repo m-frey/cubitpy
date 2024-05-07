@@ -30,7 +30,7 @@
 # -----------------------------------------------------------------------------
 """
 Implements a function that converts a cubit session to a dat file that can be used
-with BACI.
+with 4C.
 """
 
 
@@ -126,7 +126,7 @@ def add_node_sets(dat_lines, cubit, exo):
 
 
 def cubit_to_dat(cubit):
-    """Convert a CubitPy session to a dat file that can be read with BACI"""
+    """Convert a CubitPy session to a dat file that can be read with 4C"""
 
     # Create exodus file
     os.makedirs(cupy.temp_dir, exist_ok=True)
@@ -167,7 +167,7 @@ def cubit_to_dat(cubit):
     i_element = 0
     for i_block, key in enumerate(connectivity_keys):
         ele_type, block_string = cubit.blocks[i_block]
-        block_section = ele_type.get_baci_section()
+        block_section = ele_type.get_four_c_section()
         if not block_section == current_section:
             current_section = block_section
             dat_lines.append(
@@ -176,7 +176,7 @@ def cubit_to_dat(cubit):
         for connectivity in exo.variables[key][:]:
             connectivity_string = " ".join([f"{item:d}" for item in connectivity])
             dat_lines.append(
-                f"{i_element+1:9d} {ele_type.get_baci_name()} {ele_type.get_baci_type()} {connectivity_string} {block_string}"
+                f"{i_element+1:9d} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
             )
             i_element += 1
 

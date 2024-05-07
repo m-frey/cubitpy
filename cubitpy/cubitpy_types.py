@@ -30,7 +30,7 @@
 # -----------------------------------------------------------------------------
 """
 This module contains ENums for types used in cubitpy as well as functions to
-convert them to strings for cubit or baci commands or the wrapper.
+convert them to strings for cubit or 4C commands or the wrapper.
 """
 
 # Python imports.
@@ -172,8 +172,8 @@ class ElementType(Enum):
 
         return cubit_scheme, cubit_element_type
 
-    def get_baci_name(self):
-        """Get the name of this element in baci."""
+    def get_four_c_name(self):
+        """Get the name of this element in 4C."""
 
         # Get the element type parameters.
         if self == self.hex8:
@@ -203,8 +203,8 @@ class ElementType(Enum):
         else:
             raise ValueError("Got wrong element type {}!".format(self))
 
-    def get_baci_section(self):
-        """Get the correct section name of this element in baci."""
+    def get_four_c_section(self):
+        """Get the correct section name of this element in 4C."""
 
         if self == self.hex8_fluid:
             return "FLUID"
@@ -228,8 +228,8 @@ class ElementType(Enum):
         else:
             raise ValueError("Got wrong element type {}!".format(self))
 
-    def get_baci_type(self):
-        """Get the correct element shape name of this element in baci."""
+    def get_four_c_type(self):
+        """Get the correct element shape name of this element in 4C."""
 
         if (
             self == self.hex8
@@ -251,9 +251,9 @@ class ElementType(Enum):
         else:
             raise ValueError("Got wrong element type {}!".format(self))
 
-    def get_default_baci_description(self):
+    def get_default_four_c_description(self):
         """
-        Get the default text for the description in baci after the material
+        Get the default text for the description in 4C after the material
         string.
         """
 
