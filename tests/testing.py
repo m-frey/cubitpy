@@ -257,7 +257,7 @@ def create_block(cubit, np_arrays=False, **kwargs):
                 bc_description="NUMDOF 6 ONOFF 1 1 1 0 0 0 VAL 0.0 0.0 0.0 0.0 0.0 0.0 FUNCT 0 0 0 0 0 0",
             )
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, name="test_create_block", **kwargs)
 
 
@@ -345,7 +345,7 @@ def create_element_types_tet(cubit, element_type_list, name, **kwargs):
             DISPLACEMENT                    Yes
             """
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, name=name, single_precision=True, **kwargs)
 
 
@@ -429,7 +429,7 @@ def create_element_types_hex(cubit, element_type_list, name, **kwargs):
             DISPLACEMENT                    Yes
             """
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, name=name, single_precision=True, **kwargs)
 
 
@@ -570,7 +570,7 @@ def test_block_function(kwargs):
             cube.volumes()[0].mesh()
             count += 1
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, single_precision=True, **kwargs)
 
 
@@ -618,7 +618,7 @@ def test_extrude_mesh_function(kwargs):
     # Set the mesh for output.
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, single_precision=False, **kwargs)
 
 
@@ -697,7 +697,7 @@ def test_node_set_geometry_type(kwargs):
             ----------------------------------------------------------MATERIALS
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0"""
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, **kwargs)
 
 
@@ -718,7 +718,7 @@ def test_contact_condition_beam_to_surface(kwargs):
         bc_description="COUPLING_ID 1",
     )
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, **kwargs)
 
 
@@ -745,7 +745,7 @@ def test_contact_condition_surface_to_surface(kwargs):
         bc_description="0 Slave",
     )
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, **kwargs)
 
 
@@ -787,7 +787,7 @@ def test_fsi_functionality(kwargs):
         bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
     )
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, **kwargs)
 
 
@@ -843,7 +843,7 @@ def test_point_coupling(kwargs):
                     bc_description="NUMDOF 3 ONOFF 1 2 3",
                 )
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, **kwargs)
 
 
@@ -894,7 +894,7 @@ def test_group_of_surfaces(kwargs):
         bc_description="KINEM linear EAS none THICK 1.0 STRESS_STRAIN plane_strain GP 3 3",
     )
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, name="test_group_of_surfaces", **kwargs)
 
 
@@ -1012,7 +1012,7 @@ def xtest_groups(block_with_volume, **kwargs):
             ----------------------------------------------------------MATERIALS
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0"""
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, name="test_groups", **kwargs)
 
 
@@ -1066,7 +1066,7 @@ def xtest_groups_multiple_sets_get_by(
             ----------------------------------------------------------MATERIALS
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0"""
 
-    # Compare the input file created for baci.
+    # Compare the input file created for 4C.
     compare(cubit, name="test_groups_multiple_sets", **kwargs)
 
 
