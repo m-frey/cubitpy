@@ -35,6 +35,8 @@ jobs:
           # Create the virtual environment
           python3 -m venv $PYTHON_VENV
           source $PYTHON_VENV/bin/activate
+          # Update pip
+          pip install --upgrade pip
           # Install cubitpy
           pip install .[CI-CD]
           # Print information on the python environment
