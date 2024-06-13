@@ -35,6 +35,7 @@ interpreter and the main python interpreter."""
 # Import python modules.
 import execnet
 import os
+import atexit
 import numpy as np
 
 # Import global options.
@@ -132,7 +133,14 @@ class CubitConnect(object):
         cubit_id = self.send_and_return(["init", arguments])
         self.cubit = CubitObjectMain(self, cubit_id)
 
-    def send_and_return(self, argument_list, check_number_of_channels=False):
+        # We need to register a function called at interpreter shutdown that ensures that the
+        # execnet connection is closed first. Otherwise we get a runtime error during shutdown.
+        def cleanup_execnet_gateway():
+            self.cubit.cubit_connect.gw.exit()
+
+        atexit.register(cleanup_execnet_gateway)
+
+    def send_and_return(self, argument_list):
         """Send arguments to the python client and collect the return values.
 
         Args
@@ -141,18 +149,15 @@ class CubitConnect(object):
             First item is either a string with the action, or a cubit item id.
             In the second case a method will be called on the item, with the
             arguments stored in the second entry in argument_list.
-        check_number_of_channels: bool
-            If true it is checked if the channel still exists. This is
-            necessary in cases where we delete items after the connection has
-            been closed.
         """
 
-        if check_number_of_channels:
-            if len(self.gw._channelfactory.channels()) == 0:
-                return None
-
-        self.channel.send(argument_list)
-        return self.channel.receive()
+        # If the channel is already finalized we get a runtime error here. This happens in cases
+        # where we delete items after the connection has been closed. We catch this error here.
+        try:
+            self.channel.send(argument_list)
+            return self.channel.receive()
+        except:
+            return None
 
     def get_attribute(self, cubit_object, name):
         """Return the attribute 'name' of cubit_object. If the attribute is
@@ -290,9 +295,7 @@ class CubitObject(object):
         """When this object is deleted, the object in the client can also be
         deleted.
         """
-        self.cubit_connect.send_and_return(
-            ["delete", self.cubit_id], check_number_of_channels=True
-        )
+        self.cubit_connect.send_and_return(["delete", self.cubit_id])
 
     def __str__(self):
         """Return the string from the client."""
