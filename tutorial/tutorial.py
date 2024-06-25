@@ -40,7 +40,9 @@ from cubitpy import CubitPy, cupy
 from cubitpy.cubit_utility import get_surface_center
 
 
-def cubit_step_by_step_tutorial_cli(input_file_path, *, display=True):
+def cubit_step_by_step_tutorial_cli(
+    input_file_path, *, display=True, cubit=None, size=1.0
+):
     """This tutorial follows the Cubit step-by-step tutorial, which can be found
     in the cubit documentation"""
 
@@ -52,7 +54,8 @@ def cubit_step_by_step_tutorial_cli(input_file_path, *, display=True):
     # cubit python interface and provides all functionality of the direct cubit
     # python interface and also adds some additional functionality to make the
     # creation of 4C input files easier.
-    cubit = CubitPy()
+    if None == cubit:
+        cubit = CubitPy()
 
     # Once the CubitPy object is initialized, we can create our first brick
     # object. To do so we use the cubit python interface function `brick`.
@@ -115,7 +118,7 @@ def cubit_step_by_step_tutorial_cli(input_file_path, *, display=True):
     # size for the volume. we begin by setting an overall volume size interval.
     # Since the brick is 10 units in length on a side, this specifies that each
     # straight curve is to receive approximately 10 mesh elements.
-    cubit.cmd(f"volume {brick.id()} size 1.0")
+    cubit.cmd(f"volume {brick.id()} size {size}")
 
     # We will use a sweep mesh, so we will first mesh one surface of the body. We want to
     # first mesh the top surface. This surface can be selected by looking for the only
@@ -145,7 +148,7 @@ def cubit_step_by_step_tutorial_cli(input_file_path, *, display=True):
 
         if np.abs(radius - hole_radius) < 1e-10:
             # The curve lies on the cylinder radius, now set the meshing interval
-            cubit.cmd(f"curve {curve.id()} interval size 0.5")
+            cubit.cmd(f"curve {curve.id()} interval size {size/2}")
 
     # Now we can mesh the surface
     cubit.cmd(f"mesh surface {mesh_surface.id()}")
