@@ -36,6 +36,31 @@ Implements functions that create geometries in cubit.
 from . import cupy
 
 
+def create_spline_interpolation_curve(cubit, vertices, *, delete_points=True):
+    """
+    Interpolate multiple vertices with a Cubit internal spline.
+
+    Args
+    ----
+    cubit: Cubit
+        Link to the main cubit object.
+    vertices: list(points in R3)
+        Points to be interpolated by the spline curve
+    delete_points: bool
+        If the created vertices should be kept or should be deleted.
+    """
+
+    # Create the vertices
+    vertices = [cubit.create_vertex(*vertex) for vertex in vertices]
+    vertices_ids = [str(vertex.id()) for vertex in vertices]
+    cubit.cmd(
+        "create curve spline vertex {} {}".format(
+            " ".join(vertices_ids), ("delete" if delete_points else "")
+        )
+    )
+    return cubit.curve(cubit.get_last_id(cupy.geometry.curve))
+
+
 def create_parametric_curve(
     cubit,
     f,
@@ -72,17 +97,10 @@ def create_parametric_curve(
         interval[0] + i * (interval[1] - interval[0]) / float(n_segments)
         for i in range(n_segments + 1)
     ]
-    vertices = [
-        cubit.create_vertex(*f(t, *function_args, **function_kwargs))
-        for t in parameter_points
-    ]
-    vertices_ids = [str(vertex.id()) for vertex in vertices]
-    cubit.cmd(
-        "create curve spline vertex {} {}".format(
-            " ".join(vertices_ids), ("delete" if delete_points else "")
-        )
+    vertices = [f(t, *function_args, **function_kwargs) for t in parameter_points]
+    return create_spline_interpolation_curve(
+        cubit, vertices, delete_points=delete_points
     )
-    return cubit.curve(cubit.get_last_id(cupy.geometry.curve))
 
 
 def create_parametric_surface(
