@@ -47,7 +47,10 @@ testing_external_geometry = os.path.join(testing_path, "external-geometry")
 # CubitPy imports.
 from cubitpy import CubitPy, cupy
 from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
-from cubitpy.geometry_creation_functions import create_parametric_surface
+from cubitpy.geometry_creation_functions import (
+    create_spline_interpolation_curve,
+    create_parametric_surface,
+)
 from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
 
 
@@ -1328,6 +1331,51 @@ def test_create_parametric_surface():
             [11,  5,  6, 12],
             [10, 12,  8,  7],
             [12,  6,  4,  8]])
+    # fmt: on
+
+    assert 0.0 == pytest.approx(np.linalg.norm(coordinates - coordinates_ref), 1e-12)
+    assert np.linalg.norm(connectivity - connectivity_ref) == 0
+
+
+def test_spline_interpolation_curve():
+    """
+    Test the create_spline_interpolation_curve function.
+    """
+
+    cubit = CubitPy()
+
+    x = np.linspace(0, 2 * np.pi, 7)
+    y = np.cos(x)
+    z = np.sin(x)
+    vertices = np.array([x, y, z]).transpose()
+
+    curve = create_spline_interpolation_curve(cubit, vertices)
+    curve.mesh()
+
+    coordinates = [
+        cubit.get_nodal_coordinates(i + 1) for i in range(cubit.get_node_count())
+    ]
+    connectivity = [
+        cubit.get_connectivity("edge", i + 1) for i in range(cubit.get_edge_count())
+    ]
+
+    # fmt: off
+    coordinates_ref = np.array([
+        [0.0, 1.0, 0.0],
+        [6.283185307179586, 1.0, -2.4492935982947064e-16], 
+        [0.6219064247387815, 0.7622034923056742, 0.5808964193893371],
+        [1.2706376409420117, 0.30926608007524203, 0.9532391827102926],
+        [1.8922964421051867, -0.3108980458371118, 0.946952808381383],
+        [2.5151234800888007, -0.8099976142632724, 0.5846200862869367],
+        [3.1415926535897927, -0.9999999999999998, 1.6653345369377348e-16],
+        [3.7680618270907873, -0.8099976142632712, -0.5846200862869384],
+        [4.3908888650744, -0.31089804583711017, -0.9469528083813835],
+        [5.012547666237575, 0.30926608007524364, -0.9532391827102922],
+        [5.661278882440805, 0.7622034923056742, -0.5808964193893369]
+    ])
+
+    connectivity_ref = np.array([[1, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10],
+        [10, 11], [11, 2]])
     # fmt: on
 
     assert 0.0 == pytest.approx(np.linalg.norm(coordinates - coordinates_ref), 1e-12)
