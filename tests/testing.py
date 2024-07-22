@@ -225,14 +225,14 @@ def create_block(cubit, np_arrays=False, **kwargs):
         else:
             raise ArithmeticError("Error")
 
-    # Mesh the block.
+    # Mesh the block and use a user defined element description
     block.mesh()
     cubit.add_element_type(
         block.volumes()[0],
         cupy.element_type.hex8,
         name="block",
         material="MAT 1",
-        bc_description="KINEM nonlinear EAS none",
+        bc_description="KINEM linear",
     )
 
     # Create node sets.
@@ -455,24 +455,6 @@ def test_element_types_hex(kwargs):
 
 
 @pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_hex_new(kwargs):
-    """Create a curved solid with different hex element types."""
-
-    # Initialize cubit.
-    cubit = CubitPy()
-
-    element_type_list = [
-        cupy.element_type.hex8_new,
-        cupy.element_type.hex20_new,
-        cupy.element_type.hex27_new,
-        cupy.element_type.hex8sh,
-    ]
-    create_element_types_hex(
-        cubit, element_type_list, name="test_element_types_hex_new", **kwargs
-    )
-
-
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
 def test_element_types_tet(kwargs):
     """Create a curved solid with different tet element types."""
 
@@ -486,23 +468,6 @@ def test_element_types_tet(kwargs):
 
     create_element_types_tet(
         cubit, element_type_list, name="test_element_types_tet", **kwargs
-    )
-
-
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_tet_new(kwargs):
-    """Create a curved solid with different tet element types."""
-
-    # Initialize cubit.
-    cubit = CubitPy()
-
-    element_type_list = [
-        cupy.element_type.tet4_new,
-        cupy.element_type.tet10_new,
-    ]
-
-    create_element_types_tet(
-        cubit, element_type_list, name="test_element_types_tet_new", **kwargs
     )
 
 
@@ -947,12 +912,12 @@ def xtest_groups(block_with_volume, **kwargs):
     group_explicit_type.add("add vertex 3")
 
     if block_with_volume:
-        # Set element type.
+        # Set the element block and use a user defined element description
         cubit.add_element_type(
             volume,
             cupy.element_type.hex8,
             material="MAT 1",
-            bc_description="KINEM nonlinear EAS none",
+            bc_description="KINEM linear",
         )
 
     # Add BCs.
@@ -990,12 +955,13 @@ def xtest_groups(block_with_volume, **kwargs):
     cubit.cmd("mesh {}".format(volume))
 
     if not block_with_volume:
+        # Set the element block and use a user defined element description
         all_hex = cubit.group(add_value="add hex all")
         cubit.add_element_type(
             all_hex,
             cupy.element_type.hex8,
             material="MAT 1",
-            bc_description="KINEM nonlinear EAS none",
+            bc_description="KINEM linear",
         )
 
     # Add a group containing elements and nodes.
