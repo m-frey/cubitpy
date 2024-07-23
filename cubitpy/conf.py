@@ -106,7 +106,7 @@ class CubitOptions(object):
         if platform == "linux" or platform == "linux2":
             return os.path.join(cubit_root, "cubit")
         elif platform == "darwin":
-            return os.path.join(cubit_root, "Cubit.app/Contents/MacOS/Cubit")
+            return os.path.join(cubit_root, "Contents/MacOS/Cubit")
         else:
             raise ValueError("Got unexpected platform")
 
@@ -116,7 +116,7 @@ class CubitOptions(object):
         if platform == "linux" or platform == "linux2":
             return os.path.join(cubit_root, "bin")
         elif platform == "darwin":
-            return os.path.join(cubit_root, "Cubit.app/Contents/MacOS")
+            return os.path.join(cubit_root, "Contents/MacOS")
         else:
             raise ValueError("Got unexpected platform")
 
