@@ -125,6 +125,48 @@ def add_node_sets(dat_lines, cubit, exo):
                 dat_lines.append(f"NODE {i_node:6d} {set_label} {i_set+1}")
 
 
+def get_element_connectivity_string(connectivity):
+    """Return the connectivity string for an element
+
+    For hex27 we need a different ordering than the one we get from cubit"""
+
+    if len(connectivity) == 27:
+        # hex27
+        ordering = [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            21,
+            25,
+            24,
+            26,
+            23,
+            22,
+            20,
+        ]
+        return " ".join([f"{item:d}" for item in connectivity[ordering]])
+    else:
+        # all other elements
+        return " ".join([f"{item:d}" for item in connectivity])
+
+
 def cubit_to_dat(cubit):
     """Convert a CubitPy session to a dat file that can be read with 4C"""
 
@@ -174,7 +216,7 @@ def cubit_to_dat(cubit):
                 f"------------------------------------------------{current_section} ELEMENTS"
             )
         for connectivity in exo.variables[key][:]:
-            connectivity_string = " ".join([f"{item:d}" for item in connectivity])
+            connectivity_string = get_element_connectivity_string(connectivity)
             dat_lines.append(
                 f"{i_element+1:9d} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
             )
