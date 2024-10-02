@@ -567,7 +567,6 @@ def test_extrude_mesh_function(kwargs):
     cut_surface_ids_string = " ".join(map(str, cut_surface_ids))
     cubit.cmd("surface {} size auto factor 9".format(cut_surface_ids_string))
     cubit.cmd("mesh surface {}".format(cut_surface_ids_string))
-
     # Extrude the surface.
     volume = extrude_mesh_normal_to_surface(
         cubit,
@@ -580,7 +579,105 @@ def test_extrude_mesh_function(kwargs):
 
     # Check the created volume.
     assert 0.6917559630511103 == pytest.approx(
-        np.abs(cubit.get_meshed_volume_or_area("volume", [volume.id()])), 1e-10
+        cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
+    )
+
+    # Set the mesh for output.
+    cubit.add_element_type(volume, cupy.element_type.hex8)
+
+    # Compare the input file created for 4C.
+    compare(cubit, single_precision=False, **kwargs)
+
+
+@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
+def test_extrude_mesh_function_average_normals_block(kwargs):
+    """Test the average extrude mesh function for two blocks."""
+
+    # Initialize cubit.
+    cubit = CubitPy()
+
+    # Create L-shaped geometry.
+    cubit.cmd("create brick x 1")
+    cubit.cmd("create brick x 2 y 1 z 1")
+    cubit.cmd("move volume 1 x -0.5 y 1")
+    cubit.cmd("unite volume 1,2")
+
+    # Extract surfaces normal to eacht other.
+    surface_ids = cubit.get_entities(cupy.geometry.surface)
+    extrude_surface_ids = [surface_ids[-4], surface_ids[-1]]
+    extrude_surface_ids_string = " ".join(map(str, extrude_surface_ids))
+
+    # Create the mesh.
+    cubit.cmd("surface {} size auto factor 9".format(extrude_surface_ids_string))
+    cubit.cmd("mesh surface {}".format(extrude_surface_ids_string))
+
+    # Extrude the surfaces.
+    volume = extrude_mesh_normal_to_surface(
+        cubit,
+        [cubit.surface(i) for i in extrude_surface_ids],
+        0.1,
+        n_layer=3,
+        extrude_dir="inside",
+        average_normals=True,
+    )
+
+    # Check the created volume.
+    assert 0.1924264068711928 == pytest.approx(
+        cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
+    )
+
+    # Set the mesh for output.
+    cubit.add_element_type(volume, cupy.element_type.hex8)
+
+    # Compare the input file created for 4C.
+    compare(cubit, single_precision=False, **kwargs)
+
+
+@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
+def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere(kwargs):
+    """Test the average extrude mesh function for curved surfaces (Toy Aneurysm Case)."""
+
+    # Initialize cubit.
+    cubit = CubitPy()
+
+    # Offset between center of cylinder and sphere.
+    offset = 0.8
+
+    # create cylinder and sphere for a toy aneurysm.
+    cubit.cmd("create Cylinder height 1 radius 0.5")
+    cubit.cmd("create sphere radius 0.4")
+    cubit.cmd(f"move volume 2 x 0 y {offset}")
+
+    # Cut volumes into quarter parts.
+    cubit.cmd("webcut volume all with general plane xy noimprint nomerge")
+    cubit.cmd("webcut volume all with general plane yz noimprint nomerge")
+    cubit.cmd("webcut volume all with general plane xz noimprint nomerge")
+    cubit.cmd(
+        f"webcut volume all with general plane xz offset -{offset}  noimprint nomerge "
+    )
+
+    # Unit one quarter of the cylinder and sphere.
+    cubit.cmd("unite volume 12 8")
+
+    # Create surface mesh.
+    extrude_surface_ids = [115, 113]
+    extrude_surface_ids_string = " ".join(map(str, extrude_surface_ids))
+    cubit.cmd("surface {} size auto factor 7".format(extrude_surface_ids_string))
+    cubit.cmd("mesh surface {}".format(extrude_surface_ids_string))
+
+    # Extrude the surfaces.
+    volume = extrude_mesh_normal_to_surface(
+        cubit,
+        [cubit.surface(i) for i in extrude_surface_ids],
+        0.05,
+        n_layer=1,
+        extrude_dir="outside",
+        average_normals=True,
+    )
+
+    # Check the size of the created volume.
+    assert 0.02668549643643842 == pytest.approx(
+        cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
     )
 
     # Set the mesh for output.
@@ -1382,3 +1479,39 @@ def test_import_fluent_geometry():
 
     # for a feature angle of 100, the imported geometry should consist of 1 volume, 4 surfaces and 1 block
     setup_and_check_import_fluent_geometry(fluent_geometry, 100, [1, 4, 1])
+
+
+def test_extrude_artery_of_aneurysm():
+    """
+    Extrude an arterial surface based on an aneurysm test case.
+    """
+
+    # Set up Cubit.
+    cubit = CubitPy()
+
+    # Set path for geometry.
+    fluent_geometry = os.path.join(testing_external_geometry, "fluent_aneurysm.msh")
+
+    # Import aneruysm geometry to cubit.
+    import_fluent_geometry(cubit, fluent_geometry, 100)
+
+    # Select wall surface for this case.
+    wall_id = [3]
+
+    # Remesh the artery surface with hex elements.
+    cubit.cmd("delete mesh")
+    cubit.cmd("mesh surface {}".format(wall_id[0]))
+
+    # Extrude the surface.
+    volume = extrude_mesh_normal_to_surface(
+        cubit,
+        [cubit.surface(wall_id[0])],
+        0.1,
+        n_layer=2,
+        extrude_dir="outside",
+    )
+
+    # Check the created volume.
+    assert 13.570135865871498 == pytest.approx(
+        cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
+    )
