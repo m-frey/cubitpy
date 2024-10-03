@@ -55,11 +55,6 @@ To run CubitPy it is required to set an environment variable with the path to th
 export CUBIT_ROOT=path_to_cubit_root_directory
 ```
 
-(Optional) Per default CubitPy creates the 4C input file itself and does not rely `pre_exodus`. However, if for some reason `pre_exodus` shall be used, the path to the executable has to be set
-```bash
-export FOUR_C_PRE_EXODUS=path_to_four_c_pre-exodus
-```
-
 To check if everything worked as expected, run the tests from within the `tests` directory
 ```bash
 cd path_to_cubitpy/tests

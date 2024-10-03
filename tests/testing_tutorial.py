@@ -59,7 +59,7 @@ class TestTutorial(unittest.TestCase):
         cubit_step_by_step_tutorial_cli(
             tutorial_file, display=False, cubit=cubit, size=5.0
         )
-        compare(cubit, name="test_cubit_tutorial", test_cubitpy=True)
+        compare(cubit, name="test_cubit_tutorial")
 
 
 if __name__ == "__main__":

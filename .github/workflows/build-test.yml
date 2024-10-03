@@ -15,7 +15,6 @@ jobs:
     name: cubitpy-testing
     runs-on: self-hosted
     env:
-      FOUR_C_PRE_EXODUS: /home_local/github-runner/testing_lib/four_c_master/release/pre_exodus
       CUBIT_ROOT: /imcs/public/compsim/opt/cubit-15.2
       PYTHON_VENV: python-testing-environment
       SPACK_ACTIVATION_SCRIPT: /home_local/github-runner/testing_lib/spack/share/spack/setup-env.sh
