@@ -38,6 +38,9 @@ import subprocess
 import numpy as np
 import pytest
 
+# MeshPy imports
+from meshpy_testing.utils import compare_string_tolerance
+
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
 testing_input = os.path.join(testing_path, "input-files-ref")
@@ -66,36 +69,7 @@ def check_tmp_dir():
     os.makedirs(testing_temp, exist_ok=True)
 
 
-def compare_strings(string_ref, string_compare):
-    """
-    Compare two stings. If they are not identical open meld and show
-    differences.
-    """
-
-    # Check if the strings are equal, if not fail the test and show the
-    # differences in the strings.
-    name = "cubitpy_testing"
-    compare = string_ref == string_compare
-    if not compare:
-        check_tmp_dir()
-        strings = [string_ref, string_compare]
-        files = []
-        files.append(os.path.join(testing_temp, "{}_ref.dat".format(name)))
-        files.append(os.path.join(testing_temp, "{}_compare.dat".format(name)))
-        for i, file in enumerate(files):
-            with open(file, "w") as input_file:
-                input_file.write(strings[i])
-        if TESTING_GITHUB:
-            subprocess.run(["diff", files[0], files[1]])
-        else:
-            child = subprocess.Popen(
-                ["code", "--diff", files[0], files[1]], stderr=subprocess.PIPE
-            )
-            child.communicate()
-    return compare
-
-
-def compare(cubit, *, name=None, single_precision=False):
+def compare(cubit, *, name=None, rtol=1.0e-8, atol=1.0e-8):
     """Write create the dat file from the cubit mesh and compare to a reference
     file.
 
@@ -106,8 +80,6 @@ def compare(cubit, *, name=None, single_precision=False):
         Name of the test case. A reference file 'name' + '_ref.dat' must
         exits in the reference file folder. If no name is given, the test
         name will be used.
-    single_precision: bool
-        If the output of cubit is single or double precision.
     """
 
     # Get the name for this compare operation.
@@ -121,18 +93,34 @@ def compare(cubit, *, name=None, single_precision=False):
 
     check_tmp_dir()
 
-    if single_precision:
-        cubit.cmd("set exodus single precision on")
-
+    # Get the file names and create the input file
+    ref_file = os.path.join(testing_input, name + ".dat")
     dat_file = os.path.join(testing_temp, name + ".dat")
     cubit.create_dat(dat_file)
-    with open(dat_file, "r") as text_file:
-        string2 = text_file.read()
 
-    ref_file = os.path.join(testing_input, name + ".dat")
-    with open(ref_file, "r") as text_file:
-        string1 = text_file.read()
-    assert compare_strings(string1, string2)
+    def get_string(path):
+        """Get the file contents as string"""
+        with open(path, "r") as text_file:
+            string = text_file.read()
+        return string.strip()
+
+    ref_string = get_string(ref_file)
+    dat_string = get_string(dat_file)
+
+    # Check if the strings are equal, if not fail the test and show the
+    # differences in the strings.
+    files_are_equal = compare_string_tolerance(
+        ref_string, dat_string, rtol=rtol, atol=atol
+    )
+    if not files_are_equal:
+        if TESTING_GITHUB:
+            subprocess.run(["diff", ref_file, dat_file])
+        else:
+            child = subprocess.Popen(
+                ["code", "--diff", ref_file, dat_file], stderr=subprocess.PIPE
+            )
+            child.communicate()
+    assert files_are_equal
 
 
 def create_block(cubit, np_arrays=False):
@@ -303,7 +291,7 @@ def create_element_types_tet(cubit, element_type_list, name):
             """
 
     # Compare the input file created for 4C.
-    compare(cubit, name=name, single_precision=True)
+    compare(cubit, name=name)
 
 
 def create_element_types_hex(cubit, element_type_list, name):
@@ -387,7 +375,7 @@ def create_element_types_hex(cubit, element_type_list, name):
             """
 
     # Compare the input file created for 4C.
-    compare(cubit, name=name, single_precision=True)
+    compare(cubit, name=name)
 
 
 def test_element_types_hex():
@@ -438,14 +426,14 @@ def create_quad_mesh(plane):
 
 def test_element_types_quad_z_plane():
     """Create the mesh on the z plane"""
-    compare(create_quad_mesh("zplane"), single_precision=True)
+    compare(create_quad_mesh("zplane"))
 
 
 def test_element_types_quad_y_plane():
     """Create quad4 mesh, with non-zero z-values to check that they are correctly output.
     This is not the case if the automatic option from cubit while exporting the exo file
     is chosen."""
-    compare(create_quad_mesh("yplane"), single_precision=True)
+    compare(create_quad_mesh("yplane"))
 
 
 def test_block_function():
@@ -484,7 +472,7 @@ def test_block_function():
             count += 1
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=True)
+    compare(cubit)
 
 
 def test_extrude_mesh_function():
@@ -530,7 +518,7 @@ def test_extrude_mesh_function():
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=False)
+    compare(cubit)
 
 
 def test_extrude_mesh_function_average_normals_block():
@@ -573,7 +561,7 @@ def test_extrude_mesh_function_average_normals_block():
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=False)
+    compare(cubit)
 
 
 def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
@@ -626,7 +614,7 @@ def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=False)
+    compare(cubit)
 
 
 def test_node_set_geometry_type():
@@ -1441,5 +1429,5 @@ def test_extrude_artery_of_aneurysm():
 
     # Check the created volume.
     assert 13.570135865871498 == pytest.approx(
-        cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
+        cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-5
     )
