@@ -93,10 +93,6 @@ class CubitOptions(object):
         self.eps_pos = 1e-10
 
     @staticmethod
-    def get_pre_exodus_path(**kwargs):
-        return get_path("FOUR_C_PRE_EXODUS", os.path.isfile, **kwargs)
-
-    @staticmethod
     def get_cubit_root_path(**kwargs):
         return get_path("CUBIT_ROOT", os.path.isdir, **kwargs)
 

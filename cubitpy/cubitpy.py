@@ -49,15 +49,13 @@ from .cubit_wrapper.cubit_wrapper_host import CubitConnect
 class CubitPy(object):
     """A wrapper class with additional functionality for cubit."""
 
-    def __init__(self, *, cubit_exe=None, pre_exodus=None, **kwargs):
+    def __init__(self, *, cubit_exe=None, **kwargs):
         """Initialize CubitPy.
 
         Args
         ----
         cubit_exe: str
             Path to the cubit executable
-        pre_exodus: str
-            Path to the pre_exodus pre-processor of 4C
 
         kwargs:
             Arguments passed on to the creation of the python wrapper
@@ -66,10 +64,7 @@ class CubitPy(object):
         # Set paths
         if cubit_exe is None:
             cubit_exe = cupy.get_cubit_exe_path()
-        if pre_exodus is None:
-            pre_exodus = cupy.get_pre_exodus_path(throw_error=False)
         self.cubit_exe = cubit_exe
-        self.pre_exodus = pre_exodus
 
         # Set the "real" cubit object
         self.cubit = CubitConnect(**kwargs).cubit
@@ -83,10 +78,6 @@ class CubitPy(object):
 
         # Content of head file
         self.head = ""
-
-        # Other parameters
-        self.cubit_exe = cubit_exe
-        self.pre_exodus = pre_exodus
 
     def _default_cubit_variables(self):
         """
@@ -351,39 +342,13 @@ class CubitPy(object):
         """Export the mesh."""
         self.cubit.cmd('export mesh "{}" dimension 3 overwrite'.format(path))
 
-    def write_head_bc(self, head_path, bc_path):
-        """Write the head and bc files that will be used with pre_exodus."""
-
-        with open(head_path, "w") as head_file:
-            for line in self.head.split("\n"):
-                head_file.write(line.strip())
-                head_file.write("\n")
-
-        with open(bc_path, "w") as bc_file:
-            bc_file.write("---------------------------------------BCSPECS\n\n")
-            for i, (el_type, block_string) in enumerate(self.blocks):
-                bc_file.write(
-                    '*eb{}="ELEMENT"\nsectionname="{}"\ndescription="{}"\nelementname="{}"\n\n'.format(
-                        i + 1,
-                        el_type.get_four_c_section(),
-                        block_string,
-                        el_type.get_four_c_name(),
-                    )
-                )
-            for i, node_set in enumerate(self.node_sets):
-                bc_file.write(
-                    '*ns{}="CONDITION"\nsectionname="{}"\ndescription="{}"\n\n'.format(
-                        i + 1, node_set[0], node_set[1]
-                    )
-                )
-
-    def create_dat(self, dat_path, pre_exodus=False):
+    def create_dat(self, dat_path):
         """Create the dat file an copy it to dat_path
 
         Args
         ----
-        pre_exodus: bool
-            If pre exodus should be used to generate the dat file.
+        dat_path: str
+            Path where the input file file will be saved
         """
 
         # Check if output path exists.
@@ -392,74 +357,9 @@ class CubitPy(object):
             if not os.path.exists(dat_dir):
                 raise ValueError("Path {} does not exist!".format(dat_dir))
 
-        if pre_exodus:
-            # Create the dat file.
-            temp_dat_file = self._create_dat()
-
-            # Copy dat file.
-            shutil.copyfile(temp_dat_file, dat_path)
-        else:
-            with open(dat_path, "w") as the_file:
-                for line in self.get_dat_lines(pre_exodus=False):
-                    the_file.write(line + "\n")
-
-    def get_dat_lines(self, pre_exodus=False):
-        """Return a list with all lines in this input file
-
-        Args
-        ----
-        pre_exodus: bool
-            If pre_exodus should be used to generate the dat file.
-        """
-
-        if pre_exodus:
-            with open(self._create_dat()) as dat_file:
-                lines = dat_file.readlines()
-        else:
-            lines = cubit_to_dat(self)
-        return lines
-
-    def _create_dat(self):
-        """
-        This function creates a finished 4C input *.dat file. First the mesh,
-        head and bc files are written to a temp directory and then pre_exodus
-        is called to create the *.dat file.
-        """
-
-        # Check if the path to pre_exodus is valid.
-        if self.pre_exodus is None:
-            raise ValueError("The path to pre_exodus is None!")
-
-        os.makedirs(cupy.temp_dir, exist_ok=True)
-
-        # Create files
-        self.export_exo(os.path.join(cupy.temp_dir, "cubitpy.exo"))
-        self.write_head_bc(
-            os.path.join(cupy.temp_dir, "cubitpy.head"),
-            os.path.join(cupy.temp_dir, "cubitpy.bc"),
-        )
-
-        # For debugging write the command to the temp folder.
-        with open(os.path.join(cupy.temp_dir, "cmd.sh"), "w") as cmd_file:
-            cmd_file.write(self.pre_exodus)
-            cmd_file.write(" --exo=cubitpy.exo --bc=cubitpy.bc --head=cubitpy.head")
-
-        # Run pre_exodus.
-        try:
-            _out = subprocess.check_output(
-                [
-                    self.pre_exodus,
-                    "--exo=cubitpy.exo",
-                    "--bc=cubitpy.bc",
-                    "--head=cubitpy.head",
-                ],
-                cwd=cupy.temp_dir,
-            )
-        except subprocess.CalledProcessError as e:
-            print(e.output.decode(sys.stdout.encoding))
-
-        # Return the path to the dat file.
-        return os.path.join(cupy.temp_dir, "cubitpy.dat")
+        with open(dat_path, "w") as the_file:
+            for line in cubit_to_dat(self):
+                the_file.write(line + "\n")
 
     def group(self, **kwargs):
         """

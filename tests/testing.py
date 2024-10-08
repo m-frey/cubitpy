@@ -89,31 +89,13 @@ def compare_strings(string_ref, string_compare):
             subprocess.run(["diff", files[0], files[1]])
         else:
             child = subprocess.Popen(
-                ["meld", files[0], files[1]], stderr=subprocess.PIPE
+                ["code", "--diff", files[0], files[1]], stderr=subprocess.PIPE
             )
             child.communicate()
     return compare
 
 
-def get_pre_processor_decorator(cubitpy, pre_exodus):
-    """Return a list to be used as a decorator for the test case to run the
-    test case with and without pre_exodus"""
-    kwargs_list = []
-    if cubitpy:
-        kwargs_list.append({"test_cubitpy": True, "test_pre_exodus": False})
-    if pre_exodus:
-        kwargs_list.append({"test_cubitpy": False, "test_pre_exodus": True})
-    return "kwargs", kwargs_list
-
-
-def compare(
-    cubit,
-    *,
-    name=None,
-    single_precision=False,
-    test_pre_exodus=None,
-    test_cubitpy=None,
-):
+def compare(cubit, *, name=None, single_precision=False):
     """Write create the dat file from the cubit mesh and compare to a reference
     file.
 
@@ -126,16 +108,7 @@ def compare(
         name will be used.
     single_precision: bool
         If the output of cubit is single or double precision.
-    test_pre_exodus: bool
-        If the mesh should be tested with pre_exodus
-    test_cubitpy: bool
-        If the mesh should be tested with the cubitpy internal functionality
     """
-
-    if test_pre_exodus is None and test_cubitpy is None:
-        raise ValueError(
-            "At least one of the parameters 'test_pre_exodus' or 'test_cubitpy' has to be set."
-        )
 
     # Get the name for this compare operation.
     if name is None:
@@ -146,39 +119,23 @@ def compare(
             .split("[")[0]
         )
 
-    # Create the dat file for the solid.
     check_tmp_dir()
 
     if single_precision:
         cubit.cmd("set exodus single precision on")
 
-    if test_pre_exodus:
-        if cupy.get_pre_exodus_path(throw_error=False) is not None:
-            dat_file = os.path.join(testing_temp, name + ".dat")
-            cubit.create_dat(dat_file, pre_exodus=True)
-            with open(dat_file, "r") as text_file:
-                string2 = text_file.read()
+    dat_file = os.path.join(testing_temp, name + ".dat")
+    cubit.create_dat(dat_file)
+    with open(dat_file, "r") as text_file:
+        string2 = text_file.read()
 
-            ref_file = os.path.join(testing_input, name + "_pre_exodus.dat")
-            with open(ref_file, "r") as text_file:
-                string1 = text_file.read()
-            assert compare_strings(string1, string2)
-        else:
-            pytest.skip("Pre exodus is not defined")
-
-    if test_cubitpy:
-        dat_file = os.path.join(testing_temp, name + ".dat")
-        cubit.create_dat(dat_file, pre_exodus=False)
-        with open(dat_file, "r") as text_file:
-            string2 = text_file.read()
-
-        ref_file = os.path.join(testing_input, name + "_cubitpy.dat")
-        with open(ref_file, "r") as text_file:
-            string1 = text_file.read()
-        assert compare_strings(string1, string2)
+    ref_file = os.path.join(testing_input, name + ".dat")
+    with open(ref_file, "r") as text_file:
+        string1 = text_file.read()
+    assert compare_strings(string1, string2)
 
 
-def create_block(cubit, np_arrays=False, **kwargs):
+def create_block(cubit, np_arrays=False):
     """Create a block with cubit.
 
     Args
@@ -261,33 +218,30 @@ def create_block(cubit, np_arrays=False, **kwargs):
             )
 
     # Compare the input file created for 4C.
-    compare(cubit, name="test_create_block", **kwargs)
+    compare(cubit, name="test_create_block")
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_create_block(kwargs):
+def test_create_block():
     """
     Test the creation of a cubit block.
     """
 
     # Initialize cubit.
     cubit = CubitPy()
-    create_block(cubit, **kwargs)
+    create_block(cubit)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_create_block_numpy_arrays(kwargs):
+def test_create_block_numpy_arrays():
     """
     Test the creation of a cubit block.
     """
 
     # Initialize cubit.
     cubit = CubitPy()
-    create_block(cubit, np_arrays=True, **kwargs)
+    create_block(cubit, np_arrays=True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_create_block_multiple(kwargs):
+def test_create_block_multiple():
     """
     Test the creation of a cubit block multiple time to check that cubit
     can be reset.
@@ -295,22 +249,22 @@ def test_create_block_multiple(kwargs):
 
     # Initialize cubit.
     cubit = CubitPy()
-    create_block(cubit, **kwargs)
+    create_block(cubit)
 
     # Delete the old cubit object and run the function twice on the new.
     cubit = CubitPy()
     for _i in range(2):
-        create_block(cubit, **kwargs)
+        create_block(cubit)
         cubit.reset()
 
     # Create two object and keep them in parallel.
     cubit = CubitPy()
     cubit_2 = CubitPy()
-    create_block(cubit, **kwargs)
-    create_block(cubit_2, **kwargs)
+    create_block(cubit)
+    create_block(cubit_2)
 
 
-def create_element_types_tet(cubit, element_type_list, name, **kwargs):
+def create_element_types_tet(cubit, element_type_list, name):
     """Create a curved solid with different tet element types."""
 
     # Initialize cubit.
@@ -349,10 +303,10 @@ def create_element_types_tet(cubit, element_type_list, name, **kwargs):
             """
 
     # Compare the input file created for 4C.
-    compare(cubit, name=name, single_precision=True, **kwargs)
+    compare(cubit, name=name, single_precision=True)
 
 
-def create_element_types_hex(cubit, element_type_list, name, **kwargs):
+def create_element_types_hex(cubit, element_type_list, name):
     """Create a curved solid with different hex element types."""
 
     def add_arc(radius, angle):
@@ -433,11 +387,10 @@ def create_element_types_hex(cubit, element_type_list, name, **kwargs):
             """
 
     # Compare the input file created for 4C.
-    compare(cubit, name=name, single_precision=True, **kwargs)
+    compare(cubit, name=name, single_precision=True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_hex(kwargs):
+def test_element_types_hex():
     """Create a curved solid with different hex element types."""
 
     # Initialize cubit.
@@ -449,13 +402,10 @@ def test_element_types_hex(kwargs):
         cupy.element_type.hex27,
         cupy.element_type.hex8sh,
     ]
-    create_element_types_hex(
-        cubit, element_type_list, name="test_element_types_hex", **kwargs
-    )
+    create_element_types_hex(cubit, element_type_list, name="test_element_types_hex")
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_tet(kwargs):
+def test_element_types_tet():
     """Create a curved solid with different tet element types."""
 
     # Initialize cubit.
@@ -466,9 +416,7 @@ def test_element_types_tet(kwargs):
         cupy.element_type.tet10,
     ]
 
-    create_element_types_tet(
-        cubit, element_type_list, name="test_element_types_tet", **kwargs
-    )
+    create_element_types_tet(cubit, element_type_list, name="test_element_types_tet")
 
 
 def create_quad_mesh(plane):
@@ -488,22 +436,19 @@ def create_quad_mesh(plane):
     return cubit
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_quad_z_plane(kwargs):
+def test_element_types_quad_z_plane():
     """Create the mesh on the z plane"""
-    compare(create_quad_mesh("zplane"), single_precision=True, **kwargs)
+    compare(create_quad_mesh("zplane"), single_precision=True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_element_types_quad_y_plane(kwargs):
+def test_element_types_quad_y_plane():
     """Create quad4 mesh, with non-zero z-values to check that they are correctly output.
     This is not the case if the automatic option from cubit while exporting the exo file
     is chosen."""
-    compare(create_quad_mesh("yplane"), single_precision=True, **kwargs)
+    compare(create_quad_mesh("yplane"), single_precision=True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_block_function(kwargs):
+def test_block_function():
     """Create a solid block with different element types."""
 
     # Initialize cubit.
@@ -539,11 +484,10 @@ def test_block_function(kwargs):
             count += 1
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=True, **kwargs)
+    compare(cubit, single_precision=True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_extrude_mesh_function(kwargs):
+def test_extrude_mesh_function():
     """Test the extrude mesh function."""
 
     # Initialize cubit.
@@ -586,11 +530,10 @@ def test_extrude_mesh_function(kwargs):
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=False, **kwargs)
+    compare(cubit, single_precision=False)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_extrude_mesh_function_average_normals_block(kwargs):
+def test_extrude_mesh_function_average_normals_block():
     """Test the average extrude mesh function for two blocks."""
 
     # Initialize cubit.
@@ -630,11 +573,10 @@ def test_extrude_mesh_function_average_normals_block(kwargs):
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=False, **kwargs)
+    compare(cubit, single_precision=False)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere(kwargs):
+def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
     """Test the average extrude mesh function for curved surfaces (Toy Aneurysm Case)."""
 
     # Initialize cubit.
@@ -684,11 +626,10 @@ def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere(kwargs):
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare(cubit, single_precision=False, **kwargs)
+    compare(cubit, single_precision=False)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_node_set_geometry_type(kwargs):
+def test_node_set_geometry_type():
     """Create the boundary conditions via the bc_type enum."""
 
     # First create the solid mesh.
@@ -763,11 +704,10 @@ def test_node_set_geometry_type(kwargs):
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0"""
 
     # Compare the input file created for 4C.
-    compare(cubit, **kwargs)
+    compare(cubit)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_contact_condition_beam_to_surface(kwargs):
+def test_contact_condition_beam_to_surface():
     cubit = CubitPy()
 
     # Create the mesh.
@@ -784,11 +724,10 @@ def test_contact_condition_beam_to_surface(kwargs):
     )
 
     # Compare the input file created for 4C.
-    compare(cubit, **kwargs)
+    compare(cubit)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_contact_condition_surface_to_surface(kwargs):
+def test_contact_condition_surface_to_surface():
     cubit = CubitPy()
 
     # Create the mesh.
@@ -811,11 +750,10 @@ def test_contact_condition_surface_to_surface(kwargs):
     )
 
     # Compare the input file created for 4C.
-    compare(cubit, **kwargs)
+    compare(cubit)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_fsi_functionality(kwargs):
+def test_fsi_functionality():
     """Test fsi and ale conditions and fluid mesh creation"""
 
     cubit = CubitPy()
@@ -853,11 +791,10 @@ def test_fsi_functionality(kwargs):
     )
 
     # Compare the input file created for 4C.
-    compare(cubit, **kwargs)
+    compare(cubit)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_point_coupling(kwargs):
+def test_point_coupling():
     """Create node-node and vertex-vertex coupling."""
 
     # First create two blocks.
@@ -909,29 +846,26 @@ def test_point_coupling(kwargs):
                 )
 
     # Compare the input file created for 4C.
-    compare(cubit, **kwargs)
+    compare(cubit)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_groups_block_with_volume(kwargs):
+def test_groups_block_with_volume():
     """
     Test the group functions where the block is created by adding the
     volume.
     """
-    xtest_groups(True, **kwargs)
+    xtest_groups(True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_groups_block_with_hex(kwargs):
+def test_groups_block_with_hex():
     """
     Test the group functions where the block is created by adding the hex
     elements directly.
     """
-    xtest_groups(False, **kwargs)
+    xtest_groups(False)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_group_of_surfaces(kwargs):
+def test_group_of_surfaces():
     """
     Test the proper creation of a group of surfaces and assign them an element type
     """
@@ -960,10 +894,10 @@ def test_group_of_surfaces(kwargs):
     )
 
     # Compare the input file created for 4C.
-    compare(cubit, name="test_group_of_surfaces", **kwargs)
+    compare(cubit, name="test_group_of_surfaces")
 
 
-def xtest_groups(block_with_volume, **kwargs):
+def xtest_groups(block_with_volume):
     """
     Test that groups are handled correctly when creating node sets and
     element blocks.
@@ -1079,7 +1013,7 @@ def xtest_groups(block_with_volume, **kwargs):
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0"""
 
     # Compare the input file created for 4C.
-    compare(cubit, name="test_groups", **kwargs)
+    compare(cubit, name="test_groups")
 
 
 def xtest_groups_multiple_sets_get_by(
@@ -1133,35 +1067,31 @@ def xtest_groups_multiple_sets_get_by(
             MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0"""
 
     # Compare the input file created for 4C.
-    compare(cubit, name="test_groups_multiple_sets", **kwargs)
+    compare(cubit, name="test_groups_multiple_sets")
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_groups_multiple_sets(kwargs):
+def test_groups_multiple_sets():
     """
     Test that multiple sets can be created from a single group object.
     """
-    xtest_groups_multiple_sets_get_by(**kwargs)
+    xtest_groups_multiple_sets_get_by()
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_groups_get_by_id(kwargs):
+def test_groups_get_by_id():
     """
     Test that groups can be obtained by id.
     """
-    xtest_groups_multiple_sets_get_by(group_get_by_id=True, **kwargs)
+    xtest_groups_multiple_sets_get_by(group_get_by_id=True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_groups_get_by_name(kwargs):
+def test_groups_get_by_name():
     """
     Test that groups can be obtained by name.
     """
-    xtest_groups_multiple_sets_get_by(group_get_by_name=True, **kwargs)
+    xtest_groups_multiple_sets_get_by(group_get_by_name=True)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_reset_block(kwargs):
+def test_reset_block():
     """
     Test that the block counter can be reset in cubit.
     """
@@ -1176,11 +1106,11 @@ def test_reset_block(kwargs):
     cubit.cmd("mesh volume 2")
 
     cubit.add_element_type(block_1.volumes()[0], cupy.element_type.hex8)
-    compare(cubit, name="test_reset_block_1", **kwargs)
+    compare(cubit, name="test_reset_block_1")
 
     cubit.reset_blocks()
     cubit.add_element_type(block_2.volumes()[0], cupy.element_type.hex8)
-    compare(cubit, name="test_reset_block_2", **kwargs)
+    compare(cubit, name="test_reset_block_2")
 
 
 def test_get_id_functions():
@@ -1232,8 +1162,7 @@ def test_get_node_id_function():
     assert node_ids == [15]
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_serialize_nested_lists(kwargs):
+def test_serialize_nested_lists():
     """
     Test that nested lists can be send to cubit correctly.
     """
@@ -1247,7 +1176,7 @@ def test_serialize_nested_lists(kwargs):
     )
     subtracted_block[0].volumes()[0].mesh()
     cubit.add_element_type(subtracted_block[0].volumes()[0], cupy.element_type.hex8)
-    compare(cubit, **kwargs)
+    compare(cubit)
 
 
 def test_serialize_geometry_types():
@@ -1273,8 +1202,7 @@ def test_serialize_geometry_types():
     assert 0.0 == pytest.approx(np.linalg.norm(boundig_box - boundig_box_ref), 1e-10)
 
 
-@pytest.mark.parametrize(*get_pre_processor_decorator(True, True))
-def test_mesh_import(kwargs):
+def test_mesh_import():
     """
     Test that the cubit class MeshImport works properly.
 
@@ -1294,7 +1222,7 @@ def test_mesh_import(kwargs):
     element_group = cubit.group(add_value="add HEX 1")
     cubit.add_element_type(element_group, cupy.element_type.hex8)
 
-    compare(cubit, **kwargs)
+    compare(cubit)
 
 
 def test_display_in_cubit():
