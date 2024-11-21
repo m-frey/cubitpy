@@ -27,23 +27,26 @@ A few things to keep in mind:
 
 CubitPy is developed with `python3.12`.
 Other versions of Python might lead to issues.
-It is recommended to use virtual environments with `python`.
-On Debian systems the following packages have to be installed
-```bash
-sudo apt-get install python3-venv python3-dev
-```
+It is recommended to use a python environment container such as `conda` or `venv`.
+- `conda`:
+  A [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) environment can be created and loaded with
+  ```bash
+  conda create -n cubitpy python=3.12
+  conda activate cubitpy
+  ```
+- `venv`: Chose an appropriate directory for this, e.g., `/home/user/opt`.
+  A virtual environment can be setup with
+  - On Debian systems the following packages have to be installed:
+    ```bash
+    sudo apt-get install python3-venv python3-dev
+    ```
+  - Create and load the environment
+    ```bash
+    cd <path-to-env-folder>
+    python -m venv cubitpy-env
+    source cubitpy-env/bin/activate
+    ```
 
-Now a virtual environment can be created (chose an appropriate directory for this, e.g., `/home/user/opt`)
-```bash
-python -m venv cubitpy-env
-```
-
-The created virtual environment can be loaded with
-```bash
-source cubitpy-env/bin/activate
-```
-
-From now on we assume that the virtual environment is loaded.
 To install `cubitpy` go to the repository root directory
 ```bash
 cd path_to_cubitpy
