@@ -102,7 +102,10 @@ class CubitOptions(object):
     def get_cubit_exe_path(cls, **kwargs):
         cubit_root = cls.get_cubit_root_path(**kwargs)
         if platform == "linux" or platform == "linux2":
-            return os.path.join(cubit_root, "cubit")
+            if cupy.is_coreform():
+                return os.path.join(cubit_root, "bin", "coreform_cubit")
+            else:
+                return os.path.join(cubit_root, "cubit")
         elif platform == "darwin":
             if cupy.is_coreform():
                 cubit_exe_name = cubit_root.split("/")[-1].split(".app")[0]
