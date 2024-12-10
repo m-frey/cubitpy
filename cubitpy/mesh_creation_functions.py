@@ -66,7 +66,7 @@ def create_brick(
     mesh_interval: [int, int, int]
         Number of elements in each direction. This option is mutually
         exclusive with mesh_factor.
-    mesh_interval: int
+    mesh_factor: int
         Meshing factor in cubit. 10 is the largest. This option is mutually
         exclusive with mesh_factor.
     mesh: bool
