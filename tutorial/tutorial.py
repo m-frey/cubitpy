@@ -29,14 +29,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This file contains a tutorial for CubitPy, following the Cubit Step-By-Step tutorial
-from the cubit documentation. Most basic functionality is covered by this tutorial.
-For more information have a closer look at the test cases, as they cover all relevant
-functionality.
+"""This file contains a tutorial for CubitPy, following the Cubit Step-By-Step
+tutorial from the cubit documentation.
+
+Most basic functionality is covered by this tutorial. For more
+information have a closer look at the test cases, as they cover all
+relevant functionality.
 """
 
 import numpy as np
+
 from cubitpy import CubitPy, cupy
 from cubitpy.cubit_utility import get_surface_center
 
@@ -44,8 +46,8 @@ from cubitpy.cubit_utility import get_surface_center
 def cubit_step_by_step_tutorial_cli(
     input_file_path, *, display=True, cubit=None, size=1.0
 ):
-    """This tutorial follows the Cubit step-by-step tutorial, which can be found
-    in the cubit documentation"""
+    """This tutorial follows the Cubit step-by-step tutorial, which can be
+    found in the cubit documentation."""
 
     # Geometry parameters
     brick_size = 10.0
@@ -243,7 +245,7 @@ def cubit_step_by_step_tutorial_cli(
     Inner Iteration                 = No
     Outer Iteration StatusTest      = No
     ---------------------------------------------------------------------MATERIALS
-     MAT 1 MAT_Struct_StVenantKirchhoff  YOUNG 1.0E1  NUE 0.3 DENS 0 
+     MAT 1 MAT_Struct_StVenantKirchhoff  YOUNG 1.0E1  NUE 0.3 DENS 0
     --------------------------------------------------------------------------FUNCT1
     SYMBOLIC_FUNCTION_OF_SPACE_TIME t
     """

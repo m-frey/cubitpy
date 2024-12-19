@@ -29,20 +29,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-Utility functions for the use of cubitpy.
-"""
-
+"""Utility functions for the use of cubitpy."""
 
 # Import cubitpy stuff.
 from . import cupy
 
 
 def get_surface_center(surf):
-    """
-    Get a 3D point that has the local coordinated on the surface of (0,0),
-    with the parameter space being ([-1,1],[-1,1]).
-    """
+    """Get a 3D point that has the local coordinated on the surface of (0,0),
+    with the parameter space being ([-1,1],[-1,1])."""
 
     if not surf.get_geometry_type() == cupy.geometry.surface:
         raise TypeError("Did not expect {}".format(type(surf)))
@@ -55,9 +50,8 @@ def get_surface_center(surf):
 
 
 def import_fluent_geometry(cubit, file, feature_angle=135):
-    """
-    import fluent mesh geometry in cubit from file with according feature_angle
-    """
+    """Import fluent mesh geometry in cubit from file with according
+    feature_angle."""
 
     cubit.cmd(
         'import fluent mesh geometry  "{}" feature_angle {} '.format(

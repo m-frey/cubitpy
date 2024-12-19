@@ -29,10 +29,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This module contains ENums for types used in cubitpy as well as functions to
-convert them to strings for cubit or 4C commands or the wrapper.
-"""
+"""This module contains ENums for types used in cubitpy as well as functions to
+convert them to strings for cubit or 4C commands or the wrapper."""
 
 # Python imports.
 from enum import Enum, auto
@@ -61,9 +59,8 @@ class GeometryType(Enum):
             raise ValueError("Got unexpected type {}!".format(self))
 
     def get_dat_bc_section_string(self):
-        """
-        Return the string that represents this item in a dat file section.
-        """
+        """Return the string that represents this item in a dat file
+        section."""
 
         if self == self.vertex:
             return "POINT"
@@ -104,10 +101,10 @@ class FiniteElementObject(Enum):
             return "node"
 
     def get_dat_bc_section_string(self):
-        """
-        Return the string that represents this item in a dat file section.
-        Currently this only makes sense for the node type, when explicitly
-        defining boundary conditions on nodes.
+        """Return the string that represents this item in a dat file section.
+
+        Currently this only makes sense for the node type, when
+        explicitly defining boundary conditions on nodes.
         """
         if self == self.node:
             return "POINT"
@@ -135,10 +132,8 @@ class ElementType(Enum):
     quad4 = auto()
 
     def get_cubit_names(self):
-        """
-        Get the strings that are needed to mesh and describe this element in
-        cubit.
-        """
+        """Get the strings that are needed to mesh and describe this element in
+        cubit."""
 
         # Get the element type parameters.
         if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid:
@@ -223,10 +218,8 @@ class ElementType(Enum):
             raise ValueError("Got wrong element type {}!".format(self))
 
     def get_default_four_c_description(self):
-        """
-        Get the default text for the description in 4C after the material
-        string.
-        """
+        """Get the default text for the description in 4C after the material
+        string."""
 
         # Get the element type parameters.
         if (
@@ -263,10 +256,8 @@ class BoundaryConditionType(Enum):
     ale_dirichlet = auto()
 
     def get_dat_bc_section_header(self, geometry_type):
-        """
-        Get the header string for the boundary condition input section in the
-        dat file.
-        """
+        """Get the header string for the boundary condition input section in
+        the dat file."""
 
         if self == self.dirichlet or self == self.neumann:
             if self == self.dirichlet:

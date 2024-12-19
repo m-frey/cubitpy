@@ -29,32 +29,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This script is used to test the tutorial.
-"""
+"""This script is used to test the tutorial."""
 
 # Import python modules.
-import unittest
 import os
 import sys
+import unittest
 
 # Import tutorial
 from cubitpy_tutorial import cubit_step_by_step_tutorial_cli
 
+# Import testing utilities.
+from testing import compare, testing_temp
+
 # Import Cubitpy
 from cubitpy import CubitPy
-
-# Import testing utilities.
-from testing import testing_temp, compare
 
 
 class TestTutorial(unittest.TestCase):
     """This class tests the tutorials in the repository."""
 
     def test_tutorial(self):
-        """
-        Test that the tutorial works.
-        """
+        """Test that the tutorial works."""
         cubit = CubitPy()
         tutorial_file = os.path.join(testing_temp, "tutorial.dat")
         cubit_step_by_step_tutorial_cli(

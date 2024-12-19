@@ -29,9 +29,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-Test if the last element is deleted correctly.
-"""
+"""Test if the last element is deleted correctly."""
 
 # Import cubit module.
 from cubitpy import CubitPy

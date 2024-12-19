@@ -29,8 +29,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This module contains extensions and utility functions for the cubit tutorial.
-"""
+"""This module contains extensions and utility functions for the cubit
+tutorial."""
 
 from .tutorial import cubit_step_by_step_tutorial_cli

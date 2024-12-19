@@ -32,11 +32,11 @@
 """This module creates object that are used to connect between the cubit python
 interpreter and the main python interpreter."""
 
-
 # Import python modules.
-import execnet
-import os
 import atexit
+import os
+
+import execnet
 import numpy as np
 
 # Import global options.
@@ -47,8 +47,10 @@ from .cubit_wrapper_utility import cubit_item_to_id, is_base_type
 
 
 class CubitConnect(object):
-    """This class holds a connection to a cubit python interpreter and initializes
-    cubit there. It is possible to send function calls to that interpreter and
+    """This class holds a connection to a cubit python interpreter and
+    initializes cubit there.
+
+    It is possible to send function calls to that interpreter and
     receive the output.
     """
 
@@ -59,8 +61,9 @@ class CubitConnect(object):
         cubit_lib=None,
         interpreter=None,
     ):
-        """Initialize the connection between the client (cubit) python interpreter and this one.
-        Also load the cubit module in the remote interpreter.
+        """Initialize the connection between the client (cubit) python
+        interpreter and this one. Also load the cubit module in the remote
+        interpreter.
 
         Args
         ----
@@ -256,8 +259,10 @@ class CubitConnect(object):
 
 
 class CubitObject(object):
-    """This class holds a link to a cubit object in the client. Methods that are
-    called on this class will 'really' be called in the client.
+    """This class holds a link to a cubit object in the client.
+
+    Methods that are called on this class will 'really' be called in the
+    client.
     """
 
     def __init__(self, cubit_connect, cubit_data_list):
@@ -281,12 +286,12 @@ class CubitObject(object):
         self.cubit_id = cubit_data_list
 
     def __getattribute__(self, name, *args, **kwargs):
-        """This function gets called for each attribute in this object.
-        First it is checked if the attribute exists in the host (basic stuff),
-        if not the attribute is called on the client.
+        """This function gets called for each attribute in this object. First
+        it is checked if the attribute exists in the host (basic stuff), if not
+        the attribute is called on the client.
 
-        For now if an attribute is sent to the client, it is assumed that it is a
-        method.
+        For now if an attribute is sent to the client, it is assumed
+        that it is a method.
         """
 
         # Check if the attribute exists in this interpreter
@@ -297,8 +302,7 @@ class CubitObject(object):
 
     def __del__(self):
         """When this object is deleted, the object in the client can also be
-        deleted.
-        """
+        deleted."""
         self.cubit_connect.send_and_return(["delete", self.cubit_id])
 
     def __str__(self):
@@ -320,8 +324,9 @@ class CubitObject(object):
         )
 
     def get_self_dir(self):
-        """Return a list of all cubit child items of this object. Also return a
-        flag if the child item is callable or not.
+        """Return a list of all cubit child items of this object.
+
+        Also return a flag if the child item is callable or not.
         """
         return self.cubit_connect.send_and_return(["get_self_dir", self.cubit_id])
 
@@ -351,8 +356,9 @@ class CubitObject(object):
     def get_node_ids(self):
         """Return a list with the node IDs (index 1) of this object.
 
-        This is done by creating a temporary node set that this geometry is
-        added to. It is not possible to get the node list directly from cubit.
+        This is done by creating a temporary node set that this geometry
+        is added to. It is not possible to get the node list directly
+        from cubit.
         """
 
         # Get a node set ID that is not yet taken

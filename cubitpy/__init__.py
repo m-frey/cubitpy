@@ -29,10 +29,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This module contains extensions and utility functions for the cubit python
-interface.
-"""
+"""This module contains extensions and utility functions for the cubit python
+interface."""
 
 # Global options for cubitpy.
 from .conf import cupy

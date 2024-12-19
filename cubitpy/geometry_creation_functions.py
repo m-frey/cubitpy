@@ -29,17 +29,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-Implements functions that create geometries in cubit.
-"""
+"""Implements functions that create geometries in cubit."""
 
 # Import cubitpy stuff.
 from . import cupy
 
 
 def create_spline_interpolation_curve(cubit, vertices, *, delete_points=True):
-    """
-    Interpolate multiple vertices with a Cubit internal spline.
+    """Interpolate multiple vertices with a Cubit internal spline.
 
     Args
     ----
@@ -71,8 +68,7 @@ def create_parametric_curve(
     function_args=[],
     function_kwargs={},
 ):
-    """
-    Create a parametric curve in space.
+    """Create a parametric curve in space.
 
     Args
     ----
@@ -114,8 +110,7 @@ def create_parametric_surface(
     function_args=[],
     function_kwargs={},
 ):
-    """
-    Create a parametric surface in space.
+    """Create a parametric surface in space.
 
     Args
     ----
@@ -156,10 +151,8 @@ def create_parametric_surface(
         for point in parameter_points:
 
             def f_temp(t):
-                """
-                Temporary function that is evaluated at a constant value of one
-                of the two parameter coordinates.
-                """
+                """Temporary function that is evaluated at a constant value of
+                one of the two parameter coordinates."""
                 if dim == 0:
                     return f(t, point, *function_args, **function_kwargs)
                 else:
@@ -192,7 +185,7 @@ def create_parametric_surface(
 
 
 def create_surface_by_vertices(cubit, vertices):
-    """Create a surface by the bounding vertices
+    """Create a surface by the bounding vertices.
 
     Args
     ----
@@ -209,7 +202,7 @@ def create_surface_by_vertices(cubit, vertices):
 
 
 def create_brick_by_corner_points(cubit, corner_points):
-    """Create a brick by its corner points
+    """Create a brick by its corner points.
 
     Args
     ----
