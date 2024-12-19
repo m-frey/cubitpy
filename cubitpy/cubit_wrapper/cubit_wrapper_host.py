@@ -140,9 +140,10 @@ class CubitConnect(object):
         cubit_id = self.send_and_return(["init", arguments])
         self.cubit = CubitObjectMain(self, cubit_id)
 
-        # We need to register a function called at interpreter shutdown that ensures that the
-        # execnet connection is closed first. Otherwise we get a runtime error during shutdown.
         def cleanup_execnet_gateway():
+            """We need to register a function called at interpreter shutdown
+            that ensures that the execnet connection is closed first,
+            otherwise, we get a runtime error during shutdown."""
             self.cubit.cubit_connect.gw.exit()
 
         atexit.register(cleanup_execnet_gateway)
@@ -387,4 +388,6 @@ class CubitObjectMain(CubitObject):
     """The main cubit object will be of this type, it can not delete itself."""
 
     def __del__(self):
+        """Overwrite the default, because we don't want to delete any objects
+        on the client if this main object is deleted."""
         pass

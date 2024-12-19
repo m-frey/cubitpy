@@ -695,6 +695,7 @@ def test_node_set_geometry_type():
 
 
 def test_contact_condition_beam_to_surface():
+    """Test the beam-to-surface contact condition BC."""
     cubit = CubitPy()
 
     # Create the mesh.
@@ -715,6 +716,7 @@ def test_contact_condition_beam_to_surface():
 
 
 def test_contact_condition_surface_to_surface():
+    """Test the surface-to-surface contact condition BC."""
     cubit = CubitPy()
 
     # Create the mesh.
@@ -1275,6 +1277,7 @@ def test_create_parametric_surface():
     cubit = CubitPy()
 
     def f(u, v, arg, kwarg=-1.0):
+        """Parametric function to create the curve."""
         return [u, v, arg * np.sin(u) + kwarg * np.cos(v)]
 
     surface = create_parametric_surface(

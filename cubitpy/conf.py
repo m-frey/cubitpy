@@ -94,10 +94,12 @@ class CubitOptions(object):
 
     @staticmethod
     def get_cubit_root_path(**kwargs):
+        """Get Path to cubit root directory."""
         return get_path("CUBIT_ROOT", os.path.isdir, **kwargs)
 
     @classmethod
     def get_cubit_exe_path(cls, **kwargs):
+        """Get Path to cubit executable."""
         cubit_root = cls.get_cubit_root_path(**kwargs)
         if platform == "linux" or platform == "linux2":
             if cupy.is_coreform():
@@ -115,6 +117,7 @@ class CubitOptions(object):
 
     @classmethod
     def get_cubit_lib_path(cls, **kwargs):
+        """Get Path to cubit lib directory."""
         cubit_root = cls.get_cubit_root_path(**kwargs)
         if platform == "linux" or platform == "linux2":
             return os.path.join(cubit_root, "bin")

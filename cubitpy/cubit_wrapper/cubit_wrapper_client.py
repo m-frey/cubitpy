@@ -1,3 +1,4 @@
+# type: ignore
 # -----------------------------------------------------------------------------
 # CubitPy: Utility functions and 4C related functionality for the Cubit and
 #     Coreform python interface
