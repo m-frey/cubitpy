@@ -158,7 +158,7 @@ def extrude_mesh_normal_to_surface(
     feature_angle: float
         Feature angle of the created volume.
     average_normals: bool
-        Averages the different normals of the same coordinate evaluted at multiple surfaces.
+        Averages the different normals of the same coordinate evaluated at multiple surfaces.
         May lead to unexpected results.
     tol_coord: double
         Tolerance for the norm of the difference between node coordinates with the same ID

@@ -896,7 +896,7 @@ def test_group_of_surfaces():
     # create mesh
     cubit.cmd("mesh surface all")
 
-    # create group and assing element type
+    # create group and assign element type
     surfaces = cubit.group(add_value="add surface 2 3")
 
     cubit.add_element_type(
@@ -1187,17 +1187,17 @@ def test_serialize_geometry_types():
     cubit.cmd("create vertex -1 -1 -1")
     cubit.cmd("create vertex 1 2 3")
     geo_id = cubit.get_last_id(cupy.geometry.vertex)
-    boundig_box = cubit.get_bounding_box(cupy.geometry.vertex, geo_id)
-    boundig_box_ref = np.array([1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 3.0, 3.0, 0.0, 0.0])
-    assert 0.0 == pytest.approx(np.linalg.norm(boundig_box - boundig_box_ref), 1e-10)
+    bounding_box = cubit.get_bounding_box(cupy.geometry.vertex, geo_id)
+    bounding_box_ref = np.array([1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 3.0, 3.0, 0.0, 0.0])
+    assert 0.0 == pytest.approx(np.linalg.norm(bounding_box - bounding_box_ref), 1e-10)
 
     cubit.cmd("create curve vertex 1 2")
     geo_id = cubit.get_last_id(cupy.geometry.curve)
-    boundig_box = cubit.get_bounding_box(cupy.geometry.curve, geo_id)
-    boundig_box_ref = np.array(
+    bounding_box = cubit.get_bounding_box(cupy.geometry.curve, geo_id)
+    bounding_box_ref = np.array(
         [-1.0, 1.0, 2.0, -1.0, 2.0, 3.0, -1.0, 3.0, 4.0, 5.385164807134504]
     )
-    assert 0.0 == pytest.approx(np.linalg.norm(boundig_box - boundig_box_ref), 1e-10)
+    assert 0.0 == pytest.approx(np.linalg.norm(bounding_box - bounding_box_ref), 1e-10)
 
 
 def test_mesh_import():
@@ -1397,12 +1397,12 @@ def test_create_brick_by_corner_points():
 
 
 def setup_and_check_import_fluent_geometry(
-    fluent_geometry, feature_angle, reference_entitys_number
+    fluent_geometry, feature_angle, reference_entities_number
 ):
     """
     Test if cubit can import a geometry and:
         1) proceed without error
-        2) has created the same number of the reference entitys [volumes, surfaces, blocks]
+        2) has created the same number of the reference entities [volumes, surfaces, blocks]
     """
 
     # Setup
@@ -1412,10 +1412,10 @@ def setup_and_check_import_fluent_geometry(
     # check if importation was successful
     assert False == cubit.was_last_cmd_undoable()
 
-    # check number of entitys
-    assert cubit.get_volume_count() == reference_entitys_number[0]
-    assert len(cubit.get_entities("surface")) == reference_entitys_number[1]
-    assert cubit.get_block_count() == reference_entitys_number[2]
+    # check number of entities
+    assert cubit.get_volume_count() == reference_entities_number[0]
+    assert len(cubit.get_entities("surface")) == reference_entities_number[1]
+    assert cubit.get_block_count() == reference_entities_number[2]
 
 
 def test_import_fluent_geometry():

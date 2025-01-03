@@ -138,9 +138,9 @@ while 1:
     #       callable, it is executed with the given arguments.
     #       [[cubit_object], 'name', ['arguments']]
     # 'iscallable': Check if a name is callable or not
-    # 'isinstance': Check if the cubit object is of a cerain instance
+    # 'isinstance': Check if the cubit object is of a certain instance
     # 'get_self_dir': Return the attributes in a cubit_object
-    # 'delete': Delete the cubit pbject from the dictionary
+    # 'delete': Delete the cubit object from the dictionary
 
     if cubit_item_to_id(receive[0]) is not None:
         # The first item is an id for a cubit object. Return an attribute of
