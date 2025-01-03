@@ -88,7 +88,7 @@ def license_to_source(license_text, source_type):
     header = []
     start_line = "-" * 77
     if source_type == "py":
-        header = ["# -*- coding: utf-8 -*-"]
+        header = ["# -*- coding: utf-8 -*-", "# type: ignore"]
         comment = "#"
     else:
         raise ValueError("Wrong extension!")
@@ -113,20 +113,30 @@ def check_license():
     skip_list = []
     wrong_headers = []
 
-    for key in source_files:
-        source, header = license_to_source(license_text, key)
+    for extension, files in source_files.items():
+        source, header = license_to_source(license_text, extension)
         license = "\n".join(source)
-        license_plus_header = "\n".join(header + source)
-        for file in source_files[key]:
+        for file in files:
             for skip in skip_list:
                 if file.endswith(skip):
                     break
             else:
                 with open(file) as source_file:
                     source_text = source_file.read()
-                    if not source_text.startswith(
-                        license_plus_header
-                    ) and not source_text.startswith(license):
+                    source_text_lines = source_text.strip().split("\n")
+                    # Skip lines as long as they are header lines
+                    start_line = -1
+                    for i, line in enumerate(source_text_lines):
+                        if line.strip() in header:
+                            pass
+                        else:
+                            start_line = i
+                            break
+                    if start_line == -1:
+                        raise ValueError("The source file consists of only headers")
+                    if not "\n".join(source_text_lines[start_line:]).startswith(
+                        license
+                    ):
                         wrong_headers.append(file)
 
     return wrong_headers
