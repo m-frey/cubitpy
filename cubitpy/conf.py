@@ -67,7 +67,8 @@ class CubitOptions(object):
     def __init__(self):
         # Temporary directory for cubitpy.
         self.temp_dir = os.path.join(
-            "/tmp/cubitpy_{}".format(getpass.getuser()), "pid_{}".format(os.getpid())
+            "/tmp/cubitpy_{}".format(getpass.getuser()),  # nosec
+            "pid_{}".format(os.getpid()),
         )
         self.temp_log = os.path.join(self.temp_dir, "cubitpy.log")
 

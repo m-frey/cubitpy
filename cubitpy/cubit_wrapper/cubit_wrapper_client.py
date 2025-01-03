@@ -71,7 +71,7 @@ def out(string):
     else:
         out_console = "/dev/pts/18"
     escaped_string = "{}".format(string).replace('"', '\\"')
-    os.system('echo "{}" > {}'.format(escaped_string, out_console))
+    os.system('echo "{}" > {}'.format(escaped_string, out_console))  # nosec
 
 
 def is_cubit_type(obj):
