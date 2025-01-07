@@ -31,18 +31,13 @@
 # -----------------------------------------------------------------------------
 """This script is used to test the tutorial."""
 
-# Import python modules.
 import os
 import sys
 import unittest
 
-# Import tutorial
 from cubitpy_tutorial import cubit_step_by_step_tutorial_cli
-
-# Import testing utilities.
 from testing import compare, testing_temp
 
-# Import Cubitpy
 from cubitpy import CubitPy
 
 

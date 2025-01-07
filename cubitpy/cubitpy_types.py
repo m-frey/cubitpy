@@ -32,7 +32,6 @@
 """This module contains ENums for types used in cubitpy as well as functions to
 convert them to strings for cubit or 4C commands or the wrapper."""
 
-# Python imports.
 from enum import Enum, auto
 
 

@@ -31,7 +31,6 @@
 # -----------------------------------------------------------------------------
 """Test if the last element is deleted correctly."""
 
-# Import cubit module.
 from cubitpy import CubitPy
 
 # Initialize cubit

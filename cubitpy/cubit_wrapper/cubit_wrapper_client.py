@@ -42,7 +42,6 @@ interpreter only knows the id of this object and can pass it to this
 script to call a function on it or use it as an argument.
 """
 
-# Python modules
 import os
 import sys
 

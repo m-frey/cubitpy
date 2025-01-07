@@ -31,7 +31,6 @@
 # -----------------------------------------------------------------------------
 """Implements functions that create geometries in cubit."""
 
-# Import cubitpy stuff.
 from . import cupy
 
 

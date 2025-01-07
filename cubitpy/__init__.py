@@ -32,10 +32,7 @@
 """This module contains extensions and utility functions for the cubit python
 interface."""
 
-# Global options for cubitpy.
 from .conf import cupy
-
-# Global object.
 from .cubitpy import CubitPy
 
 # Define the items that will be exported by default.

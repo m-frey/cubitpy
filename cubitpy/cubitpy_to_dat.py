@@ -32,13 +32,11 @@
 """Implements a function that converts a cubit session to a dat file that can
 be used with 4C."""
 
-# Python modules.
 import os
 
 import netCDF4
 import numpy as np
 
-# Cubitpy modules.
 from .conf import cupy
 
 

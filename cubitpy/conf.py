@@ -32,13 +32,11 @@
 """This module defines a global object that manages all kind of stuff regarding
 cubitpy."""
 
-# Python imports.
 import getpass
 import glob
 import os
 from sys import platform
 
-# Cubitpy imports.
 from .cubitpy_types import (
     BoundaryConditionType,
     CubitItems,

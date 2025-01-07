@@ -31,7 +31,6 @@
 # -----------------------------------------------------------------------------
 """Utility functions for the use of cubitpy."""
 
-# Import cubitpy stuff.
 from . import cupy
 
 

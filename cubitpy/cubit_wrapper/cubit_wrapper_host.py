@@ -32,17 +32,13 @@
 """This module creates object that are used to connect between the cubit python
 interpreter and the main python interpreter."""
 
-# Import python modules.
 import atexit
 import os
 
 import execnet
 import numpy as np
 
-# Import global options.
 from ..conf import cupy
-
-# Import utility functions for cubitpy.
 from .cubit_wrapper_utility import cubit_item_to_id, is_base_type
 
 

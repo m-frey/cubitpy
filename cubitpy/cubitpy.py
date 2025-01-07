@@ -31,7 +31,6 @@
 # -----------------------------------------------------------------------------
 """Implements a class that helps create meshes with cubit."""
 
-# Python modules.
 import os
 import shutil
 import subprocess
@@ -39,7 +38,6 @@ import sys
 import time
 import warnings
 
-# Cubitpy modules.
 from .conf import cupy
 from .cubit_group import CubitGroup
 from .cubit_wrapper.cubit_wrapper_host import CubitConnect

@@ -31,10 +31,8 @@
 # -----------------------------------------------------------------------------
 """Implements functions that create basic meshes in cubit."""
 
-# Python imports.
 import numpy as np
 
-# Import cubitpy stuff.
 from . import cupy
 
 

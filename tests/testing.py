@@ -31,15 +31,12 @@
 # -----------------------------------------------------------------------------
 """This script is used to test the functionality of the cubitpy module."""
 
-# Python imports.
 import os
 import subprocess
 
 import numpy as np
 import pytest
 from meshpy.rotation import Rotation, rotate_coordinates
-
-# MeshPy imports
 from meshpy_testing.utils import compare_string_tolerance
 
 # Define the testing paths.
