@@ -29,19 +29,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This script is used to test the functionality of the cubitpy module.
-"""
+"""This script is used to test the functionality of the cubitpy module."""
 
-# Python imports.
 import os
 import subprocess
+
 import numpy as np
 import pytest
-
-# MeshPy imports
-from meshpy_testing.utils import compare_string_tolerance
 from meshpy.rotation import Rotation, rotate_coordinates
+from meshpy_testing.utils import compare_string_tolerance
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -51,14 +47,13 @@ testing_external_geometry = os.path.join(testing_path, "external-geometry")
 
 # CubitPy imports.
 from cubitpy import CubitPy, cupy
-from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
-from cubitpy.geometry_creation_functions import (
-    create_spline_interpolation_curve,
-    create_parametric_surface,
-    create_brick_by_corner_points,
-)
 from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
-
+from cubitpy.geometry_creation_functions import (
+    create_brick_by_corner_points,
+    create_parametric_surface,
+    create_spline_interpolation_curve,
+)
+from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
 
 # Global variable if this test is run by GitLab.
 if "TESTING_GITHUB" in os.environ.keys() and os.environ["TESTING_GITHUB"] == "1":
@@ -102,7 +97,7 @@ def compare(cubit, *, name=None, rtol=1.0e-8, atol=1.0e-8):
     cubit.create_dat(dat_file)
 
     def get_string(path):
-        """Get the file contents as string"""
+        """Get the file contents as string."""
         with open(path, "r") as text_file:
             string = text_file.read()
         return string.strip()
@@ -213,9 +208,7 @@ def create_block(cubit, np_arrays=False):
 
 
 def test_create_block():
-    """
-    Test the creation of a cubit block.
-    """
+    """Test the creation of a cubit block."""
 
     # Initialize cubit.
     cubit = CubitPy()
@@ -223,9 +216,7 @@ def test_create_block():
 
 
 def test_create_block_numpy_arrays():
-    """
-    Test the creation of a cubit block.
-    """
+    """Test the creation of a cubit block."""
 
     # Initialize cubit.
     cubit = CubitPy()
@@ -233,10 +224,8 @@ def test_create_block_numpy_arrays():
 
 
 def test_create_block_multiple():
-    """
-    Test the creation of a cubit block multiple time to check that cubit
-    can be reset.
-    """
+    """Test the creation of a cubit block multiple time to check that cubit can
+    be reset."""
 
     # Initialize cubit.
     cubit = CubitPy()
@@ -411,7 +400,7 @@ def test_element_types_tet():
 
 
 def create_quad_mesh(plane):
-    """Create a quad mesh on the given plane"""
+    """Create a quad mesh on the given plane."""
 
     cubit = CubitPy()
     cubit.cmd(f"create surface rectangle width 1 height 2 {plane}")
@@ -428,14 +417,17 @@ def create_quad_mesh(plane):
 
 
 def test_element_types_quad_z_plane():
-    """Create the mesh on the z plane"""
+    """Create the mesh on the z plane."""
     compare(create_quad_mesh("zplane"))
 
 
 def test_element_types_quad_y_plane():
-    """Create quad4 mesh, with non-zero z-values to check that they are correctly output.
-    This is not the case if the automatic option from cubit while exporting the exo file
-    is chosen."""
+    """Create quad4 mesh, with non-zero z-values to check that they are
+    correctly output.
+
+    This is not the case if the automatic option from cubit while
+    exporting the exo file is chosen.
+    """
     compare(create_quad_mesh("yplane"))
 
 
@@ -568,7 +560,8 @@ def test_extrude_mesh_function_average_normals_block():
 
 
 def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
-    """Test the average extrude mesh function for curved surfaces (Toy Aneurysm Case)."""
+    """Test the average extrude mesh function for curved surfaces (Toy Aneurysm
+    Case)."""
 
     # Initialize cubit.
     cubit = CubitPy()
@@ -699,6 +692,7 @@ def test_node_set_geometry_type():
 
 
 def test_contact_condition_beam_to_surface():
+    """Test the beam-to-surface contact condition BC."""
     cubit = CubitPy()
 
     # Create the mesh.
@@ -719,6 +713,7 @@ def test_contact_condition_beam_to_surface():
 
 
 def test_contact_condition_surface_to_surface():
+    """Test the surface-to-surface contact condition BC."""
     cubit = CubitPy()
 
     # Create the mesh.
@@ -745,7 +740,7 @@ def test_contact_condition_surface_to_surface():
 
 
 def test_fluid_functionality():
-    """Test fluid conditions and fluid mesh creation"""
+    """Test fluid conditions and fluid mesh creation."""
 
     cubit = CubitPy()
     fluid = create_brick(
@@ -777,7 +772,7 @@ def test_fluid_functionality():
 
 
 def test_fsi_functionality():
-    """Test fsi and ale conditions and fluid mesh creation"""
+    """Test fsi and ale conditions and fluid mesh creation."""
 
     cubit = CubitPy()
 
@@ -873,25 +868,20 @@ def test_point_coupling():
 
 
 def test_groups_block_with_volume():
-    """
-    Test the group functions where the block is created by adding the
-    volume.
-    """
+    """Test the group functions where the block is created by adding the
+    volume."""
     xtest_groups(True)
 
 
 def test_groups_block_with_hex():
-    """
-    Test the group functions where the block is created by adding the hex
-    elements directly.
-    """
+    """Test the group functions where the block is created by adding the hex
+    elements directly."""
     xtest_groups(False)
 
 
 def test_group_of_surfaces():
-    """
-    Test the proper creation of a group of surfaces and assign them an element type
-    """
+    """Test the proper creation of a group of surfaces and assign them an
+    element type."""
     cubit = CubitPy()
 
     # create a rectangle and imprint it
@@ -905,7 +895,7 @@ def test_group_of_surfaces():
     # create mesh
     cubit.cmd("mesh surface all")
 
-    # create group and assing element type
+    # create group and assign element type
     surfaces = cubit.group(add_value="add surface 2 3")
 
     cubit.add_element_type(
@@ -921,8 +911,7 @@ def test_group_of_surfaces():
 
 
 def xtest_groups(block_with_volume):
-    """
-    Test that groups are handled correctly when creating node sets and
+    """Test that groups are handled correctly when creating node sets and
     element blocks.
 
     Args
@@ -1042,8 +1031,8 @@ def xtest_groups(block_with_volume):
 def xtest_groups_multiple_sets_get_by(
     group_get_by_name=False, group_get_by_id=False, **kwargs
 ):
-    """
-    Test that multiple sets can be created from a single group object.
+    """Test that multiple sets can be created from a single group object.
+
     Also test that a group can be obtained by name and id.
     """
 
@@ -1094,30 +1083,22 @@ def xtest_groups_multiple_sets_get_by(
 
 
 def test_groups_multiple_sets():
-    """
-    Test that multiple sets can be created from a single group object.
-    """
+    """Test that multiple sets can be created from a single group object."""
     xtest_groups_multiple_sets_get_by()
 
 
 def test_groups_get_by_id():
-    """
-    Test that groups can be obtained by id.
-    """
+    """Test that groups can be obtained by id."""
     xtest_groups_multiple_sets_get_by(group_get_by_id=True)
 
 
 def test_groups_get_by_name():
-    """
-    Test that groups can be obtained by name.
-    """
+    """Test that groups can be obtained by name."""
     xtest_groups_multiple_sets_get_by(group_get_by_name=True)
 
 
 def test_reset_block():
-    """
-    Test that the block counter can be reset in cubit.
-    """
+    """Test that the block counter can be reset in cubit."""
 
     # Create a solid brick.
     cubit = CubitPy()
@@ -1137,9 +1118,7 @@ def test_reset_block():
 
 
 def test_get_id_functions():
-    """
-    Test if the get_ids and get_items methods work as expected.
-    """
+    """Test if the get_ids and get_items methods work as expected."""
 
     cubit = CubitPy()
 
@@ -1159,9 +1138,8 @@ def test_get_id_functions():
 
 
 def test_get_node_id_function():
-    """
-    Test if the get_node_ids methods in the cubit objects work as expected.
-    """
+    """Test if the get_node_ids methods in the cubit objects work as
+    expected."""
 
     # Create brick.
     cubit = CubitPy()
@@ -1186,9 +1164,7 @@ def test_get_node_id_function():
 
 
 def test_serialize_nested_lists():
-    """
-    Test that nested lists can be send to cubit correctly.
-    """
+    """Test that nested lists can be send to cubit correctly."""
 
     cubit = CubitPy()
     block_1 = cubit.brick(1, 1, 0.25)
@@ -1203,31 +1179,28 @@ def test_serialize_nested_lists():
 
 
 def test_serialize_geometry_types():
-    """
-    Test that geometry types can be send to cubit correctly.
-    """
+    """Test that geometry types can be send to cubit correctly."""
 
     cubit = CubitPy()
 
     cubit.cmd("create vertex -1 -1 -1")
     cubit.cmd("create vertex 1 2 3")
     geo_id = cubit.get_last_id(cupy.geometry.vertex)
-    boundig_box = cubit.get_bounding_box(cupy.geometry.vertex, geo_id)
-    boundig_box_ref = np.array([1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 3.0, 3.0, 0.0, 0.0])
-    assert 0.0 == pytest.approx(np.linalg.norm(boundig_box - boundig_box_ref), 1e-10)
+    bounding_box = cubit.get_bounding_box(cupy.geometry.vertex, geo_id)
+    bounding_box_ref = np.array([1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 3.0, 3.0, 0.0, 0.0])
+    assert 0.0 == pytest.approx(np.linalg.norm(bounding_box - bounding_box_ref), 1e-10)
 
     cubit.cmd("create curve vertex 1 2")
     geo_id = cubit.get_last_id(cupy.geometry.curve)
-    boundig_box = cubit.get_bounding_box(cupy.geometry.curve, geo_id)
-    boundig_box_ref = np.array(
+    bounding_box = cubit.get_bounding_box(cupy.geometry.curve, geo_id)
+    bounding_box_ref = np.array(
         [-1.0, 1.0, 2.0, -1.0, 2.0, 3.0, -1.0, 3.0, 4.0, 5.385164807134504]
     )
-    assert 0.0 == pytest.approx(np.linalg.norm(boundig_box - boundig_box_ref), 1e-10)
+    assert 0.0 == pytest.approx(np.linalg.norm(bounding_box - bounding_box_ref), 1e-10)
 
 
 def test_mesh_import():
-    """
-    Test that the cubit class MeshImport works properly.
+    """Test that the cubit class MeshImport works properly.
 
     Code mainly taken from:
     https://cubit.sandia.gov/public/13.2/help_manual/WebHelp/appendix/python/class_mesh_import.htm
@@ -1249,9 +1222,10 @@ def test_mesh_import():
 
 
 def test_display_in_cubit():
-    """
-    Call the display_in_cubit function without actually opening the graphic
-    version of cubit. Compare that the created journal file is correct.
+    """Call the display_in_cubit function without actually opening the graphic
+    version of cubit.
+
+    Compare that the created journal file is correct.
     """
 
     # Create brick.
@@ -1295,13 +1269,12 @@ def test_display_in_cubit():
 
 
 def test_create_parametric_surface():
-    """
-    Test the create_parametric_surface function.
-    """
+    """Test the create_parametric_surface function."""
 
     cubit = CubitPy()
 
     def f(u, v, arg, kwarg=-1.0):
+        """Parametric function to create the curve."""
         return [u, v, arg * np.sin(u) + kwarg * np.cos(v)]
 
     surface = create_parametric_surface(
@@ -1352,9 +1325,7 @@ def test_create_parametric_surface():
 
 
 def test_spline_interpolation_curve():
-    """
-    Test the create_spline_interpolation_curve function.
-    """
+    """Test the create_spline_interpolation_curve function."""
 
     cubit = CubitPy()
 
@@ -1376,7 +1347,7 @@ def test_spline_interpolation_curve():
     # fmt: off
     coordinates_ref = np.array([
         [0.0, 1.0, 0.0],
-        [6.283185307179586, 1.0, -2.4492935982947064e-16], 
+        [6.283185307179586, 1.0, -2.4492935982947064e-16],
         [0.6219064247387815, 0.7622034923056742, 0.5808964193893371],
         [1.2706376409420117, 0.30926608007524203, 0.9532391827102926],
         [1.8922964421051867, -0.3108980458371118, 0.946952808381383],
@@ -1398,8 +1369,7 @@ def test_spline_interpolation_curve():
 
 def test_create_brick_by_corner_points():
     """Test the create_brick_by_corner_points and create_surface_by_vertices
-    functions
-    """
+    functions."""
 
     # Set up Cubit.
     cubit = CubitPy()
@@ -1427,12 +1397,12 @@ def test_create_brick_by_corner_points():
 
 
 def setup_and_check_import_fluent_geometry(
-    fluent_geometry, feature_angle, reference_entitys_number
+    fluent_geometry, feature_angle, reference_entities_number
 ):
     """
     Test if cubit can import a geometry and:
         1) proceed without error
-        2) has created the same number of the reference entitys [volumes, surfaces, blocks]
+        2) has created the same number of the reference entities [volumes, surfaces, blocks]
     """
 
     # Setup
@@ -1442,16 +1412,14 @@ def setup_and_check_import_fluent_geometry(
     # check if importation was successful
     assert False == cubit.was_last_cmd_undoable()
 
-    # check number of entitys
-    assert cubit.get_volume_count() == reference_entitys_number[0]
-    assert len(cubit.get_entities("surface")) == reference_entitys_number[1]
-    assert cubit.get_block_count() == reference_entitys_number[2]
+    # check number of entities
+    assert cubit.get_volume_count() == reference_entities_number[0]
+    assert len(cubit.get_entities("surface")) == reference_entities_number[1]
+    assert cubit.get_block_count() == reference_entities_number[2]
 
 
 def test_import_fluent_geometry():
-    """
-    Test if an aneurysm geometry can be imported from a fluent mesh.
-    """
+    """Test if an aneurysm geometry can be imported from a fluent mesh."""
 
     fluent_geometry = os.path.join(testing_external_geometry, "fluent_aneurysm.msh")
 
@@ -1463,9 +1431,7 @@ def test_import_fluent_geometry():
 
 
 def test_extrude_artery_of_aneurysm():
-    """
-    Extrude an arterial surface based on an aneurysm test case.
-    """
+    """Extrude an arterial surface based on an aneurysm test case."""
 
     # Set up Cubit.
     cubit = CubitPy()

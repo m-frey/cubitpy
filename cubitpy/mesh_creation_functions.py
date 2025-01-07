@@ -29,14 +29,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-Implements functions that create basic meshes in cubit.
-"""
+"""Implements functions that create basic meshes in cubit."""
 
-# Python imports.
 import numpy as np
 
-# Import cubitpy stuff.
 from . import cupy
 
 
@@ -52,8 +48,7 @@ def create_brick(
     mesh=True,
     **kwargs,
 ):
-    """
-    Create a cube in cubit.
+    """Create a cube in cubit.
 
     Args
     ----
@@ -141,8 +136,7 @@ def extrude_mesh_normal_to_surface(
     tol_coord=1e-10,
     tol_normal=1e-10,
 ):
-    """
-    Extrude multiple meshed surfaces in normal direction of the surfaces.
+    """Extrude multiple meshed surfaces in normal direction of the surfaces.
 
     Args
     ----
@@ -162,7 +156,7 @@ def extrude_mesh_normal_to_surface(
     feature_angle: float
         Feature angle of the created volume.
     average_normals: bool
-        Averages the different normals of the same coordinate evaluted at multiple surfaces.
+        Averages the different normals of the same coordinate evaluated at multiple surfaces.
         May lead to unexpected results.
     tol_coord: double
         Tolerance for the norm of the difference between node coordinates with the same ID
@@ -213,10 +207,8 @@ def extrude_mesh_normal_to_surface(
 
                 # Check if coordinates match.
                 if np.linalg.norm(my_coordinates - other_coordinates) < tol_coord:
-
                     # Check if normals do not match.
                     if (np.linalg.norm(my_normal - other_normal)) > tol_normal:
-
                         # Add normal for average calculation
                         if average_normals:
                             node_id_pos_normal_map[node_id][1] += my_normal

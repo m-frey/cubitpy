@@ -1,3 +1,4 @@
+# type: ignore
 # -----------------------------------------------------------------------------
 # CubitPy: Utility functions and 4C related functionality for the Cubit and
 #     Coreform python interface
@@ -28,19 +29,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""This script gets called with the cubit python interpreter and loads the cubit
-module. With the package execnet in the host python interpreter a connection is
-established between the two different python interpreters and data and commands
-can be exchanged. The exchange happens in a serial matter, items are sent to this
-script, and results are sent back, until None is sent. If cubit creates a cubit
-object it is saved in a dictionary in this script, with the key being the id of
-the object. The host interpreter only knows the id of this object and can pass it 
-to this script to call a function on it or use it as an argument."""
+"""This script gets called with the cubit python interpreter and loads the
+cubit module.
 
-# Python modules
-import sys
+With the package execnet in the host python interpreter a connection is
+established between the two different python interpreters and data and
+commands can be exchanged. The exchange happens in a serial matter,
+items are sent to this script, and results are sent back, until None is
+sent. If cubit creates a cubit object it is saved in a dictionary in
+this script, with the key being the id of the object. The host
+interpreter only knows the id of this object and can pass it to this
+script to call a function on it or use it as an argument.
+"""
+
 import os
-
+import sys
 
 # Cubit constants
 cubit_vertex = "cubitpy_vertex"
@@ -54,8 +57,10 @@ parameters = {}
 
 
 def out(string):
-    """The print version does over different interpreters, so this function prints
-    strings to an active console. Insert the path of your console to get the
+    """The print version does over different interpreters, so this function
+    prints strings to an active console.
+
+    Insert the path of your console to get the
     right output.
     To get the current path of your console type: tty
     """
@@ -65,7 +70,7 @@ def out(string):
     else:
         out_console = "/dev/pts/18"
     escaped_string = "{}".format(string).replace('"', '\\"')
-    os.system('echo "{}" > {}'.format(escaped_string, out_console))
+    os.system('echo "{}" > {}'.format(escaped_string, out_console))  # nosec
 
 
 def is_cubit_type(obj):
@@ -104,9 +109,8 @@ dir_name = os.path.dirname(parameters["__file__"])
 sys.path.append(dir_name)
 sys.path.append(parameters["cubit_lib_path"])
 
-from cubit_wrapper_utility import object_to_id, cubit_item_to_id, is_base_type
 import cubit
-
+from cubit_wrapper_utility import cubit_item_to_id, is_base_type, object_to_id
 
 # The second call is the initialization call for cubit
 # init = ['init', cubit_path, [args]]
@@ -134,9 +138,9 @@ while 1:
     #       callable, it is executed with the given arguments.
     #       [[cubit_object], 'name', ['arguments']]
     # 'iscallable': Check if a name is callable or not
-    # 'isinstance': Check if the cubit object is of a cerain instance
+    # 'isinstance': Check if the cubit object is of a certain instance
     # 'get_self_dir': Return the attributes in a cubit_object
-    # 'delete': Delete the cubit pbject from the dictionary
+    # 'delete': Delete the cubit object from the dictionary
 
     if cubit_item_to_id(receive[0]) is not None:
         # The first item is an id for a cubit object. Return an attribute of
@@ -147,9 +151,8 @@ while 1:
         name = receive[1]
 
         def deserialize_item(item):
-            """
-            Deserialize the item, also if it contains nested nested lists.
-            """
+            """Deserialize the item, also if it contains nested nested
+            lists."""
             item_id = cubit_item_to_id(item)
             if item_id is not None:
                 return cubit_objects[item_id]

@@ -31,20 +31,17 @@
 # -----------------------------------------------------------------------------
 """Implements a class that helps create meshes with cubit."""
 
-
-# Python modules.
 import os
-import sys
 import shutil
 import subprocess
+import sys
 import time
 import warnings
 
-# Cubitpy modules.
 from .conf import cupy
 from .cubit_group import CubitGroup
-from .cubitpy_to_dat import cubit_to_dat
 from .cubit_wrapper.cubit_wrapper_host import CubitConnect
+from .cubitpy_to_dat import cubit_to_dat
 
 
 class CubitPy(object):
@@ -81,25 +78,20 @@ class CubitPy(object):
         self.head = ""
 
     def _default_cubit_variables(self):
-        """
-        Set the default values for the lists and counters used in cubit.
-        """
+        """Set the default values for the lists and counters used in cubit."""
         self.blocks = []
         self.node_sets = []
 
     def __getattr__(self, key, *args, **kwargs):
-        """
-        All calls to methods and attributes that are not in this object get
-        passed to cubit.
-        """
+        """All calls to methods and attributes that are not in this object get
+        passed to cubit."""
         return self.cubit.__getattribute__(key, *args, **kwargs)
 
     def _name_created_set(self, set_type, set_id, name, item):
-        """
-        Create a node set or block and name it. This is an own method because
-        it can be used for both types of set in cubit. If the added item is a
-        group, no explicit name should be given and the group name should be
-        used.
+        """Create a node set or block and name it. This is an own method
+        because it can be used for both types of set in cubit. If the added
+        item is a group, no explicit name should be given and the group name
+        should be used.
 
         Args
         ----
@@ -143,9 +135,8 @@ class CubitPy(object):
     def add_element_type(
         self, item, el_type, *, name=None, material="MAT 1", bc_description=None
     ):
-        """
-        Add a block to cubit that contains the geometry in item. Also set the
-        element type of block.
+        """Add a block to cubit that contains the geometry in item. Also set
+        the element type of block.
 
         Args
         ----
@@ -208,10 +199,8 @@ class CubitPy(object):
         self.blocks.append([el_type, " ".join([material, bc_description])])
 
     def reset_blocks(self):
-        """
-        This method deletes all blocks in Cubit and resets the counter in
-        this object.
-        """
+        """This method deletes all blocks in Cubit and resets the counter in
+        this object."""
 
         # Reset the block list of this object.
         self.blocks = []
@@ -230,8 +219,8 @@ class CubitPy(object):
         bc_section=None,
         geometry_type=None,
     ):
-        """
-        Add a node set to cubit. This node set can have a boundary condition.
+        """Add a node set to cubit. This node set can have a boundary
+        condition.
 
         Args
         ----
@@ -293,15 +282,12 @@ class CubitPy(object):
         self.node_sets.append([bc_section, bc_description, geometry_type])
 
     def get_ids(self, geometry_type):
-        """
-        Get a list with all available ids of a certain geometry type.
-        """
+        """Get a list with all available ids of a certain geometry type."""
         return self.get_entities(geometry_type.get_cubit_string())
 
     def get_items(self, geometry_type, item_ids=None):
-        """
-        Get a list with all available cubit objects of a certain geometry type.
-        """
+        """Get a list with all available cubit objects of a certain geometry
+        type."""
 
         if geometry_type == cupy.geometry.vertex:
             funct = self.vertex
@@ -319,8 +305,7 @@ class CubitPy(object):
         return [funct(index) for index in item_ids]
 
     def set_line_interval(self, item, n_el):
-        """
-        Set the number of elements along a line.
+        """Set the number of elements along a line.
 
         Args
         ----
@@ -347,7 +332,7 @@ class CubitPy(object):
         self.cubit.cmd('export mesh "{}" dimension 3 overwrite'.format(path))
 
     def create_dat(self, dat_path):
-        """Create the dat file an copy it to dat_path
+        """Create the dat file an copy it to dat_path.
 
         Args
         ----
@@ -366,28 +351,26 @@ class CubitPy(object):
                 the_file.write(line + "\n")
 
     def get_dat_lines(self):
-        """Return a list with all lines in this input file"""
+        """Return a list with all lines in this input file."""
         return cubit_to_dat(self)
 
     def group(self, **kwargs):
-        """
-        Reference a group in cubit. Depending on the passed keyword arguments
-        the group is created or just references an existing group.
+        """Reference a group in cubit.
+
+        Depending on the passed keyword arguments the group is created
+        or just references an existing group.
         """
         return CubitGroup(self, **kwargs)
 
     def reset(self):
-        """
-        Reset all objects in cubit and the created BCs and blocks and node
-        sets.
-        """
+        """Reset all objects in cubit and the created BCs and blocks and node
+        sets."""
 
         self.cubit.reset()
         self._default_cubit_variables()
 
     def display_in_cubit(self, labels=[], delay=0.5, testing=False):
-        """
-        Save the state to a cubit file and open cubit with that file.
+        """Save the state to a cubit file and open cubit with that file.
         Additionally labels can be displayed in cubit to simplify the mesh
         creation process.
 

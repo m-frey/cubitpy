@@ -29,24 +29,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This module defines a global object that manages all kind of stuff regarding
-cubitpy.
-"""
+"""This module defines a global object that manages all kind of stuff regarding
+cubitpy."""
 
-# Python imports.
-import os
 import getpass
-from sys import platform
 import glob
+import os
+from sys import platform
 
-# Cubitpy imports.
 from .cubitpy_types import (
+    BoundaryConditionType,
+    CubitItems,
+    ElementType,
     FiniteElementObject,
     GeometryType,
-    ElementType,
-    CubitItems,
-    BoundaryConditionType,
 )
 
 
@@ -69,7 +65,8 @@ class CubitOptions(object):
     def __init__(self):
         # Temporary directory for cubitpy.
         self.temp_dir = os.path.join(
-            "/tmp/cubitpy_{}".format(getpass.getuser()), "pid_{}".format(os.getpid())
+            "/tmp/cubitpy_{}".format(getpass.getuser()),  # nosec
+            "pid_{}".format(os.getpid()),
         )
         self.temp_log = os.path.join(self.temp_dir, "cubitpy.log")
 
@@ -96,10 +93,12 @@ class CubitOptions(object):
 
     @staticmethod
     def get_cubit_root_path(**kwargs):
+        """Get Path to cubit root directory."""
         return get_path("CUBIT_ROOT", os.path.isdir, **kwargs)
 
     @classmethod
     def get_cubit_exe_path(cls, **kwargs):
+        """Get Path to cubit executable."""
         cubit_root = cls.get_cubit_root_path(**kwargs)
         if platform == "linux" or platform == "linux2":
             if cupy.is_coreform():
@@ -117,6 +116,7 @@ class CubitOptions(object):
 
     @classmethod
     def get_cubit_lib_path(cls, **kwargs):
+        """Get Path to cubit lib directory."""
         cubit_root = cls.get_cubit_root_path(**kwargs)
         if platform == "linux" or platform == "linux2":
             return os.path.join(cubit_root, "bin")
@@ -130,7 +130,7 @@ class CubitOptions(object):
 
     @classmethod
     def get_cubit_interpreter(cls):
-        """Get the path to the python interpreter to be used for CubitPy"""
+        """Get the path to the python interpreter to be used for CubitPy."""
         cubit_root = cls.get_cubit_root_path()
         if cls.is_coreform():
             pattern = "**/python3"
@@ -148,7 +148,7 @@ class CubitOptions(object):
 
     @classmethod
     def is_coreform(cls):
-        """Return if the given path is a path to cubit coreform"""
+        """Return if the given path is a path to cubit coreform."""
         cubit_root = cls.get_cubit_root_path()
         if "15.2" in cubit_root:
             return False

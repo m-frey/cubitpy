@@ -29,19 +29,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This file contains a class to represent groups in cubit.
-"""
+"""This file contains a class to represent groups in cubit."""
 
-# Import CubitPy stuff.
 from .conf import cupy
 from .cubit_wrapper.cubit_wrapper_host import CubitObject
 
 
 class CubitGroup(object):
-    """
-    This object helps to represent groups in cubit.
-    """
+    """This object helps to represent groups in cubit."""
 
     def __init__(
         self,
@@ -50,10 +45,9 @@ class CubitGroup(object):
         name=None,
         add_value=None,
         group_from_id=None,
-        group_from_name=None
+        group_from_name=None,
     ):
-        """
-        Set up the group object.
+        """Set up the group object.
 
         Args
         ----
@@ -122,8 +116,7 @@ class CubitGroup(object):
             raise NotImplementedError("This case is not implemented")
 
     def add(self, add_value):
-        """
-        Add items to the group. This can be done in three different ways:
+        """Add items to the group. This can be done in three different ways:
 
         Args
         ----
@@ -151,9 +144,10 @@ class CubitGroup(object):
             raise TypeError("Got wrong type {}!".format(type(add_value)))
 
     def get_geometry_type(self):
-        """
-        Return the geometry type of this group. This only works if the group
-        contains a single type of geometry of finite element objects.
+        """Return the geometry type of this group.
+
+        This only works if the group contains a single type of geometry
+        of finite element objects.
         """
 
         group_items = self.get_item_ids()
@@ -180,17 +174,13 @@ class CubitGroup(object):
             raise TypeError("Error in get_geometry_type")
 
     def get_geometry_objects(self, item_type):
-        """
-        Get a list of all items in the group for the given geometry_type.
-        """
+        """Get a list of all items in the group for the given geometry_type."""
         return self.cubit.get_items(
             item_type, item_ids=self.get_item_ids_from_type(item_type)
         )
 
     def get_item_ids_from_type(self, item_type):
-        """
-        Get the IDs of a certain type of item in this group.
-        """
+        """Get the IDs of a certain type of item in this group."""
 
         # Geometry items.
         if item_type == cupy.geometry.vertex:
@@ -224,9 +214,9 @@ class CubitGroup(object):
             raise TypeError("Wrong item type.")
 
     def _get_item_ids(self, group_items):
-        """
-        Add all items in this group to group_items. Also add all items of
-        contained subgroups.
+        """Add all items in this group to group_items.
+
+        Also add all items of contained subgroups.
         """
 
         # Add entries from subgroups.
@@ -246,10 +236,8 @@ class CubitGroup(object):
             group_items[fe_object].extend(self.get_item_ids_from_type(fe_object))
 
     def get_item_ids(self):
-        """
-        Get a dictionary with the IDs of all entries in this group, this also
-        includes items in subgroups.
-        """
+        """Get a dictionary with the IDs of all entries in this group, this
+        also includes items in subgroups."""
 
         # Initialize the empty dictionary.
         group_items = {}
@@ -267,8 +255,7 @@ class CubitGroup(object):
         return group_items
 
     def add_to_block(self, block_id, el_type):
-        """
-        Add the items of this group to a block in cubit. If there are
+        """Add the items of this group to a block in cubit. If there are
         explicit elements in this group, they are also added to the block.
 
         Args
@@ -310,8 +297,7 @@ class CubitGroup(object):
                 self.cubit.cmd("block {} hex {}".format(block_id, i))
 
     def add_to_nodeset(self, nodeset_id):
-        """
-        Add the nodes from this geometry to a node set.
+        """Add the nodes from this geometry to a node set.
 
         Args
         ----
@@ -341,8 +327,7 @@ class CubitGroup(object):
             self.cubit.cmd("nodeset {} node {}".format(nodeset_id, i_node))
 
     def get_name(self, set_type):
-        """
-        Return the name for this set to be used in cubit.
+        """Return the name for this set to be used in cubit.
 
         Args
         ----

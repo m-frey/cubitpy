@@ -29,12 +29,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""Utility functions for the cubit wrapper"""
+"""Utility functions for the cubit wrapper."""
 
 
 def object_to_id(obj):
-    """Return list representing the cubit object. The first entry is the python id
-    of the object, the second entry is the string representation.
+    """Return list representing the cubit object.
+
+    The first entry is the python id of the object, the second entry is
+    the string representation.
     """
     return ["cubitpy_id_" + str(id(obj)), str(obj)]
 
@@ -55,9 +57,8 @@ def cubit_item_to_id(cubit_data_list):
 
 
 def is_base_type(obj):
-    """Check if the object is of a base type that does not need conversion for the
-    connection between the different python interpreters.
-    """
+    """Check if the object is of a base type that does not need conversion for
+    the connection between the different python interpreters."""
     if (
         isinstance(obj, str)
         or isinstance(obj, int)

@@ -29,21 +29,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-This script is used to test that all headers in the repository are correct.
+"""This script is used to test that all headers in the repository are correct.
 
-This file is adapted from LaTeX2AI (https://github.com/stoani89/LaTeX2AI).
+This file is adapted from LaTeX2AI (
+https://github.com/stoani89/LaTeX2AI).
 """
 
-# Import python modules.
 import os
 import subprocess
 
 
 def get_repository_dir():
-    """
-    Get the root directory of this repository.
-    """
+    """Get the root directory of this repository."""
 
     script_path = os.path.realpath(__file__)
     root_dir = os.path.dirname(os.path.dirname(script_path))
@@ -51,9 +48,7 @@ def get_repository_dir():
 
 
 def get_license_text():
-    """
-    Return the license text as a string.
-    """
+    """Return the license text as a string."""
 
     license_path = os.path.join(get_repository_dir(), "LICENSE")
     with open(license_path) as license_file:
@@ -61,9 +56,7 @@ def get_license_text():
 
 
 def get_all_source_files():
-    """
-    Get all source files that should be checked for license headers.
-    """
+    """Get all source files that should be checked for license headers."""
 
     # Get the files in the git repository.
     repo_dir = get_repository_dir()
@@ -88,14 +81,13 @@ def get_all_source_files():
 
 
 def license_to_source(license_text, source_type):
-    """
-    Convert the license text to a text that can be written to source code.
-    """
+    """Convert the license text to a text that can be written to source
+    code."""
 
     header = []
     start_line = "-" * 77
     if source_type == "py":
-        header = ["# -*- coding: utf-8 -*-"]
+        header = ["# -*- coding: utf-8 -*-", "# type: ignore"]
         comment = "#"
     else:
         raise ValueError("Wrong extension!")
@@ -112,9 +104,7 @@ def license_to_source(license_text, source_type):
 
 
 def check_license():
-    """
-    Check the license for all source files.
-    """
+    """Check the license for all source files."""
 
     license_text = get_license_text()
     source_files = get_all_source_files()
@@ -122,20 +112,30 @@ def check_license():
     skip_list = []
     wrong_headers = []
 
-    for key in source_files:
-        source, header = license_to_source(license_text, key)
+    for extension, files in source_files.items():
+        source, header = license_to_source(license_text, extension)
         license = "\n".join(source)
-        license_plus_header = "\n".join(header + source)
-        for file in source_files[key]:
+        for file in files:
             for skip in skip_list:
                 if file.endswith(skip):
                     break
             else:
                 with open(file) as source_file:
                     source_text = source_file.read()
-                    if not source_text.startswith(
-                        license_plus_header
-                    ) and not source_text.startswith(license):
+                    source_text_lines = source_text.strip().split("\n")
+                    # Skip lines as long as they are header lines
+                    start_line = -1
+                    for i, line in enumerate(source_text_lines):
+                        if line.strip() in header:
+                            pass
+                        else:
+                            start_line = i
+                            break
+                    if start_line == -1:
+                        raise ValueError("The source file consists of only headers")
+                    if not "\n".join(source_text_lines[start_line:]).startswith(
+                        license
+                    ):
                         wrong_headers.append(file)
 
     return wrong_headers

@@ -29,23 +29,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # -----------------------------------------------------------------------------
-"""
-Implements a function that converts a cubit session to a dat file that can be used
-with 4C.
-"""
+"""Implements a function that converts a cubit session to a dat file that can
+be used with 4C."""
 
-
-# Python modules.
 import os
-import numpy as np
-import netCDF4
 
-# Cubitpy modules.
+import netCDF4
+import numpy as np
+
 from .conf import cupy
 
 
 def add_node_sets(dat_lines, cubit, exo):
-    """Add the node sets contained in the cubit session/exo file to the dat_lines"""
+    """Add the node sets contained in the cubit session/exo file to the
+    dat_lines."""
 
     # If there are no node sets we can return immediately
     if len(cubit.node_sets) == 0:
@@ -127,9 +124,11 @@ def add_node_sets(dat_lines, cubit, exo):
 
 
 def get_element_connectivity_string(connectivity):
-    """Return the connectivity string for an element
+    """Return the connectivity string for an element.
 
-    For hex27 we need a different ordering than the one we get from cubit"""
+    For hex27 we need a different ordering than the one we get from
+    cubit
+    """
 
     if len(connectivity) == 27:
         # hex27
@@ -169,7 +168,7 @@ def get_element_connectivity_string(connectivity):
 
 
 def cubit_to_dat(cubit):
-    """Convert a CubitPy session to a dat file that can be read with 4C"""
+    """Convert a CubitPy session to a dat file that can be read with 4C."""
 
     # Create exodus file
     os.makedirs(cupy.temp_dir, exist_ok=True)
