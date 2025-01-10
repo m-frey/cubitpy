@@ -37,7 +37,7 @@ import subprocess
 import numpy as np
 import pytest
 from meshpy.rotation import Rotation, rotate_coordinates
-from meshpy_testing.utils import compare_string_tolerance
+from meshpy_testing.conftest import compare_strings_with_tolerance
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -107,7 +107,7 @@ def compare(cubit, *, name=None, rtol=1.0e-8, atol=1.0e-8):
 
     # Check if the strings are equal, if not fail the test and show the
     # differences in the strings.
-    files_are_equal = compare_string_tolerance(
+    files_are_equal = compare_strings_with_tolerance(
         ref_string, dat_string, rtol=rtol, atol=atol
     )
     if not files_are_equal:
