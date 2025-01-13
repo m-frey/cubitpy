@@ -230,8 +230,6 @@ def cubit_step_by_step_tutorial_cli(
     INT_STRATEGY                    Standard
     DYNAMICTYP                      Statics
     PRESTRESSTOLDISP                1e-10
-    RESULTSEVRY                     1
-    RESTARTEVRY                     1
     TIMESTEP                        0.5
     NUMSTEP                         20
     MAXTIME                         10
