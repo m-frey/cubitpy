@@ -139,7 +139,13 @@ class ElementType(Enum):
         cubit."""
 
         # Get the element type parameters.
-        if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid or self == self.hex8_thermo or self == self.hex8_scatra:
+        if (
+            self == self.hex8
+            or self == self.hex8sh
+            or self == self.hex8_fluid
+            or self == self.hex8_thermo
+            or self == self.hex8_scatra
+        ):
             cubit_scheme = "Auto"
             cubit_element_type = "HEX8"
         elif self == self.hex20:
@@ -148,7 +154,12 @@ class ElementType(Enum):
         elif self == self.hex27:
             cubit_scheme = "Auto"
             cubit_element_type = "HEX27"
-        elif self == self.tet4 or self == self.tet4_fluid or self == self.tet4_thermo or self == self.tet4_scatra:
+        elif (
+            self == self.tet4
+            or self == self.tet4_fluid
+            or self == self.tet4_thermo
+            or self == self.tet4_scatra
+        ):
             cubit_scheme = "Tetmesh"
             cubit_element_type = "TETRA4"
         elif self == self.tet10:
@@ -213,13 +224,24 @@ class ElementType(Enum):
     def get_four_c_type(self):
         """Get the correct element shape name of this element in 4C."""
 
-        if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid or self == self.hex8_thermo or self == self.hex8_scatra:
+        if (
+            self == self.hex8
+            or self == self.hex8sh
+            or self == self.hex8_fluid
+            or self == self.hex8_thermo
+            or self == self.hex8_scatra
+        ):
             return "HEX8"
         elif self == self.hex20:
             return "HEX20"
         elif self == self.hex27:
             return "HEX27"
-        elif self == self.tet4 or self == self.tet4_fluid or self == self.tet4_thermo or self == self.tet4_scatra:
+        elif (
+            self == self.tet4
+            or self == self.tet4_fluid
+            or self == self.tet4_thermo
+            or self == self.tet4_scatra
+        ):
             return "TET4"
         elif self == self.tet10:
             return "TET10"
