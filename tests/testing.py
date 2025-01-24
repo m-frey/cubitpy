@@ -772,7 +772,7 @@ def test_fluid_functionality():
 
 
 def test_thermo_functionality():
-    """Test thermo conditions and thermo mesh creation."""
+    """Test thermo mesh creation."""
 
     cubit = CubitPy()
     thermo = create_brick(
@@ -782,6 +782,23 @@ def test_thermo_functionality():
         1,
         mesh_interval=[1, 1, 1],
         element_type=cupy.element_type.hex8_thermo,
+    )
+
+    # Compare the input file created for 4C.
+    compare(cubit)
+
+
+def test_scatra_functionality():
+    """Test scatra mesh creation."""
+
+    cubit = CubitPy()
+    thermo = create_brick(
+        cubit,
+        1,
+        1,
+        1,
+        mesh_interval=[1, 1, 1],
+        element_type=cupy.element_type.hex8_scatra,
     )
 
     # Compare the input file created for 4C.
