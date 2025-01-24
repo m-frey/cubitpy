@@ -130,6 +130,8 @@ class ElementType(Enum):
     tet4_fluid = auto()
     hex8_thermo = auto()
     tet4_thermo = auto()
+    hex8_scatra = auto()
+    tet4_scatra = auto()
     quad4 = auto()
 
     def get_cubit_names(self):
@@ -137,7 +139,7 @@ class ElementType(Enum):
         cubit."""
 
         # Get the element type parameters.
-        if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid or self.hex8_thermo:
+        if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid or self == self.hex8_thermo or self == self.hex8_scatra:
             cubit_scheme = "Auto"
             cubit_element_type = "HEX8"
         elif self == self.hex20:
@@ -146,7 +148,7 @@ class ElementType(Enum):
         elif self == self.hex27:
             cubit_scheme = "Auto"
             cubit_element_type = "HEX27"
-        elif self == self.tet4 or self == self.tet4_fluid or self == self.tet4_thermo:
+        elif self == self.tet4 or self == self.tet4_fluid or self == self.tet4_thermo or self == self.tet4_scatra:
             cubit_scheme = "Tetmesh"
             cubit_element_type = "TETRA4"
         elif self == self.tet10:
@@ -178,6 +180,8 @@ class ElementType(Enum):
             return "FLUID"
         elif self == self.hex8_thermo or self == self.tet4_thermo:
             return "THERMO"
+        elif self == self.hex8_scatra or self == self.tet4_scatra:
+            return "TRANSP"
         if self == self.quad4:
             return "WALL"
         else:
@@ -201,19 +205,21 @@ class ElementType(Enum):
             return "STRUCTURE"
         elif self == self.hex8_thermo or self == self.tet4_thermo:
             return "THERMO"
+        elif self == self.hex8_scatra or self == self.tet4_scatra:
+            return "TRANSPORT"
         else:
             raise ValueError("Got wrong element type {}!".format(self))
 
     def get_four_c_type(self):
         """Get the correct element shape name of this element in 4C."""
 
-        if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid or self == self.hex8_thermo:
+        if self == self.hex8 or self == self.hex8sh or self == self.hex8_fluid or self == self.hex8_thermo or self == self.hex8_scatra:
             return "HEX8"
         elif self == self.hex20:
             return "HEX20"
         elif self == self.hex27:
             return "HEX27"
-        elif self == self.tet4 or self == self.tet4_fluid or self == self.tet4_thermo:
+        elif self == self.tet4 or self == self.tet4_fluid or self == self.tet4_thermo or self == self.tet4_scatra:
             return "TET4"
         elif self == self.tet10:
             return "TET10"
@@ -240,6 +246,8 @@ class ElementType(Enum):
         elif self == self.hex8_fluid or self == self.tet4_fluid:
             return "NA ALE"
         elif self == self.hex8_thermo or self == self.tet4_thermo:
+            return ""
+        elif self == self.hex8_scatra or self == self.tet4_scatra:
             return ""
         else:
             raise ValueError("Got wrong element type {}!".format(self))
