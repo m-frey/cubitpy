@@ -1,8 +1,7 @@
 
 ----------------------------------------BEAM INTERACTION/BEAM TO SOLID SURFACE CONTACT SURFACE
-DSURF 1
 // block1_contact_side
-E 1 - COUPLING_ID 1
+E 1 COUPLING_ID 1
 -----------------------------------------------DNODE-NODE TOPOLOGY
 -----------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY

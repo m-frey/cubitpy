@@ -1,10 +1,9 @@
 
 ----------------------------------------DESIGN SURF MORTAR CONTACT CONDITIONS 3D
-DSURF 2
 // block1_contact_side
-E 1 - 0 Master
+E 1 0 Master
 // block2_contact_side
-E 2 - 0 Slave
+E 2 0 Slave
 -----------------------------------------------DNODE-NODE TOPOLOGY
 -----------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY

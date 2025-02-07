@@ -79,19 +79,10 @@ def add_node_sets(dat_lines, cubit, exo):
     # Write the boundary conditions
     for (bc_section, geo), item in boundary_condition_map.items():
         dat_lines.append("-" * 40 + bc_section)
-        if geo is cupy.geometry.vertex:
-            geo_string = "DPOINT"
-        elif geo is cupy.geometry.curve:
-            geo_string = "DLINE"
-        elif geo is cupy.geometry.surface:
-            geo_string = "DSURF"
-        elif geo is cupy.geometry.volume:
-            geo_string = "DVOL"
-        dat_lines.append(f"{geo_string} {len(item)}")
         for set_id, bc_description, name in item:
             if not name == "":
                 dat_lines.append(f"// {name}")
-            dat_lines.append(f"E {set_id} - {bc_description}")
+            dat_lines.append(f"E {set_id} {bc_description}")
 
     name_geometry_tuple = [
         [
