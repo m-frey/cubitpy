@@ -2,35 +2,28 @@
 ----------------------------------------------------------MATERIALS
 MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0
 ----------------------------------------DESIGN POINT DIRICH CONDITIONS
-DPOINT 1
 // vertex
-E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 1
+E 1 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 1
 ----------------------------------------DESIGN LINE NEUMANN CONDITIONS
-DLINE 1
 // curve
-E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 2
+E 1 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 2
 ----------------------------------------DESIGN SURF DIRICH CONDITIONS
-DSURF 1
 // surface
-E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 3
+E 1 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 3
 ----------------------------------------DESIGN VOL NEUMANN CONDITIONS
-DVOL 1
 // volume
-E 1 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4
+E 1 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4
 ----------------------------------------DESIGN POINT NEUMANN CONDITIONS
-DPOINT 2
 // point2
-E 2 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4
+E 2 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4
 // point3
-E 3 - NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4
+E 3 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 4
 ----------------------------------------BEAM INTERACTION/BEAM TO SOLID VOLUME MESHTYING VOLUME
-DVOL 1
 // coupling_btsv
-E 2 - COUPLING_ID 1
+E 2 COUPLING_ID 1
 ----------------------------------------BEAM INTERACTION/BEAM TO SOLID SURFACE MESHTYING SURFACE
-DSURF 1
 // coupling_btss
-E 2 - COUPLING_ID 1
+E 2 COUPLING_ID 1
 -----------------------------------------------DNODE-NODE TOPOLOGY
 NODE      5 DNODE 1
 NODE      8 DNODE 2

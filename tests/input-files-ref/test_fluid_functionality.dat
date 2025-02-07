@@ -1,12 +1,10 @@
 
 ----------------------------------------DESIGN FLOW RATE SURF CONDITIONS
-DSURF 1
 // inflowrate
-E 1 - 1
+E 1 1
 ----------------------------------------FLUID NEUMANN INFLOW SURF CONDITIONS
-DSURF 1
 // inflow_stabilization
-E 2 - 1
+E 2 1
 -----------------------------------------------DNODE-NODE TOPOLOGY
 -----------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY
