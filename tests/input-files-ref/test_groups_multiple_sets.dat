@@ -7,9 +7,6 @@ E 1 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
 ----------------------------------------DESIGN VOL NEUMANN CONDITIONS
 // all_vol_1
 E 2 NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0
------------------------------------------------DNODE-NODE TOPOLOGY
------------------------------------------------DLINE-NODE TOPOLOGY
------------------------------------------------DSURF-NODE TOPOLOGY
 -----------------------------------------------DVOL-NODE TOPOLOGY
 NODE      1 DVOL 1
 NODE      2 DVOL 1

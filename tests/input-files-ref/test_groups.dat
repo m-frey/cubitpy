@@ -66,7 +66,6 @@ NODE     75 DNODE 2
 NODE     76 DNODE 2
 NODE     79 DNODE 2
 NODE     80 DNODE 2
------------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY
 NODE      1 DSURFACE 1
 NODE      2 DSURFACE 1
@@ -236,7 +235,6 @@ NODE     17 DSURFACE 4
 NODE     19 DSURFACE 4
 NODE     20 DSURFACE 4
 NODE     23 DSURFACE 4
------------------------------------------------DVOL-NODE TOPOLOGY
 -------------------------------------------------------NODE COORDS
 NODE         1 COORD -2.0000000000000000e+00 -1.0000000000000000e+00  5.0000000000000000e-01
 NODE         2 COORD -2.0000000000000000e+00 -1.0000000000000000e+00  0.0000000000000000e+00

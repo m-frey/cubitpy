@@ -107,11 +107,12 @@ def add_node_sets(dat_lines, cubit, exo):
         ],
     ]
     for geo, section_name, set_label in name_geometry_tuple:
-        dat_lines.append(section_name)
-        for i_set, node_set in enumerate(node_sets[geo]):
-            node_set.sort()
-            for i_node in node_set:
-                dat_lines.append(f"NODE {i_node:6d} {set_label} {i_set+1}")
+        if len(node_sets[geo]) > 0:
+            dat_lines.append(section_name)
+            for i_set, node_set in enumerate(node_sets[geo]):
+                node_set.sort()
+                for i_node in node_set:
+                    dat_lines.append(f"NODE {i_node:6d} {set_label} {i_set+1}")
 
 
 def get_element_connectivity_string(connectivity):
