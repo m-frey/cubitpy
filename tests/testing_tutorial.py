@@ -32,7 +32,6 @@
 """This script is used to test the tutorial."""
 
 import os
-import sys
 import unittest
 
 from cubitpy_tutorial import cubit_step_by_step_tutorial_cli

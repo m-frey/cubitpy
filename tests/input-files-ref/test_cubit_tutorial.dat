@@ -49,8 +49,6 @@ E 1 NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0
 ----------------------------------------DESIGN SURF NEUMANN CONDITIONS
 // load
 E 2 NUMDOF 3 ONOFF 0 1 0 VAL 0 0.1 0 FUNCT 0 1 0
------------------------------------------------DNODE-NODE TOPOLOGY
------------------------------------------------DLINE-NODE TOPOLOGY
 -----------------------------------------------DSURF-NODE TOPOLOGY
 NODE     18 DSURFACE 1
 NODE     20 DSURFACE 1
@@ -70,7 +68,6 @@ NODE     11 DSURFACE 2
 NODE     35 DSURFACE 2
 NODE     36 DSURFACE 2
 NODE     37 DSURFACE 2
------------------------------------------------DVOL-NODE TOPOLOGY
 -------------------------------------------------------NODE COORDS
 NODE         1 COORD  1.8369701987210294e-16  3.0000000000000000e+00  0.0000000000000000e+00
 NODE         2 COORD  2.1213203435596428e+00  2.1213203435596419e+00  0.0000000000000000e+00
