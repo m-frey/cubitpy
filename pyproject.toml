@@ -33,7 +33,6 @@ dynamic = ["version"]
 CI-CD = [
   "coverage",
   "coverage-badge",
-  "meshpy@git+https://github.com/imcs-compsim/meshpy.git@main",
   "setuptools", # Needed for coverage-badge
   "pytest"
 ]

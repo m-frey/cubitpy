@@ -36,8 +36,6 @@ import subprocess
 
 import numpy as np
 import pytest
-from meshpy.rotation import Rotation, rotate_coordinates
-from meshpy_testing.conftest import compare_strings_with_tolerance
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -65,6 +63,73 @@ else:
 def check_tmp_dir():
     """Check if the temp directory exists, if not create it."""
     os.makedirs(testing_temp, exist_ok=True)
+
+
+def compare_strings_with_tolerance_assert(
+    reference, result, *, rtol=None, atol=None, string_splitter=" "
+):
+    """Compare if two strings are identical within a given tolerance.
+
+    This function is copied from the MeshPy repository.
+
+    Args:
+        reference: The reference string.
+        result: The result string.
+        rtol: The relative tolerance.
+        atol: The absolute tolerance.
+        string_splitter: With which string the strings are split.
+    """
+
+    rtol = 0.0 if rtol is None else rtol
+    atol = 0.0 if atol is None else atol
+
+    lines_reference = reference.strip().split("\n")
+    lines_result = result.strip().split("\n")
+
+    if len(lines_reference) != len(lines_result):
+        raise AssertionError(
+            f"String comparison with tolerance failed!\n"
+            + f"Number of lines in reference and result differ: {len(lines_reference)} != {len(lines_result)}"
+        )
+
+    # Loop over each line in the file
+    for line_reference, line_result in zip(lines_reference, lines_result):
+        line_reference_splits = line_reference.strip().split(string_splitter)
+        line_result_splits = line_result.strip().split(string_splitter)
+
+        if len(line_reference_splits) != len(line_result_splits):
+            raise AssertionError(
+                f"String comparison with tolerance failed!\n"
+                + f"Number of items in reference and result line differ!\n"
+                + f"Reference line: {line_reference}\n"
+                + f"Result line:    {line_result}"
+            )
+
+        # Loop over each entry in the line
+        for item_reference, item_result in zip(
+            line_reference_splits, line_result_splits
+        ):
+            try:
+                number_reference = float(item_reference.strip())
+                number_result = float(item_result.strip())
+                if np.isclose(number_reference, number_result, rtol=rtol, atol=atol):
+                    pass
+                else:
+                    raise AssertionError(
+                        f"String comparison with tolerance failed!\n"
+                        + f"Numbers do not match within given tolerance!\n"
+                        + f"Reference line: {line_reference}\n"
+                        + f"Result line:    {line_result}"
+                    )
+
+            except ValueError:
+                if item_reference.strip() != item_result.strip():
+                    raise AssertionError(
+                        f"String comparison with tolerance failed!\n"
+                        + f"Strings do not match in line!\n"
+                        + f"Reference line: {line_reference}\n"
+                        + f"Result line:    {line_result}"
+                    )
 
 
 def compare(cubit, *, name=None, rtol=1.0e-8, atol=1.0e-8):
@@ -107,9 +172,14 @@ def compare(cubit, *, name=None, rtol=1.0e-8, atol=1.0e-8):
 
     # Check if the strings are equal, if not fail the test and show the
     # differences in the strings.
-    files_are_equal = compare_strings_with_tolerance(
-        ref_string, dat_string, rtol=rtol, atol=atol
-    )
+    try:
+        compare_strings_with_tolerance_assert(
+            ref_string, dat_string, rtol=rtol, atol=atol
+        )
+        files_are_equal = True
+    except AssertionError as _:
+        files_are_equal = False
+
     if not files_are_equal:
         if TESTING_GITHUB:
             subprocess.run(["diff", ref_file, dat_file])
@@ -1422,7 +1492,15 @@ def test_create_brick_by_corner_points():
         ],
         dtype=float,
     )
-    corner_points = rotate_coordinates(corner_points, Rotation([1, 2, 3], 0.1 * np.pi))
+    # Rotation matrix for the rotation angle 0.1 * np.pi around the axis [1, 2, 3]
+    rotation_matrix = [
+        [0.9545524794169283, -0.24077287082252985, 0.17566442074271046],
+        [0.25475672330962884, 0.9650403687822526, -0.06161248695804464],
+        [-0.15468864201206198, 0.10356404441934158, 0.9825201843911263],
+    ]
+    corner_points = np.array(
+        [np.dot(rotation_matrix, point) for point in corner_points]
+    )
     brick = create_brick_by_corner_points(cubit, corner_points)
     cubit.cmd(f"volume {brick.id()} size auto factor 9")
     brick.mesh()
