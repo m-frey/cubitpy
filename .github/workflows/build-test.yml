@@ -41,6 +41,13 @@ jobs:
           # Print information on the python environment
           python --version
           pip list
+          # Run code checks
+          pre-commit install --install-hooks
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            SKIP=no-commit-to-branch pre-commit run --all-files
+          else
+            pre-commit run --all-files
+          fi
           # Run tests
           cd tests
           coverage run --rcfile=coverage.config -m pytest *.py
@@ -49,8 +56,3 @@ jobs:
           coverage-badge -o htmlcov/coverage.svg
           # This tests that if cubit is completely closed everything works
           ./test_configurations.sh
-          # Check codestyle
-          cd $CUBITPY_PATH
-          black . --check --exclude=$PYTHON_VENV && exit 0
-          # If we did not exit earlier, raise an error here
-          exit 1
