@@ -25,6 +25,7 @@ cubitpy."""
 import getpass
 import glob
 import os
+import shutil
 from sys import platform
 
 from .cubitpy_types import (
@@ -134,7 +135,14 @@ class CubitOptions(object):
             cubit_python_interpreter = python3_files[0]
             return cubit_python_interpreter
         else:
-            return "python2.7"
+            if shutil.which("python2.7") is not None:
+                return "python2.7"
+
+            imcs_python2_path = "/imcs/public/compsim/opt/Python-2.7.18/python"
+            if os.path.exists(imcs_python2_path):
+                return imcs_python2_path
+
+            raise ValueError("Could not find a python2 interpreter")
 
     @classmethod
     def is_coreform(cls):
