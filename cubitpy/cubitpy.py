@@ -22,9 +22,7 @@
 """Implements a class that helps create meshes with cubit."""
 
 import os
-import shutil
-import subprocess
-import sys
+import subprocess  # nosec B404
 import time
 import warnings
 
@@ -435,6 +433,9 @@ class CubitPy(object):
 
         if not testing:
             # Open the state in cubit.
-            subprocess.call(cubit_command, cwd=cupy.temp_dir)
+            subprocess.call(
+                cubit_command,  # nosec B603
+                cwd=cupy.temp_dir,
+            )
         else:
             return journal_path
