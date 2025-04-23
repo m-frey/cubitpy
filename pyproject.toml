@@ -27,5 +27,6 @@ dev = [
   "coverage-badge",
   "setuptools", # Needed for coverage-badge
   "pre-commit",
-  "pytest"
+  "pytest",
+  "pyyaml"
 ]

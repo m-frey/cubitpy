@@ -149,7 +149,7 @@ def get_element_connectivity_string(connectivity):
         return " ".join([f"{item:d}" for item in connectivity])
 
 
-def cubit_to_dat(cubit):
+def get_dict_to_dump(cubit):
     """Convert a CubitPy session to a dat file that can be read with 4C."""
 
     # Create exodus file
@@ -158,11 +158,11 @@ def cubit_to_dat(cubit):
     cubit.export_exo(exo_path)
     exo = netCDF4.Dataset(exo_path)
 
-    data = {}
+    yaml_dict = {}
     dat_lines = []  # To remove
 
     # Add the header
-    data = data | cubit.head
+    # yaml_dict = yaml_dict | cubit.head
     for line in cubit.head.split("\n"):
         dat_lines.append(line.strip())
 
@@ -186,7 +186,7 @@ def cubit_to_dat(cubit):
         node_list.append(
             f"NODE {i + 1:9d} COORD {coordinate[0]: .16e} {coordinate[1]: .16e} {coordinate[2]: .16e}"
         )
-    data["NODE COORDS"] = node_list
+    yaml_dict["NODE COORDS"] = node_list
 
     # Add the element connectivity
     current_section = None
@@ -200,23 +200,13 @@ def cubit_to_dat(cubit):
         for connectivity in exo.variables[key][:]:
             connectivity_string = get_element_connectivity_string(connectivity)
             element_list.append(
-                f"{i_element + 1:9d} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
+                f"{i_element + 1} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
+                # f"{i_element + 1:9d} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
             )
             i_element += 1
         if not block_section == current_section:
             current_section = block_section
 
-            data[f"{current_section} ELEMENTS"] = element_list
+            yaml_dict[f"{current_section} ELEMENTS"] = element_list
 
-    return dat_lines
-
-
-def write_input_file(cubit):
-    dict = cubit_to_dat()
-    with open(file_path, "w") as input_file:
-        _yaml.dump(
-            self.get_dict_to_dump(**kwargs),
-            input_file,
-            Dumper=_MeshPyDumper,
-            width=float("inf"),
-        )
+    return yaml_dict

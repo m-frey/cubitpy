@@ -26,10 +26,20 @@ import subprocess  # nosec B404
 import time
 import warnings
 
+import yaml as _yaml
+
 from cubitpy.conf import cupy
 from cubitpy.cubit_group import CubitGroup
 from cubitpy.cubit_wrapper.cubit_wrapper_host import CubitConnect
-from cubitpy.cubitpy_to_dat import cubit_to_dat
+from cubitpy.cubitpy_to_dat import get_dict_to_dump
+
+
+class NoQuotesDumper(_yaml.SafeDumper):
+    def represent_str(self, data):
+        # Only use plain style (no quotes), unless absolutely needed
+        if "\n" in data or data.strip() != data:
+            return super().represent_str(data)
+        return self.represent_scalar("tag:yaml.org,2002:str", data, style="")
 
 
 class CubitPy(object):
@@ -338,9 +348,39 @@ class CubitPy(object):
             for line in self.get_dat_lines():
                 the_file.write(line + "\n")
 
+    def write_input_file(self, yaml_path):
+        """Create the yaml file an copy it to yaml_path.
+
+        Args
+        ----
+        yaml_path: str
+            Path where the input file file will be saved
+        """
+
+        # Check if output path exists.
+        if os.path.isabs(yaml_path):
+            dat_dir = os.path.dirname(yaml_path)
+            if not os.path.exists(dat_dir):
+                raise ValueError("Path {} does not exist!".format(dat_dir))
+
+        #    with open(yaml_path, "w") as the_file:
+        #        for line in self.get_dat_lines():
+        #            the_file.write(line + "\n")
+
+        NoQuotesDumper.add_representer(str, NoQuotesDumper.represent_str)
+        with open(yaml_path, "w") as input_file:
+            _yaml.dump(
+                get_dict_to_dump(self),
+                input_file,
+                Dumper=NoQuotesDumper,
+                width=float("inf"),
+                default_flow_style=False,
+                sort_keys=False,
+            )
+
     def get_dat_lines(self):
         """Return a list with all lines in this input file."""
-        return cubit_to_dat(self)
+        return get_dict_to_dump(self)
 
     def group(self, **kwargs):
         """Reference a group in cubit.
