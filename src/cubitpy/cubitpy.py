@@ -32,14 +32,7 @@ from cubitpy.conf import cupy
 from cubitpy.cubit_group import CubitGroup
 from cubitpy.cubit_wrapper.cubit_wrapper_host import CubitConnect
 from cubitpy.cubitpy_to_dat import get_dict_to_dump
-
-
-class NoQuotesDumper(_yaml.SafeDumper):
-    def represent_str(self, data):
-        # Only use plain style (no quotes), unless absolutely needed
-        if "\n" in data or data.strip() != data:
-            return super().represent_str(data)
-        return self.represent_scalar("tag:yaml.org,2002:str", data, style="")
+from cubitpy.yaml_dumper import CubitPyDumper
 
 
 class CubitPy(object):
@@ -363,19 +356,13 @@ class CubitPy(object):
             if not os.path.exists(dat_dir):
                 raise ValueError("Path {} does not exist!".format(dat_dir))
 
-        #    with open(yaml_path, "w") as the_file:
-        #        for line in self.get_dat_lines():
-        #            the_file.write(line + "\n")
-
-        NoQuotesDumper.add_representer(str, NoQuotesDumper.represent_str)
+        CubitPyDumper.add_representer(str, CubitPyDumper.represent_str)
         with open(yaml_path, "w") as input_file:
             _yaml.dump(
                 get_dict_to_dump(self),
                 input_file,
-                Dumper=NoQuotesDumper,
+                Dumper=CubitPyDumper,
                 width=float("inf"),
-                default_flow_style=False,
-                sort_keys=False,
             )
 
     def get_dat_lines(self):
