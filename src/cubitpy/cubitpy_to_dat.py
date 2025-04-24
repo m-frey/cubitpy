@@ -162,7 +162,7 @@ def get_dict_to_dump(cubit):
     dat_lines = []  # To remove
 
     # Add the header
-    # yaml_dict = yaml_dict | cubit.head
+    yaml_dict |= cubit.input_dict
     for line in cubit.head.split("\n"):
         dat_lines.append(line.strip())
 

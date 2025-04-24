@@ -65,8 +65,12 @@ class CubitPy(object):
         # Set lists and counters for blocks and sets
         self._default_cubit_variables()
 
+        # ToDo: Fully replace this with yaml dict
         # Content of head file
         self.head = ""
+
+        # yaml input dictionary
+        self.input_dict = {}
 
     def _default_cubit_variables(self):
         """Set the default values for the lists and counters used in cubit."""
