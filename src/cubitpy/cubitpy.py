@@ -213,6 +213,7 @@ class CubitPy(object):
         bc_description="NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0",
         bc_section=None,
         geometry_type=None,
+        bc=None,
     ):
         """Add a node set to cubit. This node set can have a boundary
         condition.
@@ -274,7 +275,7 @@ class CubitPy(object):
             )
         if bc_section is None:
             bc_section = bc_type.get_dat_bc_section_header(geometry_type)
-        self.node_sets.append([bc_section, bc_description, geometry_type])
+        self.node_sets.append([bc_section, bc_description, geometry_type, bc])
 
     def get_ids(self, geometry_type):
         """Get a list with all available ids of a certain geometry type."""
@@ -360,13 +361,13 @@ class CubitPy(object):
             if not os.path.exists(dat_dir):
                 raise ValueError("Path {} does not exist!".format(dat_dir))
 
-        CubitPyDumper.add_representer(str, CubitPyDumper.represent_str)
         with open(yaml_path, "w") as input_file:
             _yaml.dump(
                 get_dict_to_dump(self),
                 input_file,
                 Dumper=CubitPyDumper,
                 width=float("inf"),
+                sort_keys=False,
             )
 
     def get_dat_lines(self):

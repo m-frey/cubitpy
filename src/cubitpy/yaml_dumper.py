@@ -48,6 +48,19 @@ def numpy_bool_representer(dumper, value):
     return dumper.represent_bool(bool(value))
 
 
+def list_representer(dumper, data):
+    # Inline lists if they are short (≤3 items) and only primitives
+    if len(data) <= 3 and all(
+        isinstance(item, (int, float, str, bool, type(None))) for item in data
+    ):
+        return dumper.represent_sequence("tag:yaml.org,2002:seq", data, flow_style=True)
+    else:
+        return dumper.represent_sequence(
+            "tag:yaml.org,2002:seq", data, flow_style=False
+        )
+
+
+CubitPyDumper.add_representer(list, list_representer)
 CubitPyDumper.add_representer(_np.float32, numpy_float_representer)
 CubitPyDumper.add_representer(_np.float64, numpy_float_representer)
 CubitPyDumper.add_representer(_np.int32, numpy_int_representer)

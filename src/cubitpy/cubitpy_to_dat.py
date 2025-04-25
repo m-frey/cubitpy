@@ -30,7 +30,7 @@ import numpy as np
 from cubitpy.conf import cupy
 
 
-def add_node_sets(dat_lines, cubit, exo):
+def add_node_sets(dat_lines, yaml_dict, cubit, exo):
     """Add the node sets contained in the cubit session/exo file to the
     dat_lines."""
 
@@ -55,9 +55,10 @@ def add_node_sets(dat_lines, cubit, exo):
         cupy.geometry.volume: [],
     }
     boundary_condition_map = {}
+    boundary_condition_dict = {}
     node_set_keys = [key for key in exo.variables.keys() if "node_ns" in key]
     for i_set, key in enumerate(node_set_keys):
-        bc_section, bc_description, geometry_type = cubit.node_sets[i_set]
+        bc_section, bc_description, geometry_type, bc = cubit.node_sets[i_set]
         node_sets[geometry_type].append(exo.variables[key][:])
         bc_key = (bc_section, geometry_type)
         if bc_key not in boundary_condition_map.keys():
@@ -65,6 +66,17 @@ def add_node_sets(dat_lines, cubit, exo):
         boundary_condition_map[bc_key].append(
             [len(node_sets[geometry_type]), bc_description, names[i_set]]
         )
+
+        if bc_section not in boundary_condition_dict.keys():
+            boundary_condition_dict[bc_section] = []
+        bc["E"] = len(node_sets[geometry_type])
+        bc["NAME"] = names[i_set]
+        boundary_condition_dict[bc_section].append(bc)
+
+    yaml_dict |= boundary_condition_dict
+
+    # Write the boundary condition to input_dict
+    # for (bc_section, geo), item in boundary_condition_map.items():
 
     # Write the boundary conditions
     for (bc_section, geo), item in boundary_condition_map.items():
@@ -77,28 +89,40 @@ def add_node_sets(dat_lines, cubit, exo):
     name_geometry_tuple = [
         [
             cupy.geometry.vertex,
-            "-----------------------------------------------DNODE-NODE TOPOLOGY",
+            "DNODE-NODE TOPOLOGY",
             "DNODE",
         ],
         [
             cupy.geometry.curve,
-            "-----------------------------------------------DLINE-NODE TOPOLOGY",
+            "DLINE-NODE TOPOLOGY",
             "DLINE",
         ],
         [
             cupy.geometry.surface,
-            "-----------------------------------------------DSURF-NODE TOPOLOGY",
+            "DSURF-NODE TOPOLOGY",
             "DSURFACE",
         ],
         [
             cupy.geometry.volume,
-            "-----------------------------------------------DVOL-NODE TOPOLOGY",
+            "DVOL-NODE TOPOLOGY",
             "DVOL",
         ],
     ]
+    topology_dict = {}
     for geo, section_name, set_label in name_geometry_tuple:
         if len(node_sets[geo]) > 0:
-            dat_lines.append(section_name)
+            topology_dict[section_name] = []
+            for i_set, node_set in enumerate(node_sets[geo]):
+                node_set.sort()
+                for i_node in node_set:
+                    topology_dict[section_name].append(
+                        f"NODE {i_node:6d} {set_label} {i_set + 1}"
+                    )
+    yaml_dict |= topology_dict
+
+    for geo, section_name, set_label in name_geometry_tuple:
+        if len(node_sets[geo]) > 0:
+            dat_lines.append("-" * 20 + section_name)
             for i_set, node_set in enumerate(node_sets[geo]):
                 node_set.sort()
                 for i_node in node_set:
@@ -167,7 +191,7 @@ def get_dict_to_dump(cubit):
         dat_lines.append(line.strip())
 
     # Add the node sets
-    add_node_sets(dat_lines, cubit, exo)
+    add_node_sets(dat_lines, yaml_dict, cubit, exo)
 
     # Add the nodal data
     node_list = []
