@@ -21,11 +21,15 @@
 # THE SOFTWARE.
 """This script is used to test the functionality of the cubitpy module."""
 
+import math
 import os
+import shutil
 import subprocess
 
 import numpy as np
 import pytest
+import yaml
+from deepdiff import DeepDiff
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -120,6 +124,99 @@ def compare_strings_with_tolerance_assert(
                         + f"Reference line: {line_reference}\n"
                         + f"Result line:    {line_result}"
                     )
+
+
+def _compare_yaml_recursive(ref, res, *, rtol, atol, path="root"):
+    """Recursively compare two  objects loaded from YAML."""
+    if isinstance(ref, dict):
+        assert isinstance(res, dict), f"Type mismatch at {path}: dict vs {type(res)}"
+        assert (
+            ref.keys() == res.keys()
+        ), f"Dict keys mismatch at {path}: {ref.keys()} != {res.keys()}"
+        for key in ref:
+            _compare_yaml_recursive(
+                ref[key], res[key], rtol=rtol, atol=atol, path=f"{path}.{key}"
+            )
+    elif isinstance(ref, list):
+        assert isinstance(res, list), f"Type mismatch at {path}: list vs {type(res)}"
+        assert len(ref) == len(
+            res
+        ), f"List length mismatch at {path}: {len(ref)} != {len(res)}"
+        for i, (r_item, s_item) in enumerate(zip(ref, res)):
+            _compare_yaml_recursive(
+                r_item, s_item, rtol=rtol, atol=atol, path=f"{path}[{i}]"
+            )
+    elif isinstance(ref, float):
+        assert math.isclose(
+            ref, res, rel_tol=rtol, abs_tol=atol
+        ), f"Float mismatch at {path}: {ref} != {res}"
+    else:
+        assert ref == res, f"Value mismatch at {path}: {ref} != {res}"
+
+
+def compare_yaml(cubit, *, name=None, significant_digits=8):
+    """Write and compare the YAML file from a Cubit object with the reference
+    YAML file.
+
+    Args
+    ----
+    cubit: Cubit object
+        Should implement `create_yaml(path)` to generate the test output.
+    name: str, optional
+        Name of the test case. Reference file 'name.yaml' must exist.
+    rtol: float
+        Relative tolerance for numerical differences.
+    atol: float
+        Absolute tolerance for numerical differences.
+    """
+    # Determine test name
+    if name is None:
+        name = (
+            os.environ.get("PYTEST_CURRENT_TEST")
+            .split(":")[-1]
+            .split(" ")[0]
+            .split("[")[0]
+        )
+
+    check_tmp_dir()
+
+    # File paths
+    ref_file = os.path.join(testing_input, name + ".4C.yaml")
+    out_file = os.path.join(testing_temp, name + ".4C.yaml")
+    cubit.write_input_file(out_file)
+
+    # Load YAML as structured Python objects
+    with open(ref_file, "r") as f:
+        ref_data = yaml.safe_load(f)
+    with open(out_file, "r") as f:
+        out_data = yaml.safe_load(f)
+
+    # Perform yaml comparison with tolerances
+    diff = DeepDiff(
+        ref_data,
+        out_data,
+        significant_digits=significant_digits,
+        ignore_order=False,  # do not ignore order in lists for now
+    )
+    files_are_equal = not diff
+    if not files_are_equal:
+        print("YAML comparison failed! Differences found:")
+        print(diff.pretty())
+
+        if TESTING_GITHUB:
+            subprocess.run(["diff", ref_file, out_file])
+        elif shutil.which("code"):
+            subprocess.Popen(
+                ["code", "--diff", ref_file, out_file], stderr=subprocess.PIPE
+            ).communicate()
+        elif shutil.which("meld"):
+            subprocess.Popen(["meld", ref_file, out_file])
+        else:
+            print("No viewer avail. - Inspect manually.")
+            print(f"Reference: {ref_file}")
+            print(f"Generated: {out_file}")
+
+    assert files_are_equal
 
 
 def compare(cubit, *, name=None, rtol=1.0e-8, atol=1.0e-8):
@@ -1169,22 +1266,47 @@ def xtest_groups(block_with_volume):
         surface_fix,
         bc_type=cupy.bc_type.dirichlet,
         bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
+        bc={
+            "NUMDOF": 3,
+            "ONOFF": [1, 1, 1],
+            "VAL": [0, 0, 0],
+            "FUNCT": [0, 0, 0],
+        },
     )
+
     cubit.add_node_set(
         surface_load,
         bc_type=cupy.bc_type.neumann,
         bc_description="NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0",
+        bc={
+            "NUMDOF": 3,
+            "ONOFF": [0, 0, 1],
+            "VAL": [0, 0, 1],
+            "FUNCT": [0, 0, 0],
+        },
     )
     cubit.add_node_set(
         surface_load_alt,
         bc_type=cupy.bc_type.neumann,
         bc_description="NUMDOF 3 ONOFF 0 0 1 VAL 0 0 1 FUNCT 0 0 0",
+        bc={
+            "NUMDOF": 3,
+            "ONOFF": [0, 0, 1],
+            "VAL": [0, 0, 1],
+            "FUNCT": [0, 0, 0],
+        },
     )
     cubit.add_node_set(
         group_no_name,
         name="fix_surf_no_name_group",
         bc_type=cupy.bc_type.dirichlet,
         bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
+        bc={
+            "NUMDOF": 3,
+            "ONOFF": [1, 1, 1],
+            "VAL": [0, 0, 0],
+            "FUNCT": [0, 0, 0],
+        },
     )
     cubit.add_node_set(
         group_explicit_type,
@@ -1192,6 +1314,12 @@ def xtest_groups(block_with_volume):
         geometry_type=cupy.geometry.vertex,
         bc_type=cupy.bc_type.dirichlet,
         bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
+        bc={
+            "NUMDOF": 3,
+            "ONOFF": [1, 1, 1],
+            "VAL": [0, 0, 0],
+            "FUNCT": [0, 0, 0],
+        },
     )
 
     # Mesh the model.
@@ -1217,7 +1345,13 @@ def xtest_groups(block_with_volume):
         mesh_group,
         geometry_type=cupy.geometry.vertex,
         bc_type=cupy.bc_type.dirichlet,
-        bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0",
+        bc_description="NUMDOF 3 ONOFF 1 1 1 VAL 0 0 0 FUNCT 0 0 0 HANS",
+        bc={
+            "NUMDOF": 3,
+            "ONOFF": [1, 1, 1],
+            "VAL": [0, 0, 0],
+            "FUNCT": [0, 0, 0],
+        },
     )
 
     # Set the head string.
@@ -1241,6 +1375,7 @@ def xtest_groups(block_with_volume):
     # Compare the input file created for 4C.
     # Fixme: Remove once compare works again
     cubit.write_input_file("test_groups.4C.yaml")
+    compare_yaml(cubit, name="test_groups")
     # compare(cubit, name="test_groups")
 
 

@@ -28,5 +28,6 @@ dev = [
   "setuptools", # Needed for coverage-badge
   "pre-commit",
   "pytest",
-  "pyyaml"
+  "pyyaml",
+  "deepdiff"
 ]
