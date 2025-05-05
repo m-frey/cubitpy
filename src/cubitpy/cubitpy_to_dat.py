@@ -55,10 +55,9 @@ def add_node_sets(cubit, exo):
         cupy.geometry.volume: [],
     }
     boundary_condition_map = {}
-    boundary_condition_dict = {}
     node_set_keys = [key for key in exo.variables.keys() if "node_ns" in key]
     for i_set, key in enumerate(node_set_keys):
-        bc_section, bc_description, geometry_type, bc = cubit.node_sets[i_set]
+        bc_section, bc_description, geometry_type = cubit.node_sets[i_set]
         node_sets[geometry_type].append(exo.variables[key][:])
         bc_key = (bc_section, geometry_type)
         if bc_key not in boundary_condition_map.keys():
@@ -66,16 +65,12 @@ def add_node_sets(cubit, exo):
         boundary_condition_map[bc_key].append(
             [len(node_sets[geometry_type]), bc_description, names[i_set]]
         )
-
-        if bc_section not in boundary_condition_dict.keys():
-            boundary_condition_dict[bc_section] = []
+        if bc_section not in cubit.fourc_input.inlined.keys():
             cubit.fourc_input[bc_section] = []
-        bc["E"] = len(node_sets[geometry_type])
-        #bc["NAME"] = names[i_set]
-        cubit.fourc_input[bc_section].append(bc)
+        bc_description["E"] = len(node_sets[geometry_type])
 
-    # Write the boundary condition to input_dict
-    # for (bc_section, geo), item in boundary_condition_map.items():
+        # bc_description["NAME"] = names[i_set]
+        cubit.fourc_input[bc_section].append(bc_description)
 
     name_geometry_tuple = [
         [
@@ -99,18 +94,15 @@ def add_node_sets(cubit, exo):
             "DVOL",
         ],
     ]
-    topology_dict = {}
     for geo, section_name, set_label in name_geometry_tuple:
         if len(node_sets[geo]) > 0:
-            topology_dict[section_name] = []
             cubit.fourc_input[section_name] = []
             for i_set, node_set in enumerate(node_sets[geo]):
                 node_set.sort()
                 for i_node in node_set:
-                    topology_dict[section_name].append(
-                        f"NODE {i_node:6d} {set_label} {i_set + 1}"
+                    cubit.fourc_input[section_name].append(
+                        {"entry": [f"NODE", i_node, f"{set_label}", i_set + 1]}
                     )
-                    cubit.fourc_input[section_name].append({"entry" : [f"NODE", i_node, f"{set_label}", i_set+1]})
 
 
 def get_element_connectivity_string(connectivity):

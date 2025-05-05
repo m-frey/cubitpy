@@ -205,10 +205,9 @@ class CubitPy(object):
         *,
         name=None,
         bc_type=None,
-        bc_description="NUMDOF 3 ONOFF 0 0 0 VAL 0 0 0 FUNCT 0 0 0",
+        bc_description=None,
         bc_section=None,
         geometry_type=None,
-        bc=None,
     ):
         """Add a node set to cubit. This node set can have a boundary
         condition.
@@ -224,7 +223,7 @@ class CubitPy(object):
         bc_section: str
             Name of the section in the input file. Mutually exclusive with
             bc_type.
-        bc_description: str
+        bc_description: dict
             Definition of the boundary condition.
         geometry_type: cupy.geometry
             Directly set the geometry type, instead of obtaining it from the
@@ -270,7 +269,7 @@ class CubitPy(object):
             )
         if bc_section is None:
             bc_section = bc_type.get_dat_bc_section_header(geometry_type)
-        self.node_sets.append([bc_section, bc_description, geometry_type, bc])
+        self.node_sets.append([bc_section, bc_description, geometry_type])
 
     def get_ids(self, geometry_type):
         """Get a list with all available ids of a certain geometry type."""
