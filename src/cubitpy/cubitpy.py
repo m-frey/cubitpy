@@ -27,12 +27,12 @@ import time
 import warnings
 
 import yaml as _yaml
+from fourcipp.fourc_input import FourCInput
 
 from cubitpy.conf import cupy
 from cubitpy.cubit_group import CubitGroup
 from cubitpy.cubit_wrapper.cubit_wrapper_host import CubitConnect
-from cubitpy.cubitpy_to_dat import get_dict_to_dump
-from cubitpy.yaml_dumper import CubitPyDumper
+from cubitpy.cubitpy_to_dat import write_mesh_to_inputfile
 
 
 class CubitPy(object):
@@ -65,12 +65,7 @@ class CubitPy(object):
         # Set lists and counters for blocks and sets
         self._default_cubit_variables()
 
-        # ToDo: Fully replace this with yaml dict
-        # Content of head file
-        self.head = ""
-
-        # yaml input dictionary
-        self.input_dict = {}
+        self.fourc_input = FourCInput()
 
     def _default_cubit_variables(self):
         """Set the default values for the lists and counters used in cubit."""
@@ -361,18 +356,8 @@ class CubitPy(object):
             if not os.path.exists(dat_dir):
                 raise ValueError("Path {} does not exist!".format(dat_dir))
 
-        with open(yaml_path, "w") as input_file:
-            _yaml.dump(
-                get_dict_to_dump(self),
-                input_file,
-                Dumper=CubitPyDumper,
-                width=float("inf"),
-                sort_keys=False,
-            )
-
-    def get_dat_lines(self):
-        """Return a list with all lines in this input file."""
-        return get_dict_to_dump(self)
+        (write_mesh_to_inputfile(self),)
+        self.fourc_input.dump(yaml_path)
 
     def group(self, **kwargs):
         """Reference a group in cubit.

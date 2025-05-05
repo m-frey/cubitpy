@@ -30,7 +30,7 @@ import numpy as np
 from cubitpy.conf import cupy
 
 
-def add_node_sets(dat_lines, yaml_dict, cubit, exo):
+def add_node_sets(cubit, exo):
     """Add the node sets contained in the cubit session/exo file to the
     dat_lines."""
 
@@ -71,20 +71,10 @@ def add_node_sets(dat_lines, yaml_dict, cubit, exo):
             boundary_condition_dict[bc_section] = []
         bc["E"] = len(node_sets[geometry_type])
         bc["NAME"] = names[i_set]
-        boundary_condition_dict[bc_section].append(bc)
-
-    yaml_dict |= boundary_condition_dict
+        cubit.fourc_input[bc_section] = bc
 
     # Write the boundary condition to input_dict
     # for (bc_section, geo), item in boundary_condition_map.items():
-
-    # Write the boundary conditions
-    for (bc_section, geo), item in boundary_condition_map.items():
-        dat_lines.append("-" * 40 + bc_section)
-        for set_id, bc_description, name in item:
-            if not name == "":
-                dat_lines.append(f"// {name}")
-            dat_lines.append(f"E {set_id} {bc_description}")
 
     name_geometry_tuple = [
         [
@@ -112,21 +102,17 @@ def add_node_sets(dat_lines, yaml_dict, cubit, exo):
     for geo, section_name, set_label in name_geometry_tuple:
         if len(node_sets[geo]) > 0:
             topology_dict[section_name] = []
+            cubit.fourc_input[section_name] = []
             for i_set, node_set in enumerate(node_sets[geo]):
                 node_set.sort()
                 for i_node in node_set:
+                    # cubit.fourc_input[section_name].append(
+                    #    f"NODE {i_node} {set_label} {i_set + 1}"
+                    # )
                     topology_dict[section_name].append(
                         f"NODE {i_node:6d} {set_label} {i_set + 1}"
                     )
     yaml_dict |= topology_dict
-
-    for geo, section_name, set_label in name_geometry_tuple:
-        if len(node_sets[geo]) > 0:
-            dat_lines.append("-" * 20 + section_name)
-            for i_set, node_set in enumerate(node_sets[geo]):
-                node_set.sort()
-                for i_node in node_set:
-                    dat_lines.append(f"NODE {i_node:6d} {set_label} {i_set + 1}")
 
 
 def get_element_connectivity_string(connectivity):
@@ -173,7 +159,7 @@ def get_element_connectivity_string(connectivity):
         return " ".join([f"{item:d}" for item in connectivity])
 
 
-def get_dict_to_dump(cubit):
+def write_mesh_to_inputfile(cubit):
     """Convert a CubitPy session to a dat file that can be read with 4C."""
 
     # Create exodus file
@@ -182,22 +168,11 @@ def get_dict_to_dump(cubit):
     cubit.export_exo(exo_path)
     exo = netCDF4.Dataset(exo_path)
 
-    yaml_dict = {}
-    dat_lines = []  # To remove
-
-    # Add the header
-    yaml_dict |= cubit.input_dict
-    for line in cubit.head.split("\n"):
-        dat_lines.append(line.strip())
-
     # Add the node sets
-    add_node_sets(dat_lines, yaml_dict, cubit, exo)
+    add_node_sets(cubit, exo)
 
     # Add the nodal data
     node_list = []
-    dat_lines.append(
-        "-------------------------------------------------------NODE COORDS"
-    )
     if "coordz" in exo.variables:
         coordinates = np.array(
             [exo.variables["coord" + dim][:] for dim in ["x", "y", "z"]],
@@ -208,9 +183,9 @@ def get_dict_to_dump(cubit):
         coordinates = np.array(temp).transpose()
     for i, coordinate in enumerate(coordinates):
         node_list.append(
-            f"NODE {i + 1:9d} COORD {coordinate[0]: .16e} {coordinate[1]: .16e} {coordinate[2]: .16e}"
+            f"NODE {i+1} COORD {coordinate[0]} {coordinate[1]} {coordinate[2]}"
         )
-    yaml_dict["NODE COORDS"] = node_list
+    cubit.fourc_input["NODE COORDS"] = node_list
 
     # Add the element connectivity
     current_section = None
@@ -225,12 +200,11 @@ def get_dict_to_dump(cubit):
             connectivity_string = get_element_connectivity_string(connectivity)
             element_list.append(
                 f"{i_element + 1} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
-                # f"{i_element + 1:9d} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
             )
             i_element += 1
         if not block_section == current_section:
             current_section = block_section
 
-            yaml_dict[f"{current_section} ELEMENTS"] = element_list
+            cubit.fourc_input[f"{current_section} ELEMENTS"] = element_list
 
-    return yaml_dict
+    return 0
