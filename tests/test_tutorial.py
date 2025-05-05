@@ -25,7 +25,7 @@ import os
 import unittest
 
 import pytest
-from test_cubitpy import compare, testing_temp
+from test_cubitpy import testing_temp, compare_yaml
 
 from cubitpy import CubitPy
 from tutorial.tutorial import cubit_step_by_step_tutorial_cli
@@ -44,7 +44,7 @@ class TestTutorial(unittest.TestCase):
         cubit_step_by_step_tutorial_cli(
             tutorial_file, display=False, cubit=cubit, size=5.0
         )
-        compare(cubit, name="test_cubit_tutorial")
+        compare_yaml(cubit, name="test_cubit_tutorial")
 
 
 if __name__ == "__main__":
