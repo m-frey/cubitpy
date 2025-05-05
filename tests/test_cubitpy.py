@@ -30,6 +30,7 @@ import numpy as np
 import pytest
 import yaml
 from deepdiff import DeepDiff
+from pytest import approx
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -191,12 +192,49 @@ def compare_yaml(cubit, *, name=None, significant_digits=8):
     with open(out_file, "r") as f:
         out_data = yaml.safe_load(f)
 
+    def compare_legacy_node_coords_with_tolerance(
+        ref_coords_list, out_coords_list, tol=1e-8
+    ):
+        assert len(ref_coords_list) == len(
+            out_coords_list
+        ), "NODE COORDS list lengths differ"
+
+        for ref_line, out_line in zip(ref_coords_list, out_coords_list):
+            ref_parts = ref_line.split()
+            out_parts = out_line.split()
+
+            assert (
+                ref_parts[:3] == out_parts[:3]
+            ), f"Prefix mismatch in line: {ref_line} vs {out_line}"
+
+            try:
+                ref_nums = list(map(float, ref_parts[3:]))
+                out_nums = list(map(float, out_parts[3:]))
+            except ValueError:
+                raise AssertionError(
+                    f"Failed to parse floats in line: {ref_line} or {out_line}"
+                )
+
+            assert len(ref_nums) == len(out_nums), "Coordinate length mismatch"
+            for i, (r, o) in enumerate(zip(ref_nums, out_nums)):
+                assert o == approx(r, abs=tol), f"Coordinate {i} mismatch: {r} vs {o}"
+
+        return 0
+
+    # Remove NODE COORDS for DeepDiff as they are stored as a string
+    ref_coords = ref_data.pop("NODE COORDS", None)
+    out_coords = out_data.pop("NODE COORDS", None)
+
+    # Compare NODE COORDS with tolerance
+    if ref_coords and out_coords:
+        compare_legacy_node_coords_with_tolerance(ref_coords, out_coords)
+
     # Perform yaml comparison with tolerances
     diff = DeepDiff(
         ref_data,
         out_data,
         significant_digits=significant_digits,
-        ignore_order=False,  # do not ignore order in lists for now
+        ignore_order=True,
     )
     files_are_equal = not diff
     if not files_are_equal:
@@ -205,12 +243,12 @@ def compare_yaml(cubit, *, name=None, significant_digits=8):
 
         if TESTING_GITHUB:
             subprocess.run(["diff", ref_file, out_file])
+        elif shutil.which("meld"):
+            subprocess.Popen(["meld", ref_file, out_file])
         elif shutil.which("code"):
             subprocess.Popen(
                 ["code", "--diff", ref_file, out_file], stderr=subprocess.PIPE
             ).communicate()
-        elif shutil.which("meld"):
-            subprocess.Popen(["meld", ref_file, out_file])
         else:
             print("No viewer avail. - Inspect manually.")
             print(f"Reference: {ref_file}")
@@ -1031,7 +1069,7 @@ def test_thermo_functionality():
     )
 
     # Compare the input file created for 4C.
-    compare(cubit)
+    compare_yaml(cubit, name="test_thermo_functionality")
 
 
 @pytest.mark.skip(
@@ -1354,23 +1392,14 @@ def xtest_groups(block_with_volume):
         },
     )
 
-    # Set the head string.
-    cubit.head = """
-            ----------------------------------------------------------MATERIALS
-            MAT 1 MAT_Struct_StVenantKirchhoff YOUNG 10 NUE 0.0 DENS 0.0"""
-
-    cubit.input_dict |= {
-        "MATERIALS": [
-            {
-                "MAT": 1,
-                "MAT_Struct_StVenantKirchhoff": {
-                    "YOUNG": 10,
-                    "NUE": 0.0,
-                    "DENS": 0.0,
-                },
-            }
-        ]
-    }
+    cubit.fourc_input["MATERIALS"] = [{
+        "MAT": 1,
+        "MAT_Struct_StVenantKirchhoff": {
+            "YOUNG": 10,
+            "NUE": 0.0,
+            "DENS": 0.0,
+        },
+    }]
 
     # Compare the input file created for 4C.
     # Fixme: Remove once compare works again

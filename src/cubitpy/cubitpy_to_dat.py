@@ -69,9 +69,10 @@ def add_node_sets(cubit, exo):
 
         if bc_section not in boundary_condition_dict.keys():
             boundary_condition_dict[bc_section] = []
+            cubit.fourc_input[bc_section] = []
         bc["E"] = len(node_sets[geometry_type])
-        bc["NAME"] = names[i_set]
-        cubit.fourc_input[bc_section] = bc
+        #bc["NAME"] = names[i_set]
+        cubit.fourc_input[bc_section].append(bc)
 
     # Write the boundary condition to input_dict
     # for (bc_section, geo), item in boundary_condition_map.items():
@@ -106,13 +107,10 @@ def add_node_sets(cubit, exo):
             for i_set, node_set in enumerate(node_sets[geo]):
                 node_set.sort()
                 for i_node in node_set:
-                    # cubit.fourc_input[section_name].append(
-                    #    f"NODE {i_node} {set_label} {i_set + 1}"
-                    # )
                     topology_dict[section_name].append(
                         f"NODE {i_node:6d} {set_label} {i_set + 1}"
                     )
-    yaml_dict |= topology_dict
+                    cubit.fourc_input[section_name].append({"entry" : [f"NODE", i_node, f"{set_label}", i_set+1]})
 
 
 def get_element_connectivity_string(connectivity):
