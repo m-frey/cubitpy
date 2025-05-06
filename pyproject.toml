@@ -30,5 +30,5 @@ dev = [
   "pytest",
   "pyyaml",
   "deepdiff",
-  "fourcipp+git+https://github.com/4C-multiphysics/fourcipp.git@main"
+  "fourcipp @ git+https://github.com/4C-multiphysics/fourcipp.git@main"
 ]
