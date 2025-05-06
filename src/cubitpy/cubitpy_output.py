@@ -182,19 +182,26 @@ def write_mesh_to_inputfile(cubit):
     connectivity_keys = [key for key in exo.variables.keys() if "connect" in key]
     connectivity_keys.sort()
     i_element = 0
+    element_dict = {}
+    element_list = []
     for i_block, key in enumerate(connectivity_keys):
         ele_type, block_string = cubit.blocks[i_block]
         block_section = ele_type.get_four_c_section()
-        element_list = []
+        if block_section not in element_dict.keys():
+            element_dict[block_section] = []
         for connectivity in exo.variables[key][:]:
             connectivity_string = get_element_connectivity_string(connectivity)
             element_list.append(
+                f"{i_element + 1} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
+            )
+            element_dict[block_section].append(
                 f"{i_element + 1} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
             )
             i_element += 1
         if not block_section == current_section:
             current_section = block_section
 
-            cubit.fourc_input[f"{current_section} ELEMENTS"] = element_list
+    for section, element_list in element_dict.items():
+        cubit.fourc_input[f"{section} ELEMENTS"] = element_list
 
     return 0

@@ -32,7 +32,7 @@ from fourcipp.fourc_input import FourCInput
 from cubitpy.conf import cupy
 from cubitpy.cubit_group import CubitGroup
 from cubitpy.cubit_wrapper.cubit_wrapper_host import CubitConnect
-from cubitpy.cubitpy_to_dat import write_mesh_to_inputfile
+from cubitpy.cubitpy_output import write_mesh_to_inputfile
 
 
 class CubitPy(object):
@@ -269,6 +269,8 @@ class CubitPy(object):
             )
         if bc_section is None:
             bc_section = bc_type.get_dat_bc_section_header(geometry_type)
+        if bc_description is None:
+            bc_description = {}
         self.node_sets.append([bc_section, bc_description, geometry_type])
 
     def get_ids(self, geometry_type):
