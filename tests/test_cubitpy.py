@@ -60,9 +60,26 @@ def check_tmp_dir():
     os.makedirs(testing_temp, exist_ok=True)
 
 
-def compare_node_coords_with_tol(
-    ref_coords_list, out_coords_list, tol=1e-8
-):
+def compare_node_coords_with_tol(ref_coords_list, out_coords_list, tol=1e-8):
+    """Compares two lists of node coordinate strings with a tolerance.
+
+    Each coordinate string is expected to be in the format:
+    "NODE <id> COORD <x> <y> <z>", and the function compares corresponding
+    coordinates between the reference and output lists. The comparison
+    is considered successful if all coordinate differences are within the
+    specified tolerance.
+
+    Args:
+        ref_coords_list (list of str): The list of reference node coordinate strings.
+        out_coords_list (list of str): The list of output node coordinate strings to compare.
+        tol (float, optional): The tolerance for coordinate comparison. Defaults to 1e-8.
+
+    Returns:
+        int: 0 if all coordinates match within the tolerance, 1 otherwise.
+
+    Raises:
+        AssertionError: If the input lists are not of the same length.
+    """
     assert len(ref_coords_list) == len(
         out_coords_list
     ), "NODE COORDS list lengths differ"
@@ -470,9 +487,6 @@ def create_element_types_hex(cubit, element_type_list, name):
     compare_yaml(cubit, name=name)
 
 
-@pytest.mark.skip(
-    reason="Temporarily disabled due to switch to .yaml based input files - check if test is necessary and fix"
-)
 def test_element_types_hex():
     """Create a curved solid with different hex element types."""
 
@@ -1737,6 +1751,8 @@ def test_extrude_artery_of_aneurysm():
 
 
 def test_compare_legacy_node_coords_with_tolerance_behavior():
+    """Extrude an arterial surface based on an aneurysm test case."""
+
     ref_coords_list = [
         "NODE 1 COORD -5.0000000000000000e-01 -5.0000000000000000e-01 5.0000000000000000e-01",
         "NODE 8 COORD 5.0000000000000000e-01 5.0000000000000000e-01 5.0000000000000000e-01",
@@ -1747,12 +1763,8 @@ def test_compare_legacy_node_coords_with_tolerance_behavior():
         "NODE 8 COORD 5.0011000000000000e-01 5.0000000000000000e-01 5.0000000000000000e-01",
     ]
 
-    result = compare_node_coords_with_tol(
-        ref_coords_list, out_coords_list, tol=1e-1
-    )
+    result = compare_node_coords_with_tol(ref_coords_list, out_coords_list, tol=1e-1)
     assert result == 0
 
     with pytest.raises(AssertionError):
-        compare_node_coords_with_tol(
-            ref_coords_list, out_coords_list, tol=1e-4
-        )
+        compare_node_coords_with_tol(ref_coords_list, out_coords_list, tol=1e-4)

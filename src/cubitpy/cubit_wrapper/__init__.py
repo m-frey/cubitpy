@@ -20,3 +20,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """This module defines a wrapper for cubit python interpreters."""
+
+from cubitpy import CubitPy, cupy
