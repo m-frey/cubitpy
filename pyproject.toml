@@ -29,5 +29,6 @@ dev = [
   "pre-commit",
   "pytest",
   "pyyaml",
-  "deepdiff"
+  "deepdiff",
+  "fourcipp+git+https://github.com/4C-multiphysics/fourcipp.git@main"
 ]
