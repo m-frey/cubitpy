@@ -183,7 +183,6 @@ def write_mesh_to_inputfile(cubit):
     connectivity_keys.sort()
     i_element = 0
     element_dict = {}
-    element_list = []
     for i_block, key in enumerate(connectivity_keys):
         ele_type, block_string = cubit.blocks[i_block]
         block_section = ele_type.get_four_c_section()
@@ -191,9 +190,6 @@ def write_mesh_to_inputfile(cubit):
             element_dict[block_section] = []
         for connectivity in exo.variables[key][:]:
             connectivity_string = get_element_connectivity_string(connectivity)
-            element_list.append(
-                f"{i_element + 1} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
-            )
             element_dict[block_section].append(
                 f"{i_element + 1} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
             )
