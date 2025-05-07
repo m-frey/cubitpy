@@ -30,6 +30,7 @@ import numpy as np
 import pytest
 import yaml
 from deepdiff import DeepDiff
+from fourcipp.fourc_input import FourCInput
 from pytest import approx
 
 # Define the testing paths.
@@ -138,29 +139,37 @@ def compare_yaml(cubit, *, name=None):
     out_file = os.path.join(testing_temp, name + ".4C.yaml")
     cubit.write_input_file(out_file)
 
-    # Load YAML as structured Python objects
-    with open(ref_file, "r") as f:
-        ref_data = yaml.safe_load(f)
-    with open(out_file, "r") as f:
-        out_data = yaml.safe_load(f)
+    ref_input_file = FourCInput.from_4C_yaml(ref_file)
+    out_input_file = FourCInput.from_4C_yaml(out_file)
 
-    # Remove NODE COORDS for DeepDiff as they are stored as a string
-    ref_coords = ref_data.pop("NODE COORDS", None)
-    out_coords = out_data.pop("NODE COORDS", None)
+    try:
+        files_are_equal = ref_input_file.compare(
+            out_input_file, allow_int_as_float=True, raise_exception=True
+        )
+    except AssertionError as exception:
+        print(f"[compare] Files differ: {exception}")
 
-    # Compare NODE COORDS with tolerance
-    if ref_coords and out_coords:
-        compare_node_coords_with_tol(ref_coords, out_coords)
+        # Load YAML as structured Python objects
+        with open(ref_file, "r") as f:
+            ref_data = yaml.safe_load(f)
+        with open(out_file, "r") as f:
+            out_data = yaml.safe_load(f)
 
-    # Perform yaml comparison with tolerances
-    diff = DeepDiff(
-        ref_data,
-        out_data,
-        ignore_order=True,
-    )
-    files_are_equal = not diff
-    if not files_are_equal:
-        print("YAML comparison failed! Differences found:")
+        # Remove NODE COORDS for DeepDiff as they are stored as a string
+        ref_coords = ref_data.pop("NODE COORDS", None)
+        out_coords = out_data.pop("NODE COORDS", None)
+
+        # Compare NODE COORDS with tolerance
+        if ref_coords and out_coords:
+            compare_node_coords_with_tol(ref_coords, out_coords)
+
+        # Perform yaml comparison with tolerances
+        diff = DeepDiff(
+            ref_data,
+            out_data,
+            ignore_order=True,
+        )
+        print(f"diff is {diff}")
         print(diff.pretty())
 
         if TESTING_GITHUB:
@@ -175,8 +184,9 @@ def compare_yaml(cubit, *, name=None):
             print("No viewer avail. - Inspect manually.")
             print(f"Reference: {ref_file}")
             print(f"Generated: {out_file}")
-
-    assert files_are_equal
+        raise exception
+    else:
+        assert files_are_equal
 
 
 def create_block(cubit, np_arrays=False):
@@ -1274,7 +1284,6 @@ def xtest_groups(block_with_volume):
     ]
 
     # Compare the input file created for 4C.
-    cubit.write_input_file("test_groups.4C.yaml")
     compare_yaml(cubit, name="test_groups")
 
 

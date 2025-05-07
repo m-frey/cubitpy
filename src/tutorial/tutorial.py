@@ -205,60 +205,57 @@ def cubit_step_by_step_tutorial_cli(
 
     # Set the head string.
     cubit.fourc_input["PROBLEM TYPE"] = {"PROBLEMTYPE": "Structure"}
-
-    cubit.fourc_input["IO"] = {
-        "OUTPUT_BIN": "no",
-        "VERBOSITY": "Standard",
-        "STRUCT_STRAIN": "GL",
-        "STRUCT_STRESS": "Cauchy",
-        "OUTPUT_SPRING": "Yes",
-    }
-
-    cubit.fourc_input["IO/RUNTIME VTK OUTPUT"] = {
-        "INTERVAL_STEPS": 1,
-    }
-
-    cubit.fourc_input["IO/RUNTIME VTK OUTPUT/STRUCTURE"] = {
-        "OUTPUT_STRUCTURE": "yes",
-        "DISPLACEMENT": "yes",
-        "ELEMENT_OWNER": "yes",
-        "STRESS_STRAIN": "yes",
-    }
-
-    cubit.fourc_input["SOLVER 1"] = {"NAME": "Structure_Solver", "SOLVER": "Superlu"}
-
-    cubit.fourc_input["STRUCTURAL DYNAMIC"] = {
-        "INT_STRATEGY": "Standard",
-        "DYNAMICTYPE": "Statics",
-        "PRESTRESSTOLDISP": 1e-10,
-        "TIMESTEP": 0.5,
-        "NUMSTEP": 20,
-        "MAXTIME": 10,
-        "TOLRES": 1e-10,
-        "LINEAR_SOLVER": 1,
-        "MAXITER": 200,
-    }
-
-    cubit.fourc_input["STRUCT NOX/Printing"] = {
-        "Inner Iteration": "No",
-        "Outer Iteration StatusTest": "No",
-    }
-
-    cubit.fourc_input["MATERIALS"] = [
+    cubit.fourc_input.add(
         {
-            "MAT": 1,
-            "MAT_Struct_StVenantKirchhoff": {
-                "YOUNG": 1.0e1,
-                "NUE": 0.3,
-                "DENS": 0,
+            "PROBLEM TYPE": {"PROBLEMTYPE": "Structure"},
+            "IO": {
+                "OUTPUT_SPRING": True,
+                "OUTPUT_BIN": False,
+                "VERBOSITY": "Standard",
+                "STRUCT_STRAIN": "GL",
+                "STRUCT_STRESS": "Cauchy",
             },
+            "IO/RUNTIME VTK OUTPUT": {
+                "INTERVAL_STEPS": 1,
+            },
+            "IO/RUNTIME VTK OUTPUT/STRUCTURE": {
+                "OUTPUT_STRUCTURE": True,
+                "DISPLACEMENT": True,
+                "ELEMENT_OWNER": True,
+                "STRESS_STRAIN": True,
+            },
+            "SOLVER 1": {"NAME": "Structure_Solver", "SOLVER": "Superlu"},
+            "STRUCTURAL DYNAMIC": {
+                "INT_STRATEGY": "Standard",
+                "DYNAMICTYPE": "Statics",
+                "PRESTRESSTOLDISP": 1e-10,
+                "TIMESTEP": 0.5,
+                "NUMSTEP": 20,
+                "MAXTIME": 10,
+                "TOLRES": 1e-10,
+                "MAXITER": 200,
+                "LINEAR_SOLVER": 1,
+            },
+            "STRUCT NOX/Printing": {
+                "Inner Iteration": False,
+                "Outer Iteration StatusTest": False,
+            },
+            "MATERIALS": [
+                {
+                    "MAT": 1,
+                    "MAT_Struct_StVenantKirchhoff": {
+                        "YOUNG": 1.0e1,
+                        "NUE": 0.3,
+                        "DENS": 0,
+                    },
+                }
+            ],
+            "FUNCT1": [{"SYMBOLIC_FUNCTION_OF_SPACE_TIME": "t"}],
         }
-    ]
-
-    cubit.fourc_input["FUNCT1"] = [{"SYMBOLIC_FUNCTION_OF_SPACE_TIME": "t"}]
+    )
 
     # Write the input file.
-    cubit.write_input_file(input_file_path)
+    # cubit.write_input_file(input_file_path)
 
 
 if __name__ == "__main__":
