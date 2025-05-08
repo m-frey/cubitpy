@@ -70,7 +70,6 @@ def add_node_sets(cubit, exo, input_file):
             input_file[bc_section] = []
         bc_description["E"] = len(node_sets[geometry_type])
 
-        # bc_description["NAME"] = names[i_set]
         input_file[bc_section].append(bc_description)
 
     name_geometry_tuple = [
@@ -86,7 +85,12 @@ def add_node_sets(cubit, exo, input_file):
                 node_set.sort()
                 for i_node in node_set:
                     input_file[section_name].append(
-                        {"entry": [f"NODE", i_node, f"{set_label}", i_set + 1]}
+                        {
+                            "type": "NODE",
+                            "node_id": i_node,
+                            "d_type": set_label,
+                            "d_id": i_set + 1,
+                        }
                     )
 
 
