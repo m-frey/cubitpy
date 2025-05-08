@@ -26,11 +26,12 @@ import os
 
 import netCDF4
 import numpy as np
+from fourcipp import fourc_input
 
 from cubitpy.conf import cupy
 
 
-def add_node_sets(cubit, exo):
+def add_node_sets(cubit, exo, input_file):
     """Add the node sets contained in the cubit session/exo file to the
     dat_lines."""
 
@@ -65,42 +66,26 @@ def add_node_sets(cubit, exo):
         boundary_condition_map[bc_key].append(
             [len(node_sets[geometry_type]), bc_description, names[i_set]]
         )
-        if bc_section not in cubit.fourc_input.inlined.keys():
-            cubit.fourc_input[bc_section] = []
+        if bc_section not in input_file.inlined.keys():
+            input_file[bc_section] = []
         bc_description["E"] = len(node_sets[geometry_type])
 
         # bc_description["NAME"] = names[i_set]
-        cubit.fourc_input[bc_section].append(bc_description)
+        input_file[bc_section].append(bc_description)
 
     name_geometry_tuple = [
-        [
-            cupy.geometry.vertex,
-            "DNODE-NODE TOPOLOGY",
-            "DNODE",
-        ],
-        [
-            cupy.geometry.curve,
-            "DLINE-NODE TOPOLOGY",
-            "DLINE",
-        ],
-        [
-            cupy.geometry.surface,
-            "DSURF-NODE TOPOLOGY",
-            "DSURFACE",
-        ],
-        [
-            cupy.geometry.volume,
-            "DVOL-NODE TOPOLOGY",
-            "DVOL",
-        ],
+        [cupy.geometry.vertex, "DNODE-NODE TOPOLOGY", "DNODE"],
+        [cupy.geometry.curve, "DLINE-NODE TOPOLOGY", "DLINE"],
+        [cupy.geometry.surface, "DSURF-NODE TOPOLOGY", "DSURFACE"],
+        [cupy.geometry.volume, "DVOL-NODE TOPOLOGY", "DVOL"],
     ]
     for geo, section_name, set_label in name_geometry_tuple:
         if len(node_sets[geo]) > 0:
-            cubit.fourc_input[section_name] = []
+            input_file[section_name] = []
             for i_set, node_set in enumerate(node_sets[geo]):
                 node_set.sort()
                 for i_node in node_set:
-                    cubit.fourc_input[section_name].append(
+                    input_file[section_name].append(
                         {"entry": [f"NODE", i_node, f"{set_label}", i_set + 1]}
                     )
 
@@ -149,8 +134,9 @@ def get_element_connectivity_string(connectivity):
         return " ".join([f"{item:d}" for item in connectivity])
 
 
-def write_mesh_to_inputfile(cubit):
-    """Convert a CubitPy session to a dat file that can be read with 4C."""
+def get_input_file_with_mesh(cubit):
+    """Return a copy of cubit.fourc_input with mesh data (nodes and elements)
+    added."""
 
     # Create exodus file
     os.makedirs(cupy.temp_dir, exist_ok=True)
@@ -158,8 +144,10 @@ def write_mesh_to_inputfile(cubit):
     cubit.export_exo(exo_path)
     exo = netCDF4.Dataset(exo_path)
 
+    # create a deep copy of the inputfile
+    input_file = cubit.fourc_input.copy()
     # Add the node sets
-    add_node_sets(cubit, exo)
+    add_node_sets(cubit, exo, input_file)
 
     # Add the nodal data
     node_list = []
@@ -175,7 +163,7 @@ def write_mesh_to_inputfile(cubit):
         node_list.append(
             f"NODE {i+1} COORD {coordinate[0]} {coordinate[1]} {coordinate[2]}"
         )
-    cubit.fourc_input["NODE COORDS"] = node_list
+    input_file["NODE COORDS"] = node_list
 
     # Add the element connectivity
     current_section = None
@@ -198,6 +186,6 @@ def write_mesh_to_inputfile(cubit):
             current_section = block_section
 
     for section, element_list in element_dict.items():
-        cubit.fourc_input[f"{section} ELEMENTS"] = element_list
+        input_file[f"{section} ELEMENTS"] = element_list
 
-    return 0
+    return input_file

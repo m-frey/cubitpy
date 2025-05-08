@@ -32,8 +32,8 @@ from fourcipp.fourc_input import FourCInput
 
 from cubitpy.conf import cupy
 from cubitpy.cubit_group import CubitGroup
+from cubitpy.cubit_to_fourc_input import get_input_file_with_mesh
 from cubitpy.cubit_wrapper.cubit_wrapper_host import CubitConnect
-from cubitpy.cubitpy_output import write_mesh_to_inputfile
 
 
 class CubitPy(object):
@@ -344,7 +344,7 @@ class CubitPy(object):
                 the_file.write(line + "\n")
 
     def write_input_file(self, yaml_path):
-        """Create the yaml file an copy it to yaml_path.
+        """Create the yaml file an save it in yaml_path.
 
         Args
         ----
@@ -358,8 +358,8 @@ class CubitPy(object):
             if not os.path.exists(dat_dir):
                 raise ValueError("Path {} does not exist!".format(dat_dir))
 
-        (write_mesh_to_inputfile(self),)
-        self.fourc_input.dump(yaml_path)
+        input_file = get_input_file_with_mesh(self)
+        input_file.dump(yaml_path)
 
     def group(self, **kwargs):
         """Reference a group in cubit.
