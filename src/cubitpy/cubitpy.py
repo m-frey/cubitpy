@@ -26,7 +26,6 @@ import subprocess  # nosec B404
 import time
 import warnings
 
-import yaml as _yaml
 from fourcipp import fourc_input
 from fourcipp.fourc_input import FourCInput
 

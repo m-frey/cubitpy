@@ -108,7 +108,7 @@ def compare_node_coords_with_tol(ref_coords_list, out_coords_list, tol=1e-8):
     return 0
 
 
-def compare_yaml(cubit, *, name=None):
+def compare_yaml(cubit, *, name=None, rtol=1.0e-5, atol=1.0e-8):
     """Write and compare the YAML file from a Cubit object with the reference
     YAML file.
 
@@ -144,7 +144,11 @@ def compare_yaml(cubit, *, name=None):
 
     try:
         files_are_equal = ref_input_file.compare(
-            out_input_file, allow_int_as_float=True, raise_exception=True
+            out_input_file,
+            allow_int_as_float=True,
+            raise_exception=True,
+            rtol=rtol,
+            atol=atol,
         )
     except AssertionError as exception:
         print(f"[compare] Files differ: {exception}")
