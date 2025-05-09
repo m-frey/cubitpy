@@ -148,13 +148,13 @@ def get_input_file_with_mesh(cubit):
     cubit.export_exo(exo_path)
     exo = netCDF4.Dataset(exo_path)
 
-    # create a deep copy of the inputfile
+    # create a deep copy of the input_file
     input_file = cubit.fourc_input.copy()
     # Add the node sets
     add_node_sets(cubit, exo, input_file)
 
     # Add the nodal data
-    node_list = []
+    input_file["NODE COORDS"] = []
     if "coordz" in exo.variables:
         coordinates = np.array(
             [exo.variables["coord" + dim][:] for dim in ["x", "y", "z"]],
@@ -164,32 +164,37 @@ def get_input_file_with_mesh(cubit):
         temp.append([0 for i in range(len(temp[0]))])
         coordinates = np.array(temp).transpose()
     for i, coordinate in enumerate(coordinates):
-        node_list.append(
-            f"NODE {i+1} COORD {coordinate[0]} {coordinate[1]} {coordinate[2]}"
+        input_file["NODE COORDS"].append(
+            {
+                "COORD": [coordinate[0], coordinate[1], coordinate[2]],
+                "data": {"type": "NODE"},
+                "id": i + 1,
+            }
         )
-    input_file["NODE COORDS"] = node_list
 
     # Add the element connectivity
-    current_section = None
     connectivity_keys = [key for key in exo.variables.keys() if "connect" in key]
     connectivity_keys.sort()
     i_element = 0
-    element_dict = {}
     for i_block, key in enumerate(connectivity_keys):
-        ele_type, block_string = cubit.blocks[i_block]
+        ele_type, block_dict = cubit.blocks[i_block]
         block_section = ele_type.get_four_c_section()
-        if block_section not in element_dict.keys():
-            element_dict[block_section] = []
+        input_sections = input_file.sections
+        if f"{block_section} ELEMENTS" not in input_sections.keys():
+            input_file[f"{block_section} ELEMENTS"] = []
         for connectivity in exo.variables[key][:]:
-            connectivity_string = get_element_connectivity_string(connectivity)
-            element_dict[block_section].append(
-                f"{i_element + 1} {ele_type.get_four_c_name()} {ele_type.get_four_c_type()} {connectivity_string} {block_string}"
+            input_file[f"{block_section} ELEMENTS"].append(
+                {
+                    "id": i_element + 1,
+                    "cell": {
+                        "connectivity": connectivity.tolist(),
+                        "type": ele_type.get_four_c_type(),
+                    },
+                    "data": {
+                        "type": ele_type.get_four_c_name(),
+                        **block_dict,
+                    },
+                }
             )
             i_element += 1
-        if not block_section == current_section:
-            current_section = block_section
-
-    for section, element_list in element_dict.items():
-        input_file[f"{section} ELEMENTS"] = element_list
-
     return input_file

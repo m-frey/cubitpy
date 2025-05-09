@@ -237,8 +237,8 @@ def create_block(cubit, np_arrays=False):
         block.volumes()[0],
         cupy.element_type.hex8,
         name="block",
-        material="MAT 1",
-        bc_description="KINEM linear",
+        material={"MAT": 1},
+        bc_description={"KINEM": "linear"},
     )
 
     # Create node sets.
@@ -352,7 +352,7 @@ def test_create_wedge6():
         wedge_group,
         cupy.element_type.wedge6,
         name="wedges",
-        material="MAT 1",
+        material={"MAT": 1},
         bc_description=None,
     )
 
@@ -374,7 +374,7 @@ def create_element_types_tet(cubit, element_type_list, name):
             volume,
             element_type,
             name="block_" + str(i),
-            material="MAT 1",
+            material={"MAT": 1},
             bc_description=None,
         )
         cubit.cmd("Volume {} size 2".format(volume.id()))
@@ -467,7 +467,7 @@ def create_element_types_hex(cubit, element_type_list, name):
             cubit.volume(1 + offset_volume),
             element_type,
             name="block_" + str(i),
-            material="MAT 1",
+            material={"MAT": 1},
             bc_description=None,
         )
 
@@ -550,8 +550,14 @@ def create_quad_mesh(plane):
     cubit.add_element_type(
         cubit.surface(1),
         cupy.element_type.quad4,
-        material="MAT 1",
-        bc_description="KINEM nonlinear EAS none THICK 1.0 STRESS_STRAIN plane_stress GP 3 3",
+        material={"MAT": 1},
+        bc_description={
+            "KINEM": "nonlinear",
+            "EAS": "none",
+            "THICK": 1.0,
+            "STRESS_STRAIN": "plane_stress",
+            "GP": [3, 3],
+        },
     )
     return cubit
 
@@ -1124,8 +1130,14 @@ def test_group_of_surfaces():
         surfaces,
         cupy.element_type.quad4,
         name="mesh",
-        material="MAT 1",
-        bc_description="KINEM linear EAS none THICK 1.0 STRESS_STRAIN plane_strain GP 3 3",
+        material={"MAT": 1},
+        bc_description={
+            "KINEM": "linear",
+            "EAS": "none",
+            "THICK": 1.0,
+            "STRESS_STRAIN": "plane_strain",
+            "GP": [3, 3],
+        },
     )
 
     # Compare the input file created for 4C.
@@ -1181,8 +1193,8 @@ def xtest_groups(block_with_volume):
         cubit.add_element_type(
             volume,
             cupy.element_type.hex8,
-            material="MAT 1",
-            bc_description="KINEM linear",
+            material={"MAT": 1},
+            bc_description={"KINEM": "linear"},
         )
 
     # Add BCs.
@@ -1251,8 +1263,8 @@ def xtest_groups(block_with_volume):
         cubit.add_element_type(
             all_hex,
             cupy.element_type.hex8,
-            material="MAT 1",
-            bc_description="KINEM linear",
+            material={"MAT": 1},
+            bc_description={"KINEM": "linear"},
         )
 
     # Add a group containing elements and nodes.

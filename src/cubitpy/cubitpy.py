@@ -124,7 +124,7 @@ class CubitPy(object):
             self.cubit.cmd('{} {} name "{}"'.format(set_type, set_id, rename_name))
 
     def add_element_type(
-        self, item, el_type, *, name=None, material="MAT 1", bc_description=None
+        self, item, el_type, *, name=None, material=None, bc_description=None
     ):
         """Add a block to cubit that contains the geometry in item. Also set
         the element type of block.
@@ -137,13 +137,19 @@ class CubitPy(object):
             Cubit element type.
         name: str
             Name of the block.
-        material: str
+        material: dict
             Material string of the block, will be the first part of the BC
             description.
-        bc_description: str
+        bc_description: dict
             Will be written after the material string. If this is not set, the
             default values for the given element type will be used.
         """
+
+        # default values
+        if material is None:
+            material = {"MAT": 1}
+        if bc_description is None:
+            bc_description = {}
 
         # Check that all blocks in cubit are created with this function.
         n_blocks = len(self.blocks)
@@ -183,11 +189,11 @@ class CubitPy(object):
         self._name_created_set("block", n_blocks + 1, name, item)
 
         # If the user does not give a bc_description, load the default one.
-        if bc_description is None:
+        if not bc_description:
             bc_description = el_type.get_default_four_c_description()
 
         # Add data that will be written to bc file.
-        self.blocks.append([el_type, " ".join([material, bc_description])])
+        self.blocks.append([el_type, material | bc_description])
 
     def reset_blocks(self):
         """This method deletes all blocks in Cubit and resets the counter in
