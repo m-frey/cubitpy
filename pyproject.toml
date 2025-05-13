@@ -17,7 +17,8 @@ license = "MIT"
 dependencies = [
   "execnet==1.9.0",
   "netCDF4",
-  "numpy"
+  "numpy",
+  "fourcipp @ git+https://github.com/4C-multiphysics/fourcipp.git@main"
 ]
 dynamic = ["version"]
 
@@ -28,7 +29,5 @@ dev = [
   "setuptools", # Needed for coverage-badge
   "pre-commit",
   "pytest",
-  "pyyaml",
   "deepdiff",
-  "fourcipp @ git+https://github.com/4C-multiphysics/fourcipp.git@main"
 ]

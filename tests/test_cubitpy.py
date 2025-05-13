@@ -28,7 +28,6 @@ import subprocess
 
 import numpy as np
 import pytest
-import yaml
 from deepdiff import DeepDiff
 from fourcipp.fourc_input import FourCInput
 from pytest import approx
@@ -59,53 +58,6 @@ else:
 def check_tmp_dir():
     """Check if the temp directory exists, if not create it."""
     os.makedirs(testing_temp, exist_ok=True)
-
-
-def compare_node_coords_with_tol(ref_coords_list, out_coords_list, tol=1e-8):
-    """Compares two lists of node coordinate strings with a tolerance.
-
-    Each coordinate string is expected to be in the format:
-    "NODE <id> COORD <x> <y> <z>", and the function compares corresponding
-    coordinates between the reference and output lists. The comparison
-    is considered successful if all coordinate differences are within the
-    specified tolerance.
-
-    Args:
-        ref_coords_list (list of str): The list of reference node coordinate strings.
-        out_coords_list (list of str): The list of output node coordinate strings to compare.
-        tol (float, optional): The tolerance for coordinate comparison. Defaults to 1e-8.
-
-    Returns:
-        int: 0 if all coordinates match within the tolerance, 1 otherwise.
-
-    Raises:
-        AssertionError: If the input lists are not of the same length.
-    """
-    assert len(ref_coords_list) == len(
-        out_coords_list
-    ), "NODE COORDS list lengths differ"
-
-    for ref_line, out_line in zip(ref_coords_list, out_coords_list):
-        ref_parts = ref_line.split()
-        out_parts = out_line.split()
-
-        assert (
-            ref_parts[:3] == out_parts[:3]
-        ), f"Prefix mismatch in line: {ref_line} vs {out_line}"
-
-        try:
-            ref_nums = list(map(float, ref_parts[3:]))
-            out_nums = list(map(float, out_parts[3:]))
-        except ValueError:
-            raise AssertionError(
-                f"Failed to parse floats in line: {ref_line} or {out_line}"
-            )
-
-        assert len(ref_nums) == len(out_nums), "Coordinate length mismatch"
-        for i, (r, o) in enumerate(zip(ref_nums, out_nums)):
-            assert o == approx(r, abs=tol), f"Coordinate {i} mismatch: {r} vs {o}"
-
-    return 0
 
 
 def compare_yaml(cubit, *, name=None, rtol=1.0e-5, atol=1.0e-8):
@@ -153,28 +105,21 @@ def compare_yaml(cubit, *, name=None, rtol=1.0e-5, atol=1.0e-8):
     except AssertionError as exception:
         print(f"[compare] Files differ: {exception}")
 
-        # Load YAML as structured Python objects
-        with open(ref_file, "r") as f:
-            ref_data = yaml.safe_load(f)
-        with open(out_file, "r") as f:
-            out_data = yaml.safe_load(f)
+        ref_sections = ref_input_file.sections
+        out_sections = out_input_file.sections
 
-        # Remove NODE COORDS for DeepDiff as they are stored as a string
-        ref_coords = ref_data.pop("NODE COORDS", None)
-        out_coords = out_data.pop("NODE COORDS", None)
+        for section in ref_sections:
+            ref_section_data = ref_sections.get(section)
+            out_section_data = out_sections.get(section)
 
-        # Compare NODE COORDS with tolerance
-        if ref_coords and out_coords:
-            compare_node_coords_with_tol(ref_coords, out_coords)
-
-        # Perform yaml comparison with tolerances
-        diff = DeepDiff(
-            ref_data,
-            out_data,
-            ignore_order=True,
-        )
-        print(f"diff is {diff}")
-        print(diff.pretty())
+            # Perform yaml comparison
+            diff = DeepDiff(
+                ref_section_data,
+                out_section_data,
+                ignore_order=True,
+            )
+            if diff:
+                print(diff.pretty())
 
         if TESTING_GITHUB:
             subprocess.run(["diff", ref_file, out_file])
@@ -513,7 +458,6 @@ def create_element_types_hex(cubit, element_type_list, name):
     compare_yaml(cubit, name=name)
 
 
-@pytest.mark.skip(reason="Failure due to hexsh unavail. in fourcipp")
 def test_element_types_hex():
     """Create a curved solid with different hex element types."""
 
@@ -581,7 +525,6 @@ def test_element_types_quad_y_plane():
     compare_yaml(create_quad_mesh("yplane"))
 
 
-@pytest.mark.skip(reason="Failure due to hexsh unavail. in fourcipp")
 def test_block_function():
     """Create a solid block with different element types."""
 
@@ -610,7 +553,6 @@ def test_block_function():
                 element_type=element_type,
                 name=f"{element_type} {count}",
                 mesh=False,
-                material="test material string",
                 **kwargs_brick,
             )
             cubit.move(cube, [count, 0, 0])
@@ -618,6 +560,8 @@ def test_block_function():
             count += 1
 
     # Compare the input file created for 4C.
+    out_file = os.path.join(testing_temp, "tmp" + ".4C.yaml")
+    cubit.write_input_file(out_file)
     compare_yaml(cubit)
 
 
@@ -1760,23 +1704,3 @@ def test_extrude_artery_of_aneurysm():
     assert 13.570135865871498 == pytest.approx(
         cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-5
     )
-
-
-def test_compare_legacy_node_coords_with_tolerance_behavior():
-    """Extrude an arterial surface based on an aneurysm test case."""
-
-    ref_coords_list = [
-        "NODE 1 COORD -5.0000000000000000e-01 -5.0000000000000000e-01 5.0000000000000000e-01",
-        "NODE 8 COORD 5.0000000000000000e-01 5.0000000000000000e-01 5.0000000000000000e-01",
-    ]
-
-    out_coords_list = [
-        "NODE 1 COORD -4.9989000000000000e-01 -5.0000000000000000e-01 5.0000000000000000e-01",
-        "NODE 8 COORD 5.0011000000000000e-01 5.0000000000000000e-01 5.0000000000000000e-01",
-    ]
-
-    result = compare_node_coords_with_tol(ref_coords_list, out_coords_list, tol=1e-1)
-    assert result == 0
-
-    with pytest.raises(AssertionError):
-        compare_node_coords_with_tol(ref_coords_list, out_coords_list, tol=1e-4)

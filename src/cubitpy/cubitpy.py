@@ -26,7 +26,6 @@ import subprocess  # nosec B404
 import time
 import warnings
 
-from fourcipp import fourc_input
 from fourcipp.fourc_input import FourCInput
 
 from cubitpy.conf import cupy
@@ -380,7 +379,7 @@ class CubitPy(object):
 
         self.cubit.reset()
         self._default_cubit_variables()
-        self.fourc_input = fourc_input.FourCInput()
+        self.fourc_input = FourCInput()
 
     def display_in_cubit(self, labels=[], delay=0.5, testing=False):
         """Save the state to a cubit file and open cubit with that file.
