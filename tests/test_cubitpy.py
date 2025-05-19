@@ -21,7 +21,6 @@
 # THE SOFTWARE.
 """This script is used to test the functionality of the cubitpy module."""
 
-import math
 import os
 import shutil
 import subprocess
@@ -30,7 +29,6 @@ import numpy as np
 import pytest
 from deepdiff import DeepDiff
 from fourcipp.fourc_input import FourCInput
-from pytest import approx
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -60,7 +58,7 @@ def check_tmp_dir():
     os.makedirs(testing_temp, exist_ok=True)
 
 
-def compare_yaml(cubit, *, name=None, rtol=1.0e-5, atol=1.0e-8):
+def compare_yaml(cubit, *, name=None, rtol=1.0e-12, atol=1.0e-12):
     """Write and compare the YAML file from a Cubit object with the reference
     YAML file.
 
@@ -916,7 +914,7 @@ def test_thermo_functionality():
     )
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_thermo_functionality")
+    compare_yaml(cubit)
 
 
 def test_scatra_functionality():
@@ -1089,7 +1087,7 @@ def test_group_of_surfaces():
     )
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_group_of_surfaces")
+    compare_yaml(cubit)
 
 
 def xtest_groups(block_with_volume):

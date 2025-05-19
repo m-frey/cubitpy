@@ -70,6 +70,7 @@ class CubitPy(object):
         """Set the default values for the lists and counters used in cubit."""
         self.blocks = []
         self.node_sets = []
+        self.fourc_input = FourCInput()
 
     def __getattr__(self, key, *args, **kwargs):
         """All calls to methods and attributes that are not in this object get
@@ -328,25 +329,6 @@ class CubitPy(object):
         """Export the mesh."""
         self.cubit.cmd('export mesh "{}" dimension 3 overwrite'.format(path))
 
-    def create_dat(self, dat_path):
-        """Create the dat file an copy it to dat_path.
-
-        Args
-        ----
-        dat_path: str
-            Path where the input file file will be saved
-        """
-
-        # Check if output path exists.
-        if os.path.isabs(dat_path):
-            dat_dir = os.path.dirname(dat_path)
-            if not os.path.exists(dat_dir):
-                raise ValueError("Path {} does not exist!".format(dat_dir))
-
-        with open(dat_path, "w") as the_file:
-            for line in self.get_dat_lines():
-                the_file.write(line + "\n")
-
     def write_input_file(self, yaml_path):
         """Create the yaml file an save it in yaml_path.
 
@@ -356,11 +338,10 @@ class CubitPy(object):
             Path where the input file file will be saved
         """
 
-        # Check if output path exists.
-        if os.path.isabs(yaml_path):
-            dat_dir = os.path.dirname(yaml_path)
-            if not os.path.exists(dat_dir):
-                raise ValueError("Path {} does not exist!".format(dat_dir))
+        # Check if output path exists
+        dat_dir = os.path.dirname(os.path.abspath(yaml_path))
+        if not os.path.exists(dat_dir):
+            raise ValueError("Path {} does not exist!".format(dat_dir))
 
         input_file = get_input_file_with_mesh(self)
         input_file.dump(yaml_path)
@@ -379,7 +360,6 @@ class CubitPy(object):
 
         self.cubit.reset()
         self._default_cubit_variables()
-        self.fourc_input = FourCInput()
 
     def display_in_cubit(self, labels=[], delay=0.5, testing=False):
         """Save the state to a cubit file and open cubit with that file.

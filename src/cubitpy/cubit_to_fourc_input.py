@@ -26,7 +26,6 @@ import os
 
 import netCDF4
 import numpy as np
-from fourcipp import fourc_input
 
 from cubitpy.conf import cupy
 
@@ -92,50 +91,6 @@ def add_node_sets(cubit, exo, input_file):
                             "d_id": i_set + 1,
                         }
                     )
-
-
-def get_element_connectivity_string(connectivity):
-    """Return the connectivity string for an element.
-
-    For hex27 we need a different ordering than the one we get from
-    cubit
-    """
-
-    if len(connectivity) == 27:
-        # hex27
-        ordering = [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            21,
-            25,
-            24,
-            26,
-            23,
-            22,
-            20,
-        ]
-        return " ".join([f"{item:d}" for item in connectivity[ordering]])
-    else:
-        # all other elements
-        return " ".join([f"{item:d}" for item in connectivity])
 
 
 def get_element_connectivity_list(connectivity):
@@ -222,11 +177,11 @@ def get_input_file_with_mesh(cubit):
     i_element = 0
     for i_block, key in enumerate(connectivity_keys):
         ele_type, block_dict = cubit.blocks[i_block]
-        block_section = ele_type.get_four_c_section()
-        if f"{block_section} ELEMENTS" not in input_file.sections.keys():
-            input_file[f"{block_section} ELEMENTS"] = []
+        block_section = f"{ele_type.get_four_c_section()} ELEMENTS"
+        if block_section not in input_file.sections.keys():
+            input_file[block_section] = []
         for connectivity in exo.variables[key][:]:
-            input_file[f"{block_section} ELEMENTS"].append(
+            input_file[block_section].append(
                 {
                     "id": i_element + 1,
                     "cell": {
