@@ -23,12 +23,11 @@ Issues = "https://github.com/imcs-compsim/cubitpy/issues/"
 
 [project.optional-dependencies]
 dev = [
-  "coverage",
-  "coverage-badge",
-  "setuptools", # Needed for coverage-badge
   "pre-commit",
-  "pytest"
+  "pytest",
+  "pytest-cov"
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-p pytest_cov --cov-report=term --cov-report=html --cov=src/"
