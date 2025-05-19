@@ -30,4 +30,4 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-p pytest_cov --cov-report=term --cov-report=html --cov=src/"
+addopts = "-p pytest_cov --cov-report=term --cov-report=html --cov=src/ --cov-config=.coveragerc"
