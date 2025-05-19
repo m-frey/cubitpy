@@ -204,7 +204,7 @@ def cubit_step_by_step_tutorial_cli(
         cubit.display_in_cubit()
 
     # Set the head string.
-    cubit.fourc_input.add(
+    cubit.fourc_input.combine_sections(
         {
             "PROBLEM TYPE": {"PROBLEMTYPE": "Structure"},
             "IO": {
