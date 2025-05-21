@@ -11,6 +11,27 @@ on:
     type: choice
 
 jobs:
+  code_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Install cubitpy
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+      - name: Code checks
+        run: |
+          pre-commit install --install-hooks
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            SKIP=no-commit-to-branch pre-commit run --all-files
+          else
+            pre-commit run --all-files
+          fi
+
   testing:
     name: cubitpy-testing
     runs-on: self-hosted
@@ -37,22 +58,12 @@ jobs:
           # Update pip
           pip install --upgrade pip
           # Install cubitpy
-          pip install .[dev]
+          pip install .[CI-CD]
           # Print information on the python environment
           python --version
           pip list
-          # Run code checks
-          pre-commit install --install-hooks
-          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-            SKIP=no-commit-to-branch pre-commit run --all-files
-          else
-            pre-commit run --all-files
-          fi
           # Run tests
-          cd tests
-          coverage run --rcfile=coverage.config -m pytest *.py
-          coverage html
-          coverage report
-          coverage-badge -o htmlcov/coverage.svg
+          pytest
           # This tests that if cubit is completely closed everything works
+          cd tests
           ./test_configurations.sh

@@ -1,0 +1,3 @@
+[run]
+omit =
+    src/cubitpy/cubit_wrapper/cubit_wrapper_client.py
