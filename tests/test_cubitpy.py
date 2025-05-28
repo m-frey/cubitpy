@@ -87,7 +87,7 @@ def compare_yaml(cubit, *, name=None, rtol=1.0e-12, atol=1.0e-12):
     # File paths
     ref_file = os.path.join(testing_input, name + ".4C.yaml")
     out_file = os.path.join(testing_temp, name + ".4C.yaml")
-    cubit.write_input_file(out_file)
+    cubit.dump(out_file)
 
     ref_input_file = FourCInput.from_4C_yaml(ref_file)
     out_input_file = FourCInput.from_4C_yaml(out_file)
@@ -559,7 +559,7 @@ def test_block_function():
 
     # Compare the input file created for 4C.
     out_file = os.path.join(testing_temp, "tmp" + ".4C.yaml")
-    cubit.write_input_file(out_file)
+    cubit.dump(out_file)
     compare_yaml(cubit)
 
 

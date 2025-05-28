@@ -329,13 +329,13 @@ class CubitPy(object):
         """Export the mesh."""
         self.cubit.cmd('export mesh "{}" dimension 3 overwrite'.format(path))
 
-    def write_input_file(self, yaml_path):
-        """Create the yaml file an save it in yaml_path.
+    def dump(self, yaml_path):
+        """Create the yaml file and save it in under provided yaml_path.
 
         Args
         ----
         yaml_path: str
-            Path where the input file file will be saved
+            Path where the input file will be saved
         """
 
         # Check if output path exists

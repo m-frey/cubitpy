@@ -254,7 +254,7 @@ def cubit_step_by_step_tutorial_cli(
     )
 
     # Write the input file.
-    cubit.write_input_file(input_file_path)
+    cubit.dump(input_file_path)
 
 
 if __name__ == "__main__":
