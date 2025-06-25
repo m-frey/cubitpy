@@ -1,0 +1,61 @@
+name: Protected test suite (can access cubit secrets)
+
+on:
+  schedule:
+    - cron: '0 04 * * *'
+  push:
+    branches:
+      - main
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+env:
+  CUBIT_DOWNLOAD_URL: https://f002.backblazeb2.com/file/cubit-downloads/Coreform-Cubit/Releases/Linux/Coreform-Cubit-2025.3%2B58709-Lin64.tar.gz
+
+jobs:
+  testing_coreform:
+    name: Test suite with Coreform
+    runs-on: ubuntu-latest
+    environment:
+      # If this workflow is triggered in a PR we use the untrusted environment (someone has to approve the workflow run),
+      # otherwise (scheduled or merge triggers) we use the trusted environment (no approval needed).
+      name: ${{ github.event_name == 'pull_request_target' && 'cubit_secrets_untrusted' || 'cubit_secrets_trusted' }}
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          # For PR runs, checkout PR code; otherwise fallback to default branch or ref
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+      - name: Setup cubit
+        id: cubit
+        uses: beamme-py/beamme/.github/actions/setup_cubit@main
+        with:
+          cubit_download_url: ${{ env.CUBIT_DOWNLOAD_URL }}
+          cubit_email: ${{ secrets.CUBIT_EMAIL }}
+          cubit_password: ${{ secrets.CUBIT_PASSWORD }}
+      - name: Setup virtual environment and run tests
+        run: |
+          whoami
+          pwd
+          export CUBITPY_PATH="$(pwd)"
+          # Create the virtual environment
+          python -m venv $PYTHON_VENV
+          source $PYTHON_VENV/bin/activate
+          # Update pip
+          pip install --upgrade pip
+          # Install cubitpy
+          pip install -e .[dev]
+          # Print information on the python environment
+          python --version
+          pip list
+          # Run tests
+          pytest
+          # This tests that if cubit is completely closed everything works
+          cd tests
+          ./test_configurations.sh
