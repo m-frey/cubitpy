@@ -37,8 +37,9 @@ testing_temp = os.path.join(testing_path, "testing-tmp")
 testing_external_geometry = os.path.join(testing_path, "external-geometry")
 
 # CubitPy imports.
-from cubitpy import CubitPy, cupy
+from cubitpy.conf import cupy
 from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
+from cubitpy.cubitpy import CubitPy
 from cubitpy.geometry_creation_functions import (
     create_brick_by_corner_points,
     create_parametric_surface,
@@ -51,6 +52,10 @@ if "TESTING_GITHUB" in os.environ.keys() and os.environ["TESTING_GITHUB"] == "1"
     TESTING_GITHUB = True
 else:
     TESTING_GITHUB = False
+
+CUBIT_VERSION_TESTING_IDENTIFIER = {True: "coreform", False: "cubit15"}[
+    cupy.is_coreform()
+]
 
 
 def check_tmp_dir():
@@ -482,7 +487,11 @@ def test_element_types_tet():
         cupy.element_type.tet10,
     ]
 
-    create_element_types_tet(cubit, element_type_list, name="test_element_types_tet")
+    create_element_types_tet(
+        cubit,
+        element_type_list,
+        name="test_element_types_tet_" + CUBIT_VERSION_TESTING_IDENTIFIER,
+    )
 
 
 def create_quad_mesh(plane):
@@ -598,7 +607,11 @@ def test_extrude_mesh_function():
     )
 
     # Check the created volume.
-    assert 0.6917559630511103 == pytest.approx(
+    if cupy.is_coreform():
+        ref_volume = 0.6934429579015018
+    else:
+        ref_volume = 0.6917559630511103
+    assert ref_volume == pytest.approx(
         cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
     )
 
@@ -695,7 +708,11 @@ def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
     )
 
     # Check the size of the created volume.
-    assert 0.02668549643643842 == pytest.approx(
+    if cupy.is_coreform():
+        ref_volume = 0.026753602587277842
+    else:
+        ref_volume = 0.02668549643643842
+    assert ref_volume == pytest.approx(
         cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
     )
 
@@ -703,7 +720,9 @@ def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit)
+    # Since this meshes slightly different on different Cubit versions, we need
+    # a "loose" tolerance here.
+    compare_yaml(cubit, rtol=1e-8, atol=1e-8)
 
 
 def test_node_set_geometry_type():
@@ -897,14 +916,16 @@ def test_fluid_functionality():
     )
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit)
+    compare_yaml(
+        cubit, name="test_fluid_functionality_" + CUBIT_VERSION_TESTING_IDENTIFIER
+    )
 
 
 def test_thermo_functionality():
     """Test thermo mesh creation."""
 
     cubit = CubitPy()
-    thermo = create_brick(
+    create_brick(
         cubit,
         1,
         1,
@@ -1002,7 +1023,15 @@ def test_point_coupling():
     # Check each node with each other node. If they are at the same
     # position, add a coupling.
     surf = surfaces.get_geometry_objects(cupy.geometry.surface)
-    for node_id_1 in surf[0].get_node_ids():
+
+    # Sort the node IDs, by doing so the results are independent of the ordering
+    # of the node IDs returned by cubit (which can change between versions).
+    node_ids_1 = surf[0].get_node_ids()
+    node_ids_1.sort()
+    node_ids_2 = surf[1].get_node_ids()
+    node_ids_2.sort()
+
+    for node_id_1 in node_ids_1:
         coordinates_1 = np.array(cubit.get_nodal_coordinates(node_id_1))
         for node_id_2 in surf[1].get_node_ids():
             coordinates_2 = cubit.get_nodal_coordinates(node_id_2)
@@ -1366,7 +1395,12 @@ def test_get_id_functions():
         cupy.geometry.curve
     )
     assert [1, 2, 3, 4, 5, 6, 7] == cubit.get_ids(cupy.geometry.surface)
-    assert [2] == cubit.get_ids(cupy.geometry.volume)
+    if cupy.is_coreform():
+        ref_ids = [1, 2]
+        assert [1, 2] == cubit.get_ids(cupy.geometry.volume)
+    else:
+        ref_ids = [2]
+    assert ref_ids == cubit.get_ids(cupy.geometry.volume)
 
 
 def test_get_node_id_function():
@@ -1403,7 +1437,7 @@ def test_serialize_nested_lists():
     block_2 = cubit.brick(0.5, 0.5, 0.5)
     subtracted_block = cubit.subtract([block_2], [block_1])
     cubit.cmd(
-        "volume {} size auto factor 10".format(subtracted_block[0].volumes()[0].id())
+        "volume {} size auto factor 9".format(subtracted_block[0].volumes()[0].id())
     )
     subtracted_block[0].volumes()[0].mesh()
     cubit.add_element_type(subtracted_block[0].volumes()[0], cupy.element_type.hex8)
@@ -1483,8 +1517,12 @@ def test_display_in_cubit():
     )
     with open(journal_path, "r") as journal:
         journal_text = journal.read()
+    if cupy.is_coreform():
+        state_name = "state.cub5"
+    else:
+        state_name = "state.cub"
     ref_text = (
-        'open "{}/state.cub"\n'
+        f'open "{cupy.temp_dir}/{state_name}"\n'
         "label volume On\n"
         "label surface On\n"
         "label curve On\n"
@@ -1496,7 +1534,7 @@ def test_display_in_cubit():
         "label edge On\n"
         "label node On\n"
         "display"
-    ).format(cupy.temp_dir)
+    )
     assert journal_text.strip() == ref_text.strip()
 
 
@@ -1650,7 +1688,7 @@ def setup_and_check_import_fluent_geometry(
     import_fluent_geometry(cubit, fluent_geometry, feature_angle)
 
     # check if importation was successful
-    assert False == cubit.was_last_cmd_undoable()
+    assert not cubit.was_last_cmd_undoable()
 
     # check number of entities
     assert cubit.get_volume_count() == reference_entities_number[0]
@@ -1699,6 +1737,10 @@ def test_extrude_artery_of_aneurysm():
     )
 
     # Check the created volume.
-    assert 13.570135865871498 == pytest.approx(
+    if cupy.is_coreform():
+        ref_volume = 13.614146346307278
+    else:
+        ref_volume = 13.570135865871498
+    assert ref_volume == pytest.approx(
         cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-5
     )
