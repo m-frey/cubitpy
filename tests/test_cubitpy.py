@@ -63,7 +63,9 @@ def check_tmp_dir():
     os.makedirs(testing_temp, exist_ok=True)
 
 
-def compare_yaml(cubit, *, name=None, rtol=1.0e-12, atol=1.0e-12):
+def compare_yaml(
+    cubit, *, base_name=None, additional_identifier=None, rtol=1.0e-12, atol=1.0e-12
+):
     """Write and compare the YAML file from a Cubit object with the reference
     YAML file.
 
@@ -71,27 +73,34 @@ def compare_yaml(cubit, *, name=None, rtol=1.0e-12, atol=1.0e-12):
     ----
     cubit: Cubit object
         Should implement `create_yaml(path)` to generate the test output.
-    name: str, optional
-        Name of the test case. Reference file 'name.yaml' must exist.
+    base_name: str, optional
+        Base name of the test, per default this is the current test name.
+    additional_identifier: str, optional
+        Additional identifier added to the base name of the test to result
+        in the reference file.
     rtol: float
         Relative tolerance for numerical differences.
     atol: float
         Absolute tolerance for numerical differences.
     """
     # Determine test name
-    if name is None:
-        name = (
+    if base_name is None:
+        compare_name = (
             os.environ.get("PYTEST_CURRENT_TEST")
             .split(":")[-1]
             .split(" ")[0]
             .split("[")[0]
         )
+    else:
+        compare_name = base_name
+    if additional_identifier is not None:
+        compare_name += "_" + additional_identifier
 
     check_tmp_dir()
 
     # File paths
-    ref_file = os.path.join(testing_input, name + ".4C.yaml")
-    out_file = os.path.join(testing_temp, name + ".4C.yaml")
+    ref_file = os.path.join(testing_input, compare_name + ".4C.yaml")
+    out_file = os.path.join(testing_temp, compare_name + ".4C.yaml")
     cubit.dump(out_file)
 
     ref_input_file = FourCInput.from_4C_yaml(ref_file)
@@ -234,7 +243,7 @@ def create_block(cubit, np_arrays=False):
             )
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_create_block")
+    compare_yaml(cubit, base_name="test_create_block")
 
 
 def test_create_block():
@@ -312,11 +321,16 @@ def test_create_wedge6():
     compare_yaml(cubit)
 
 
-def create_element_types_tet(cubit, element_type_list, name):
+def test_element_types_tet():
     """Create a curved solid with different tet element types."""
 
     # Initialize cubit.
     cubit = CubitPy()
+
+    element_type_list = [
+        cupy.element_type.tet4,
+        cupy.element_type.tet10,
+    ]
 
     for i, element_type in enumerate(element_type_list):
         cubit.cmd("create pyramid height 1 sides 3 radius 1.2 top 0")
@@ -363,11 +377,21 @@ def create_element_types_tet(cubit, element_type_list, name):
     }
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name=name)
+    compare_yaml(cubit, additional_identifier=CUBIT_VERSION_TESTING_IDENTIFIER)
 
 
-def create_element_types_hex(cubit, element_type_list, name):
+def test_element_types_hex():
     """Create a curved solid with different hex element types."""
+
+    # Initialize cubit.
+    cubit = CubitPy()
+
+    element_type_list = [
+        cupy.element_type.hex8,
+        cupy.element_type.hex20,
+        cupy.element_type.hex27,
+        cupy.element_type.hex8sh,
+    ]
 
     def add_arc(radius, angle):
         """Add a arc segment."""
@@ -458,45 +482,18 @@ def create_element_types_hex(cubit, element_type_list, name):
         "DISPLACEMENT": True,
     }
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name=name)
+    compare_yaml(cubit)
 
 
-def test_element_types_hex():
-    """Create a curved solid with different hex element types."""
+@pytest.mark.parametrize("plane", ["zplane", "yplane"])
+def test_element_types_quad(plane):
+    """Create a quad mesh on the given plane.
 
-    # Initialize cubit.
-    cubit = CubitPy()
-
-    element_type_list = [
-        cupy.element_type.hex8,
-        cupy.element_type.hex20,
-        cupy.element_type.hex27,
-        cupy.element_type.hex8sh,
-    ]
-    create_element_types_hex(cubit, element_type_list, name="test_element_types_hex")
-
-
-def test_element_types_tet():
-    """Create a curved solid with different tet element types."""
-
-    # Initialize cubit.
-    cubit = CubitPy()
-
-    element_type_list = [
-        cupy.element_type.tet4,
-        cupy.element_type.tet10,
-    ]
-
-    create_element_types_tet(
-        cubit,
-        element_type_list,
-        name="test_element_types_tet_" + CUBIT_VERSION_TESTING_IDENTIFIER,
-    )
-
-
-def create_quad_mesh(plane):
-    """Create a quad mesh on the given plane."""
-
+    We check two planes there because for 2D output depending on the
+    plane that the nodes are on, cubit might drop the third coordinate
+    entry if the automatic option from cubit while exporting the exo
+    file is chosen.
+    """
     cubit = CubitPy()
     cubit.cmd(f"create surface rectangle width 1 height 2 {plane}")
     cubit.cmd("curve 1 3 interval 3")
@@ -514,22 +511,7 @@ def create_quad_mesh(plane):
             "GP": [3, 3],
         },
     )
-    return cubit
-
-
-def test_element_types_quad_z_plane():
-    """Create the mesh on the z plane."""
-    compare_yaml(create_quad_mesh("zplane"))
-
-
-def test_element_types_quad_y_plane():
-    """Create quad4 mesh, with non-zero z-values to check that they are
-    correctly output.
-
-    This is not the case if the automatic option from cubit while
-    exporting the exo file is chosen.
-    """
-    compare_yaml(create_quad_mesh("yplane"))
+    compare_yaml(cubit, additional_identifier=plane)
 
 
 def test_block_function():
@@ -916,9 +898,7 @@ def test_fluid_functionality():
     )
 
     # Compare the input file created for 4C.
-    compare_yaml(
-        cubit, name="test_fluid_functionality_" + CUBIT_VERSION_TESTING_IDENTIFIER
-    )
+    compare_yaml(cubit, additional_identifier=CUBIT_VERSION_TESTING_IDENTIFIER)
 
 
 def test_thermo_functionality():
@@ -1070,18 +1050,6 @@ def test_point_coupling():
     compare_yaml(cubit)
 
 
-def test_groups_block_with_volume():
-    """Test the group functions where the block is created by adding the
-    volume."""
-    xtest_groups(True)
-
-
-def test_groups_block_with_hex():
-    """Test the group functions where the block is created by adding the hex
-    elements directly."""
-    xtest_groups(False)
-
-
 def test_group_of_surfaces():
     """Test the proper creation of a group of surfaces and assign them an
     element type."""
@@ -1119,16 +1087,20 @@ def test_group_of_surfaces():
     compare_yaml(cubit)
 
 
-def xtest_groups(block_with_volume):
+@pytest.mark.parametrize("group_with", ["volume", "hex"])
+def test_groups(group_with):
     """Test that groups are handled correctly when creating node sets and
     element blocks.
 
     Args
     ----
-    block_with_volume: bool
+    group_with: str
         If the element block should be added via a group containing the
         geometry volume or via a group containing the hex elements.
     """
+
+    if not group_with == "volume" and not group_with == "hex":
+        raise ValueError(f"Got unexpected argument group_with {group_with}")
 
     # Create a solid brick.
     cubit = CubitPy()
@@ -1163,7 +1135,7 @@ def xtest_groups(block_with_volume):
     group_explicit_type.add("add curve 1")
     group_explicit_type.add("add vertex 3")
 
-    if block_with_volume:
+    if group_with == "volume":
         # Set the element block and use a user defined element description
         cubit.add_element_type(
             volume,
@@ -1232,7 +1204,7 @@ def xtest_groups(block_with_volume):
     cubit.cmd("volume {} size auto factor 8".format(volume.id()))
     cubit.cmd("mesh {}".format(volume))
 
-    if not block_with_volume:
+    if group_with == "hex":
         # Set the element block and use a user defined element description
         all_hex = cubit.group(add_value="add hex all")
         cubit.add_element_type(
@@ -1271,12 +1243,11 @@ def xtest_groups(block_with_volume):
     ]
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_groups")
+    compare_yaml(cubit)
 
 
-def xtest_groups_multiple_sets_get_by(
-    group_get_by_name=False, group_get_by_id=False, **kwargs
-):
+@pytest.mark.parametrize("group_get_by", [None, "name", "id"])
+def test_groups_multiple_sets(group_get_by):
     """Test that multiple sets can be created from a single group object.
 
     Also test that a group can be obtained by name and id.
@@ -1291,12 +1262,14 @@ def xtest_groups_multiple_sets_get_by(
     volume.add("add volume all")
 
     # Get group.
-    if group_get_by_name or group_get_by_id:
+    if group_get_by is not None:
         volume_old = volume
-        if group_get_by_name:
+        if group_get_by == "name":
             volume = cubit.group(group_from_name=volume_old.name)
-        elif group_get_by_id:
+        elif group_get_by == "id":
             volume = cubit.group(group_from_id=volume_old._id)
+        else:
+            raise ValueError(f"Got unexpected value for group_get_by {group_get_by}")
         assert volume._id == volume_old._id
         assert volume.name == volume_old.name
 
@@ -1340,22 +1313,7 @@ def xtest_groups_multiple_sets_get_by(
         }
     ]
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_groups_multiple_sets")
-
-
-def test_groups_multiple_sets():
-    """Test that multiple sets can be created from a single group object."""
-    xtest_groups_multiple_sets_get_by()
-
-
-def test_groups_get_by_id():
-    """Test that groups can be obtained by id."""
-    xtest_groups_multiple_sets_get_by(group_get_by_id=True)
-
-
-def test_groups_get_by_name():
-    """Test that groups can be obtained by name."""
-    xtest_groups_multiple_sets_get_by(group_get_by_name=True)
+    compare_yaml(cubit)
 
 
 def test_reset_block():
@@ -1371,11 +1329,11 @@ def test_reset_block():
     cubit.cmd("mesh volume 2")
 
     cubit.add_element_type(block_1.volumes()[0], cupy.element_type.hex8)
-    compare_yaml(cubit, name="test_reset_block_1")
+    compare_yaml(cubit, additional_identifier="1")
 
     cubit.reset_blocks()
     cubit.add_element_type(block_2.volumes()[0], cupy.element_type.hex8)
-    compare_yaml(cubit, name="test_reset_block_2")
+    compare_yaml(cubit, additional_identifier="2")
 
 
 def test_get_id_functions():
