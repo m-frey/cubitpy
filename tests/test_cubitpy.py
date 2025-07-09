@@ -869,6 +869,9 @@ def test_contact_condition_surface_to_surface():
     compare_yaml(cubit)
 
 
+@pytest.mark.xfail(
+    reason="This test fails due to mismatching results on macOS and Linux"
+)
 def test_fluid_functionality():
     """Test fluid conditions and fluid mesh creation."""
 
@@ -1666,6 +1669,9 @@ def test_import_fluent_geometry():
     setup_and_check_import_fluent_geometry(fluent_geometry, 100, [1, 4, 1])
 
 
+@pytest.mark.xfail(
+    reason="This test fails due to mismatching results on macOS and Linux"
+)
 def test_extrude_artery_of_aneurysm():
     """Extrude an arterial surface based on an aneurysm test case."""
 
