@@ -24,6 +24,8 @@ jobs:
       # If this workflow is triggered in a PR we use the untrusted environment (someone has to approve the workflow run),
       # otherwise (scheduled or merge triggers) we use the trusted environment (no approval needed).
       name: ${{ github.event_name == 'pull_request_target' && 'cubit_secrets_untrusted' || 'cubit_secrets_trusted' }}
+    env:
+      PYTHON_VENV: python-testing-environment
     steps:
       - name: Checkout PR code
         uses: actions/checkout@v4
