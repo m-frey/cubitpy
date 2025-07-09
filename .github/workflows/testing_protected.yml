@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  CUBIT_DOWNLOAD_URL: https://f002.backblazeb2.com/file/cubit-downloads/Coreform-Cubit/Releases/Linux/Coreform-Cubit-2024.3%2B46968-Lin64.tar.gz
+  CUBIT_DOWNLOAD_URL: https://f002.backblazeb2.com/file/cubit-downloads/Coreform-Cubit/Releases/Linux/Coreform-Cubit-2025.3%2B58709-Lin64.tar.gz
 
 jobs:
   testing_coreform:
