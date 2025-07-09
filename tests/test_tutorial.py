@@ -23,9 +23,9 @@
 
 import os
 
-from test_cubitpy import compare_yaml, testing_temp
+from test_cubitpy import CUBIT_VERSION_TESTING_IDENTIFIER, compare_yaml, testing_temp
 
-from cubitpy import CubitPy
+from cubitpy.cubitpy import CubitPy
 from tutorial.tutorial import cubit_step_by_step_tutorial_cli
 
 
@@ -34,4 +34,4 @@ def test_cubit_tutorial():
     cubit = CubitPy()
     tutorial_file = os.path.join(testing_temp, "tutorial.dat")
     cubit_step_by_step_tutorial_cli(tutorial_file, display=False, cubit=cubit, size=5.0)
-    compare_yaml(cubit)
+    compare_yaml(cubit, additional_identifier=CUBIT_VERSION_TESTING_IDENTIFIER)

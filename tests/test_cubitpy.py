@@ -37,8 +37,9 @@ testing_temp = os.path.join(testing_path, "testing-tmp")
 testing_external_geometry = os.path.join(testing_path, "external-geometry")
 
 # CubitPy imports.
-from cubitpy import CubitPy, cupy
+from cubitpy.conf import cupy
 from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
+from cubitpy.cubitpy import CubitPy
 from cubitpy.geometry_creation_functions import (
     create_brick_by_corner_points,
     create_parametric_surface,
@@ -52,13 +53,19 @@ if "TESTING_GITHUB" in os.environ.keys() and os.environ["TESTING_GITHUB"] == "1"
 else:
     TESTING_GITHUB = False
 
+CUBIT_VERSION_TESTING_IDENTIFIER = {True: "coreform", False: "cubit15"}[
+    cupy.is_coreform()
+]
+
 
 def check_tmp_dir():
     """Check if the temp directory exists, if not create it."""
     os.makedirs(testing_temp, exist_ok=True)
 
 
-def compare_yaml(cubit, *, name=None, rtol=1.0e-12, atol=1.0e-12):
+def compare_yaml(
+    cubit, *, base_name=None, additional_identifier=None, rtol=1.0e-12, atol=1.0e-12
+):
     """Write and compare the YAML file from a Cubit object with the reference
     YAML file.
 
@@ -66,27 +73,34 @@ def compare_yaml(cubit, *, name=None, rtol=1.0e-12, atol=1.0e-12):
     ----
     cubit: Cubit object
         Should implement `create_yaml(path)` to generate the test output.
-    name: str, optional
-        Name of the test case. Reference file 'name.yaml' must exist.
+    base_name: str, optional
+        Base name of the test, per default this is the current test name.
+    additional_identifier: str, optional
+        Additional identifier added to the base name of the test to result
+        in the reference file.
     rtol: float
         Relative tolerance for numerical differences.
     atol: float
         Absolute tolerance for numerical differences.
     """
     # Determine test name
-    if name is None:
-        name = (
+    if base_name is None:
+        compare_name = (
             os.environ.get("PYTEST_CURRENT_TEST")
             .split(":")[-1]
             .split(" ")[0]
             .split("[")[0]
         )
+    else:
+        compare_name = base_name
+    if additional_identifier is not None:
+        compare_name += "_" + additional_identifier
 
     check_tmp_dir()
 
     # File paths
-    ref_file = os.path.join(testing_input, name + ".4C.yaml")
-    out_file = os.path.join(testing_temp, name + ".4C.yaml")
+    ref_file = os.path.join(testing_input, compare_name + ".4C.yaml")
+    out_file = os.path.join(testing_temp, compare_name + ".4C.yaml")
     cubit.dump(out_file)
 
     ref_input_file = FourCInput.from_4C_yaml(ref_file)
@@ -229,7 +243,7 @@ def create_block(cubit, np_arrays=False):
             )
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_create_block")
+    compare_yaml(cubit, base_name="test_create_block")
 
 
 def test_create_block():
@@ -307,11 +321,16 @@ def test_create_wedge6():
     compare_yaml(cubit)
 
 
-def create_element_types_tet(cubit, element_type_list, name):
+def test_element_types_tet():
     """Create a curved solid with different tet element types."""
 
     # Initialize cubit.
     cubit = CubitPy()
+
+    element_type_list = [
+        cupy.element_type.tet4,
+        cupy.element_type.tet10,
+    ]
 
     for i, element_type in enumerate(element_type_list):
         cubit.cmd("create pyramid height 1 sides 3 radius 1.2 top 0")
@@ -358,11 +377,21 @@ def create_element_types_tet(cubit, element_type_list, name):
     }
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name=name)
+    compare_yaml(cubit, additional_identifier=CUBIT_VERSION_TESTING_IDENTIFIER)
 
 
-def create_element_types_hex(cubit, element_type_list, name):
+def test_element_types_hex():
     """Create a curved solid with different hex element types."""
+
+    # Initialize cubit.
+    cubit = CubitPy()
+
+    element_type_list = [
+        cupy.element_type.hex8,
+        cupy.element_type.hex20,
+        cupy.element_type.hex27,
+        cupy.element_type.hex8sh,
+    ]
 
     def add_arc(radius, angle):
         """Add a arc segment."""
@@ -453,41 +482,18 @@ def create_element_types_hex(cubit, element_type_list, name):
         "DISPLACEMENT": True,
     }
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name=name)
+    compare_yaml(cubit)
 
 
-def test_element_types_hex():
-    """Create a curved solid with different hex element types."""
+@pytest.mark.parametrize("plane", ["zplane", "yplane"])
+def test_element_types_quad(plane):
+    """Create a quad mesh on the given plane.
 
-    # Initialize cubit.
-    cubit = CubitPy()
-
-    element_type_list = [
-        cupy.element_type.hex8,
-        cupy.element_type.hex20,
-        cupy.element_type.hex27,
-        cupy.element_type.hex8sh,
-    ]
-    create_element_types_hex(cubit, element_type_list, name="test_element_types_hex")
-
-
-def test_element_types_tet():
-    """Create a curved solid with different tet element types."""
-
-    # Initialize cubit.
-    cubit = CubitPy()
-
-    element_type_list = [
-        cupy.element_type.tet4,
-        cupy.element_type.tet10,
-    ]
-
-    create_element_types_tet(cubit, element_type_list, name="test_element_types_tet")
-
-
-def create_quad_mesh(plane):
-    """Create a quad mesh on the given plane."""
-
+    We check two planes there because for 2D output depending on the
+    plane that the nodes are on, cubit might drop the third coordinate
+    entry if the automatic option from cubit while exporting the exo
+    file is chosen.
+    """
     cubit = CubitPy()
     cubit.cmd(f"create surface rectangle width 1 height 2 {plane}")
     cubit.cmd("curve 1 3 interval 3")
@@ -505,22 +511,7 @@ def create_quad_mesh(plane):
             "GP": [3, 3],
         },
     )
-    return cubit
-
-
-def test_element_types_quad_z_plane():
-    """Create the mesh on the z plane."""
-    compare_yaml(create_quad_mesh("zplane"))
-
-
-def test_element_types_quad_y_plane():
-    """Create quad4 mesh, with non-zero z-values to check that they are
-    correctly output.
-
-    This is not the case if the automatic option from cubit while
-    exporting the exo file is chosen.
-    """
-    compare_yaml(create_quad_mesh("yplane"))
+    compare_yaml(cubit, additional_identifier=plane)
 
 
 def test_block_function():
@@ -598,7 +589,11 @@ def test_extrude_mesh_function():
     )
 
     # Check the created volume.
-    assert 0.6917559630511103 == pytest.approx(
+    if cupy.is_coreform():
+        ref_volume = 0.6934429579015018
+    else:
+        ref_volume = 0.6917559630511103
+    assert ref_volume == pytest.approx(
         cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
     )
 
@@ -695,7 +690,11 @@ def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
     )
 
     # Check the size of the created volume.
-    assert 0.02668549643643842 == pytest.approx(
+    if cupy.is_coreform():
+        ref_volume = 0.026753602587277842
+    else:
+        ref_volume = 0.02668549643643842
+    assert ref_volume == pytest.approx(
         cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-10
     )
 
@@ -703,7 +702,9 @@ def test_extrude_mesh_function_average_normals_for_cylinder_and_sphere():
     cubit.add_element_type(volume, cupy.element_type.hex8)
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit)
+    # Since this meshes slightly different on different Cubit versions, we need
+    # a "loose" tolerance here.
+    compare_yaml(cubit, rtol=1e-8, atol=1e-8)
 
 
 def test_node_set_geometry_type():
@@ -897,14 +898,14 @@ def test_fluid_functionality():
     )
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit)
+    compare_yaml(cubit, additional_identifier=CUBIT_VERSION_TESTING_IDENTIFIER)
 
 
 def test_thermo_functionality():
     """Test thermo mesh creation."""
 
     cubit = CubitPy()
-    thermo = create_brick(
+    create_brick(
         cubit,
         1,
         1,
@@ -1002,7 +1003,15 @@ def test_point_coupling():
     # Check each node with each other node. If they are at the same
     # position, add a coupling.
     surf = surfaces.get_geometry_objects(cupy.geometry.surface)
-    for node_id_1 in surf[0].get_node_ids():
+
+    # Sort the node IDs, by doing so the results are independent of the ordering
+    # of the node IDs returned by cubit (which can change between versions).
+    node_ids_1 = surf[0].get_node_ids()
+    node_ids_1.sort()
+    node_ids_2 = surf[1].get_node_ids()
+    node_ids_2.sort()
+
+    for node_id_1 in node_ids_1:
         coordinates_1 = np.array(cubit.get_nodal_coordinates(node_id_1))
         for node_id_2 in surf[1].get_node_ids():
             coordinates_2 = cubit.get_nodal_coordinates(node_id_2)
@@ -1039,18 +1048,6 @@ def test_point_coupling():
 
     # Compare the input file created for 4C.
     compare_yaml(cubit)
-
-
-def test_groups_block_with_volume():
-    """Test the group functions where the block is created by adding the
-    volume."""
-    xtest_groups(True)
-
-
-def test_groups_block_with_hex():
-    """Test the group functions where the block is created by adding the hex
-    elements directly."""
-    xtest_groups(False)
 
 
 def test_group_of_surfaces():
@@ -1090,16 +1087,20 @@ def test_group_of_surfaces():
     compare_yaml(cubit)
 
 
-def xtest_groups(block_with_volume):
+@pytest.mark.parametrize("group_with", ["volume", "hex"])
+def test_groups(group_with):
     """Test that groups are handled correctly when creating node sets and
     element blocks.
 
     Args
     ----
-    block_with_volume: bool
+    group_with: str
         If the element block should be added via a group containing the
         geometry volume or via a group containing the hex elements.
     """
+
+    if not group_with == "volume" and not group_with == "hex":
+        raise ValueError(f"Got unexpected argument group_with {group_with}")
 
     # Create a solid brick.
     cubit = CubitPy()
@@ -1134,7 +1135,7 @@ def xtest_groups(block_with_volume):
     group_explicit_type.add("add curve 1")
     group_explicit_type.add("add vertex 3")
 
-    if block_with_volume:
+    if group_with == "volume":
         # Set the element block and use a user defined element description
         cubit.add_element_type(
             volume,
@@ -1203,7 +1204,7 @@ def xtest_groups(block_with_volume):
     cubit.cmd("volume {} size auto factor 8".format(volume.id()))
     cubit.cmd("mesh {}".format(volume))
 
-    if not block_with_volume:
+    if group_with == "hex":
         # Set the element block and use a user defined element description
         all_hex = cubit.group(add_value="add hex all")
         cubit.add_element_type(
@@ -1242,12 +1243,11 @@ def xtest_groups(block_with_volume):
     ]
 
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_groups")
+    compare_yaml(cubit)
 
 
-def xtest_groups_multiple_sets_get_by(
-    group_get_by_name=False, group_get_by_id=False, **kwargs
-):
+@pytest.mark.parametrize("group_get_by", [None, "name", "id"])
+def test_groups_multiple_sets(group_get_by):
     """Test that multiple sets can be created from a single group object.
 
     Also test that a group can be obtained by name and id.
@@ -1262,12 +1262,14 @@ def xtest_groups_multiple_sets_get_by(
     volume.add("add volume all")
 
     # Get group.
-    if group_get_by_name or group_get_by_id:
+    if group_get_by is not None:
         volume_old = volume
-        if group_get_by_name:
+        if group_get_by == "name":
             volume = cubit.group(group_from_name=volume_old.name)
-        elif group_get_by_id:
+        elif group_get_by == "id":
             volume = cubit.group(group_from_id=volume_old._id)
+        else:
+            raise ValueError(f"Got unexpected value for group_get_by {group_get_by}")
         assert volume._id == volume_old._id
         assert volume.name == volume_old.name
 
@@ -1311,22 +1313,7 @@ def xtest_groups_multiple_sets_get_by(
         }
     ]
     # Compare the input file created for 4C.
-    compare_yaml(cubit, name="test_groups_multiple_sets")
-
-
-def test_groups_multiple_sets():
-    """Test that multiple sets can be created from a single group object."""
-    xtest_groups_multiple_sets_get_by()
-
-
-def test_groups_get_by_id():
-    """Test that groups can be obtained by id."""
-    xtest_groups_multiple_sets_get_by(group_get_by_id=True)
-
-
-def test_groups_get_by_name():
-    """Test that groups can be obtained by name."""
-    xtest_groups_multiple_sets_get_by(group_get_by_name=True)
+    compare_yaml(cubit)
 
 
 def test_reset_block():
@@ -1342,11 +1329,11 @@ def test_reset_block():
     cubit.cmd("mesh volume 2")
 
     cubit.add_element_type(block_1.volumes()[0], cupy.element_type.hex8)
-    compare_yaml(cubit, name="test_reset_block_1")
+    compare_yaml(cubit, additional_identifier="1")
 
     cubit.reset_blocks()
     cubit.add_element_type(block_2.volumes()[0], cupy.element_type.hex8)
-    compare_yaml(cubit, name="test_reset_block_2")
+    compare_yaml(cubit, additional_identifier="2")
 
 
 def test_get_id_functions():
@@ -1366,7 +1353,12 @@ def test_get_id_functions():
         cupy.geometry.curve
     )
     assert [1, 2, 3, 4, 5, 6, 7] == cubit.get_ids(cupy.geometry.surface)
-    assert [2] == cubit.get_ids(cupy.geometry.volume)
+    if cupy.is_coreform():
+        ref_ids = [1, 2]
+        assert [1, 2] == cubit.get_ids(cupy.geometry.volume)
+    else:
+        ref_ids = [2]
+    assert ref_ids == cubit.get_ids(cupy.geometry.volume)
 
 
 def test_get_node_id_function():
@@ -1403,7 +1395,7 @@ def test_serialize_nested_lists():
     block_2 = cubit.brick(0.5, 0.5, 0.5)
     subtracted_block = cubit.subtract([block_2], [block_1])
     cubit.cmd(
-        "volume {} size auto factor 10".format(subtracted_block[0].volumes()[0].id())
+        "volume {} size auto factor 9".format(subtracted_block[0].volumes()[0].id())
     )
     subtracted_block[0].volumes()[0].mesh()
     cubit.add_element_type(subtracted_block[0].volumes()[0], cupy.element_type.hex8)
@@ -1483,8 +1475,12 @@ def test_display_in_cubit():
     )
     with open(journal_path, "r") as journal:
         journal_text = journal.read()
+    if cupy.is_coreform():
+        state_name = "state.cub5"
+    else:
+        state_name = "state.cub"
     ref_text = (
-        'open "{}/state.cub"\n'
+        f'open "{cupy.temp_dir}/{state_name}"\n'
         "label volume On\n"
         "label surface On\n"
         "label curve On\n"
@@ -1496,7 +1492,7 @@ def test_display_in_cubit():
         "label edge On\n"
         "label node On\n"
         "display"
-    ).format(cupy.temp_dir)
+    )
     assert journal_text.strip() == ref_text.strip()
 
 
@@ -1650,7 +1646,7 @@ def setup_and_check_import_fluent_geometry(
     import_fluent_geometry(cubit, fluent_geometry, feature_angle)
 
     # check if importation was successful
-    assert False == cubit.was_last_cmd_undoable()
+    assert not cubit.was_last_cmd_undoable()
 
     # check number of entities
     assert cubit.get_volume_count() == reference_entities_number[0]
@@ -1699,6 +1695,10 @@ def test_extrude_artery_of_aneurysm():
     )
 
     # Check the created volume.
-    assert 13.570135865871498 == pytest.approx(
+    if cupy.is_coreform():
+        ref_volume = 13.614146346307278
+    else:
+        ref_volume = 13.570135865871498
+    assert ref_volume == pytest.approx(
         cubit.get_meshed_volume_or_area("volume", [volume.id()]), 1e-5
     )
