@@ -61,3 +61,5 @@ jobs:
           # This tests that if cubit is completely closed everything works
           cd tests
           ./test_configurations.sh
+        env:
+          CUBIT_ROOT: ${{ steps.cubit.outputs.cubit_root }}
