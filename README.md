@@ -77,3 +77,29 @@ If you intend to actively develop CubitPy, please make sure to install the `pre-
 ```bash
 pre-commit install
 ```
+
+## Debugging in VS Code and PyCharm
+
+When debugging, IDEs may try to attach to subprocesses, which can cause issues. The instructions below show how to disable this behavior in VS Code and PyCharm.
+
+### VS Code
+
+To prevent the debugger from attaching to subprocesses, add the following to your `launch.json`:
+
+```json
+{
+  "subProcess": false
+}
+```
+
+Thanks to @isteinbrecher for identifying this fix.
+
+### PyCharm
+
+To disable subprocess debugging:
+
+1. Go to **File > Settings**
+2. Navigate to:
+   **Build, Execution, Deployment > Python Debugger**
+3. Uncheck:
+   **Attach to subprocess automatically while debugging**
