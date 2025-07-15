@@ -84,15 +84,13 @@ When debugging, IDEs may try to attach to subprocesses, which can cause issues. 
 
 ### VS Code
 
-To prevent the debugger from attaching to subprocesses, add the following to your `launch.json`:
+To prevent the debugger from attaching to subprocesses, add the following to your `.vscode/launch.json`:
 
 ```json
 {
   "subProcess": false
 }
 ```
-
-Thanks to @isteinbrecher for identifying this fix.
 
 ### PyCharm
 
