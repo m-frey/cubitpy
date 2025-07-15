@@ -88,7 +88,19 @@ To prevent the debugger from attaching to subprocesses, add the following to you
 
 ```json
 {
-  "subProcess": false
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Launch current file",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}", // Launches the currently open file
+      "console": "integratedTerminal", // or "externalTerminal" if needed
+      "subProcess":false, // Disables debugging for subprocesses and libraries
+    }
+  ]
 }
 ```
 
