@@ -287,7 +287,6 @@ class BoundaryConditionType(Enum):
     beam_to_solid_surface_meshtying = auto()
     beam_to_solid_surface_contact = auto()
     solid_to_solid_surface_contact = auto()
-    solid_to_solid_curve_contact = auto()
     solid_to_solid_contact = auto()
 
     # fluid
@@ -326,9 +325,10 @@ class BoundaryConditionType(Enum):
             return "BEAM INTERACTION/BEAM TO SOLID SURFACE CONTACT SURFACE"
         elif self == self.point_coupling and (geometry_type == GeometryType.vertex):
             return "DESIGN POINT COUPLING CONDITIONS"
-        elif self == self.solid_to_solid_contact and (
-            geometry_type == GeometryType.surface
-        ):
+        elif (
+            self == self.solid_to_solid_contact
+            or self == self.solid_to_solid_surface_contact
+        ) and (geometry_type == GeometryType.surface):
             return "DESIGN SURF MORTAR CONTACT CONDITIONS 3D"
         elif self == self.solid_to_solid_contact and (
             geometry_type == GeometryType.curve
