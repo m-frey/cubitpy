@@ -59,7 +59,7 @@ pip install .
 
 If you intend to actively develop `cubitpy`, install it in *editable mode*
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 To run CubitPy it is required to set an environment variable with the path to the Cubit directory. This should be the "root" directory for the installation.
@@ -70,7 +70,7 @@ export CUBIT_ROOT=path_to_cubit_root_directory
 To check if everything worked as expected, run the tests from within the `tests` directory
 ```bash
 cd path_to_cubitpy/tests
-pytest -q testing.py
+pytest -q test_cubitpy.py
 ```
 
 If you intend to actively develop CubitPy, please make sure to install the `pre-commit` hook within the python environment to follow our style guides:
