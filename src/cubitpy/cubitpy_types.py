@@ -22,8 +22,8 @@
 """This module contains ENums for types used in cubitpy as well as functions to
 convert them to strings for cubit or 4C commands or the wrapper."""
 
-from enum import Enum, auto
 import warnings
+from enum import Enum, auto
 
 
 class GeometryType(Enum):
@@ -287,7 +287,7 @@ class BoundaryConditionType(Enum):
     beam_to_solid_volume_meshtying = auto()
     beam_to_solid_surface_meshtying = auto()
     beam_to_solid_surface_contact = auto()
-    # The following value "solid_to_solid_surface_contact" is deprecated and 
+    # The following value "solid_to_solid_surface_contact" is deprecated and
     # only kept for legacy reasons.
     # Please use "solid_to_solid_contact" instead.
     solid_to_solid_surface_contact = auto()
@@ -329,16 +329,20 @@ class BoundaryConditionType(Enum):
             return "BEAM INTERACTION/BEAM TO SOLID SURFACE CONTACT SURFACE"
         elif self == self.point_coupling and (geometry_type == GeometryType.vertex):
             return "DESIGN POINT COUPLING CONDITIONS"
-        elif self == self.solid_to_solid_surface_contact and (geometry_type == GeometryType.surface):
+        elif self == self.solid_to_solid_surface_contact and (
+            geometry_type == GeometryType.surface
+        ):
             warnings.warn(
                 "The 'solid_to_solid_surface_contact' boundary condition enum is deprecated "
                 "and will be removed in a future version. "
                 "Use 'solid_to_solid_contact' instead.",
                 category=DeprecationWarning,
-                stacklevel=2
+                stacklevel=2,
             )
             return "DESIGN SURF MORTAR CONTACT CONDITIONS 3D"
-        elif self == self.solid_to_solid_contact and (geometry_type == GeometryType.surface):
+        elif self == self.solid_to_solid_contact and (
+            geometry_type == GeometryType.surface
+        ):
             return "DESIGN SURF MORTAR CONTACT CONDITIONS 3D"
         elif self == self.solid_to_solid_contact and (
             geometry_type == GeometryType.curve
