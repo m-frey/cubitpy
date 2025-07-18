@@ -22,6 +22,7 @@
 """This module contains ENums for types used in cubitpy as well as functions to
 convert them to strings for cubit or 4C commands or the wrapper."""
 
+import warnings
 from enum import Enum, auto
 
 
@@ -286,7 +287,11 @@ class BoundaryConditionType(Enum):
     beam_to_solid_volume_meshtying = auto()
     beam_to_solid_surface_meshtying = auto()
     beam_to_solid_surface_contact = auto()
+    # The following value "solid_to_solid_surface_contact" is deprecated and
+    # only kept for legacy reasons.
+    # Please use "solid_to_solid_contact" instead.
     solid_to_solid_surface_contact = auto()
+    solid_to_solid_contact = auto()
 
     # fluid
     flow_rate = auto()
@@ -322,25 +327,30 @@ class BoundaryConditionType(Enum):
             and geometry_type == GeometryType.surface
         ):
             return "BEAM INTERACTION/BEAM TO SOLID SURFACE CONTACT SURFACE"
-        elif self == self.point_coupling and (
-            geometry_type == GeometryType.vertex
-            or geometry_type == FiniteElementObject.node
-        ):
+        elif self == self.point_coupling and (geometry_type == GeometryType.vertex):
             return "DESIGN POINT COUPLING CONDITIONS"
         elif self == self.solid_to_solid_surface_contact and (
             geometry_type == GeometryType.surface
-            or geometry_type == FiniteElementObject.node
+        ):
+            warnings.warn(
+                "The 'solid_to_solid_surface_contact' boundary condition enum is deprecated "
+                "and will be removed in a future version. "
+                "Use 'solid_to_solid_contact' instead.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            return "DESIGN SURF MORTAR CONTACT CONDITIONS 3D"
+        elif self == self.solid_to_solid_contact and (
+            geometry_type == GeometryType.surface
         ):
             return "DESIGN SURF MORTAR CONTACT CONDITIONS 3D"
-        elif self == self.fsi_coupling and (
-            geometry_type == GeometryType.surface
-            or geometry_type == FiniteElementObject.node
+        elif self == self.solid_to_solid_contact and (
+            geometry_type == GeometryType.curve
         ):
+            return "DESIGN LINE MORTAR CONTACT CONDITIONS 2D"
+        elif self == self.fsi_coupling and (geometry_type == GeometryType.surface):
             return "DESIGN FSI COUPLING SURF CONDITIONS"
-        elif self == self.ale_dirichlet and (
-            geometry_type == GeometryType.surface
-            or geometry_type == FiniteElementObject.node
-        ):
+        elif self == self.ale_dirichlet and (geometry_type == GeometryType.surface):
             return "DESIGN SURF ALE DIRICH CONDITIONS"
         elif self == self.flow_rate and (geometry_type == GeometryType.surface):
             return "DESIGN FLOW RATE SURF CONDITIONS"

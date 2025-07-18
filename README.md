@@ -1,9 +1,9 @@
-[![build-test](https://github.com/imcs-compsim/cubitpy/actions/workflows/.github/workflows/build-test.yml/badge.svg)](https://github.com/imcs-compsim/cubitpy/actions/workflows/.github/workflows/build-test.yml)
-
 # CubitPy
 
 Utility functions and 4C related functionality for the Cubit and Coreform python interface,
 Especially for the creation of input files for 4C.
+
+[![Cubit testing](https://github.com/imcs-compsim/cubitpy/actions/workflows/testing.yml/badge.svg)](https://github.com/imcs-compsim/cubitpy/actions/workflows/testing.yml)
 
 ## Usage
 
@@ -59,7 +59,7 @@ pip install .
 
 If you intend to actively develop `cubitpy`, install it in *editable mode*
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 To run CubitPy it is required to set an environment variable with the path to the Cubit directory. This should be the "root" directory for the installation.
@@ -67,10 +67,10 @@ To run CubitPy it is required to set an environment variable with the path to th
 export CUBIT_ROOT=path_to_cubit_root_directory
 ```
 
-To check if everything worked as expected, run the tests from within the `tests` directory
+To check if everything worked as expected, run the test suite (from the root directory)
 ```bash
 cd path_to_cubitpy/tests
-pytest -q testing.py
+pytest
 ```
 
 If you intend to actively develop CubitPy, please make sure to install the `pre-commit` hook within the python environment to follow our style guides:

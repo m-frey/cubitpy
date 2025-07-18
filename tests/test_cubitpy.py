@@ -842,6 +842,57 @@ def test_contact_condition_beam_to_surface():
     compare_yaml(cubit)
 
 
+def test_contact_condition_curve_to_curve():
+    """Test the curve-to-curve contact condition BC."""
+    cubit = CubitPy()
+
+    # Create and mesh two rectangles
+    cubit.cmd("create surface rectangle width 1 height 1 zplane")
+    solid1 = cubit.surface(cubit.get_last_id(cupy.geometry.surface))
+    cubit.cmd(f"surface {solid1.id()} size 1")
+    cubit.cmd("create surface rectangle width 2 height 1 zplane")
+    solid2 = cubit.surface(cubit.get_last_id(cupy.geometry.surface))
+    cubit.cmd(f"move surface {solid2.id()} x 0 y -1 z 0 include_merged")
+    cubit.cmd(f"surface {solid2.id()} size 1")
+    cubit.cmd("mesh surface all")
+
+    # Add elements
+    bc_desc = {
+        "KINEM": "nonlinear",
+        "EAS": None,
+        "THICK": 1,
+        "STRESS_STRAIN": "plain_strain",
+        "GP": [2, 2],
+    }
+    cubit.add_element_type(
+        solid1.surfaces()[0],
+        el_type=cupy.element_type.quad4,
+        bc_description=bc_desc,
+    )
+    cubit.add_element_type(
+        solid2.surfaces()[0],
+        el_type=cupy.element_type.quad4,
+        bc_description=bc_desc,
+    )
+
+    # Test contact conditions
+    cubit.add_node_set(
+        solid1.curves()[2],
+        name="block1_contact_side",
+        bc_type=cupy.bc_type.solid_to_solid_contact,
+        bc_description={"InterfaceID": 0, "Side": "Master"},
+    )
+    cubit.add_node_set(
+        solid2.curves()[0],
+        name="block2_contact_side",
+        bc_type=cupy.bc_type.solid_to_solid_contact,
+        bc_description={"InterfaceID": 0, "Side": "Slave"},
+    )
+
+    # Compare the input file created for 4C.
+    compare_yaml(cubit)
+
+
 def test_contact_condition_surface_to_surface():
     """Test the surface-to-surface contact condition BC."""
     cubit = CubitPy()
@@ -861,7 +912,7 @@ def test_contact_condition_surface_to_surface():
     cubit.add_node_set(
         solid2.surfaces()[3],
         name="block2_contact_side",
-        bc_type=cupy.bc_type.solid_to_solid_surface_contact,
+        bc_type=cupy.bc_type.solid_to_solid_contact,
         bc_description={"InterfaceID": 0, "Side": "Slave"},
     )
 
