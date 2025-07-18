@@ -1,9 +1,9 @@
-[![build-test](https://github.com/imcs-compsim/cubitpy/actions/workflows/.github/workflows/build-test.yml/badge.svg)](https://github.com/imcs-compsim/cubitpy/actions/workflows/.github/workflows/build-test.yml)
-
 # CubitPy
 
 Utility functions and 4C related functionality for the Cubit and Coreform python interface,
 Especially for the creation of input files for 4C.
+
+[![Cubit testing](https://github.com/imcs-compsim/cubitpy/actions/workflows/testing.yml/badge.svg)](https://github.com/imcs-compsim/cubitpy/actions/workflows/testing.yml)
 
 ## Usage
 
