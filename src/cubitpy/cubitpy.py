@@ -334,7 +334,7 @@ class CubitPy(object):
         """Export the mesh."""
         self.cubit.cmd('export mesh "{}" dimension 3 overwrite'.format(path))
 
-    def dump_w_exo_mesh(self, path_stem):
+    def dump_with_exo_mesh(self, path_stem):
         """Create the 4C yaml input file and export the mesh in exo format.
 
         The path_stem refers to the path where the input file and the mesh
