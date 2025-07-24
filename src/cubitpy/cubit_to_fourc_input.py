@@ -71,17 +71,17 @@ def add_node_sets(cubit, exo, input_file, write_topology_information=True):
         bc_description["E"] = len(node_sets[geometry_type])
 
         if not write_topology_information:
-            # if in compressed format, we will not write the topology
-            # information for the node sets explicitly, but 4C will deduce
-            # them based on the node set ids
+            # when working with external .exo meshes, we do not write the
+            # topology information for the node sets explicitly, since 4C will
+            # deduce them based on the node set ids, when reading the .exo file
             bc_description["ENTITY_TYPE"] = "node_set_id"
 
         input_file[bc_section].append(bc_description)
 
     if write_topology_information:
-        # only add topology information if an uncompressed version is needed
-        # (mostly needed for backward compatibility when the mesh is supposed
-        # to be contained in the .yaml file)
+        # this is the default case: when the mesh is supposed to be contained
+        # in the .yaml file, we have to write the topology information of the
+        # node sets
         name_geometry_tuple = [
             [cupy.geometry.vertex, "DNODE-NODE TOPOLOGY", "DNODE"],
             [cupy.geometry.curve, "DLINE-NODE TOPOLOGY", "DLINE"],
