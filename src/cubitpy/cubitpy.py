@@ -334,13 +334,13 @@ class CubitPy(object):
         """Export the mesh."""
         self.cubit.cmd('export mesh "{}" dimension 3 overwrite'.format(path))
 
-    def dump(self, path_stem, mesh_in_exo=False):
+    def dump(self, yaml_path, mesh_in_exo=False):
         """Create the yaml file and save it in under provided yaml_path.
 
         Args
         ----
-        path_stem: str
-            Path stem where the input file and the mesh will be saved.
+        yaml_path: str
+            Path where the input file will be saved
         mesh_in_exo: bool
             If True, the mesh will be exported in exodus format and the input file
             will contain a reference to the exodus file. If False, the mesh will
@@ -350,13 +350,17 @@ class CubitPy(object):
         """
 
         # Check if output path exists
-        dat_dir = os.path.dirname(os.path.abspath(path_stem))
+        dat_dir = os.path.dirname(os.path.abspath(yaml_path))
         if not os.path.exists(dat_dir):
             raise ValueError("Path {} does not exist!".format(dat_dir))
 
         if mesh_in_exo:
-            # Create the exodus file
-            exo_path = f"{path_stem}.exo"
+            # Determine the path stem: Strip the '(.4C).yaml' suffix
+            # (if the filename does not contain '.4C' the second call to
+            # 'removesuffix' won't alter the string at all)
+            path_stem = yaml_path.removesuffix(".yaml").removesuffix(".4C")
+            # Export the mesh in exodus format
+            exo_path = path_stem + ".exo"
             self.export_exo(exo_path)
             # parse the exodus file
             exo = netCDF4.Dataset(exo_path)
@@ -370,7 +374,7 @@ class CubitPy(object):
         else:
             input_file = get_input_file_with_mesh(self)
         # Export the input file in YAML format
-        input_file.dump(f"{path_stem}.4C.yaml")
+        input_file.dump(yaml_path)
 
     def group(self, **kwargs):
         """Reference a group in cubit.

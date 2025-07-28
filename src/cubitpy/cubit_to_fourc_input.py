@@ -123,23 +123,17 @@ def add_exodus_geometry_section(cubit, input_file, rel_exo_file_path):
         file that contains the mesh.
     """
 
-    # map the problem type to the keyword for the problem specific geometry
-    # section
-    problem_to_geometry_dict = {
-        "Structure": "STRUCTURE GEOMETRY",
-        "Fluid": "FLUID GEOMETRY",
-    }
-
-    # retrieve the problem type
-    problem_type = input_file["PROBLEM TYPE"]["PROBLEMTYPE"]
-    # check if the problem type is supported
-    problem_key = problem_to_geometry_dict.get(problem_type)
-    if problem_key is None:
-        raise ValueError(
-            f"I do not know how to generate a 'GEOMETRY' section for problem type '{problem_type}'. "
-            "Currently supported types are: "
-            f"{', '.join(problem_to_geometry_dict.keys())}."
+    # check which 4C sections are currently defined
+    sections = {data[0].get_four_c_section() for data in cubit.blocks}
+    if not len(sections) == 1:
+        raise RuntimeError(
+            "A geometry section can currently only be generated if a single"
+            "element type is defined in the cubit session, but I found "
+            f"{len(sections)} different element types: {', '.join(sections)}. "
+            "Please include the mesh in the .yaml input file by rerunning "
+            "'cubit.dump()' with the 'mesh_in_exo' argument set to False."
         )
+    problem_key = sections.pop() + " GEOMETRY"
 
     # create the dictionary for the geometry section
     geometry_section_dict = {}
