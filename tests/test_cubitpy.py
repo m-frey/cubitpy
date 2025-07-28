@@ -70,7 +70,7 @@ def compare_yaml(
     additional_identifier=None,
     rtol=1.0e-12,
     atol=1.0e-12,
-    dump_yaml=True,
+    mesh_in_exo=False,
 ):
     """Write and compare the YAML file from a Cubit object with the reference
     YAML file.
@@ -88,12 +88,10 @@ def compare_yaml(
         Relative tolerance for numerical differences.
     atol: float
         Absolute tolerance for numerical differences.
-    dump_yaml: bool
-        If True, this function will dump the YAML input to the (temporary)
-        output directory. This is the default behavior. If False, no YAML file
-        will be dumped from this function and it is assumed that a YAML file
-        with the corresponding name has already been generated prior to
-        invoking this function.
+    mesh_in_exo: bool
+        If true, the mesh is dumped in exodus format instead of YAML, meaning
+        that two files are created, so we perform an additional check to make
+        sure the exodus file is also created. Default is False.
     """
     # Determine test name
     if base_name is None:
@@ -113,7 +111,14 @@ def compare_yaml(
     # File paths
     ref_file = os.path.join(testing_input, compare_name + ".4C.yaml")
     out_file = os.path.join(testing_temp, compare_name + ".4C.yaml")
-    if dump_yaml:
+
+    if mesh_in_exo:
+        out_file_stem = out_file.removesuffix(".4C.yaml")
+        # dump the input script with the mesh in exodus format
+        cubit.dump(out_file_stem, mesh_in_exo=True)
+        # make sure the directory also contains the exo mesh
+        assert os.path.exists(f"{out_file_stem}.exo")
+    else:
         cubit.dump(out_file)
 
     ref_input_file = FourCInput.from_4C_yaml(ref_file)
@@ -1861,13 +1866,5 @@ def test_yaml_with_exo_export():
         }
     )
 
-    # export the yaml input with exo mesh into a temporary directory
-    check_tmp_dir()
-    out_file_stem = os.path.join(testing_temp, "test_yaml_with_exo_export")
-    cubit.dump_with_exo_mesh(out_file_stem)
-
-    # make sure the directory also contains the exo mesh
-    assert os.path.exists(f"{out_file_stem}.exo")
-
     # Compare the input file created for 4C.
-    compare_yaml(cubit, dump_yaml=False)
+    compare_yaml(cubit, mesh_in_exo=True)

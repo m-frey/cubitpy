@@ -26,14 +26,13 @@ import os
 
 import netCDF4
 import numpy as np
-from fourcipp.legacy_io.inline_dat import to_dat_string
 
 from cubitpy.conf import cupy
 
 
 def add_node_sets(cubit, exo, input_file, write_topology_information=True):
-    """Add the node sets contained in the cubit session/exo file to the
-    yaml file."""
+    """Add the node sets contained in the cubit session/exo file to the yaml
+    file."""
 
     # If there are no node sets we can return immediately
     if len(cubit.node_sets) == 0:
@@ -104,8 +103,9 @@ def add_node_sets(cubit, exo, input_file, write_topology_information=True):
                         )
 
 
-def add_exodus_geometry_section(cubit, rel_exo_file_path):
-    """Add the problem specific geometry section to the input file required to directly read the mesh from an exodus file.
+def add_exodus_geometry_section(cubit, input_file, rel_exo_file_path):
+    """Add the problem specific geometry section to the input file required to
+    directly read the mesh from an exodus file.
 
     This section contains information about all element blocks as well as the
     path to the exo file that contains the mesh.
@@ -113,7 +113,11 @@ def add_exodus_geometry_section(cubit, rel_exo_file_path):
     Args
     ----
     cubit: CubitPy
-        The python object for managing the current Cubit session.
+        The python object for managing the current Cubit session (exclusively
+        used in a read-only fashion).
+    input_file: dict
+        The input file dictionary that will be modified to include the geometry
+        section.
     rel_exo_file_path: str
         The relative path (as seen from the yaml input file) to the exodus
         file that contains the mesh.
@@ -127,7 +131,7 @@ def add_exodus_geometry_section(cubit, rel_exo_file_path):
     }
 
     # retrieve the problem type
-    problem_type = cubit.fourc_input["PROBLEM TYPE"]["PROBLEMTYPE"]
+    problem_type = input_file["PROBLEM TYPE"]["PROBLEMTYPE"]
     # check if the problem type is supported
     problem_key = problem_to_geometry_dict.get(problem_type)
     if problem_key is None:
@@ -149,9 +153,9 @@ def add_exodus_geometry_section(cubit, rel_exo_file_path):
     geometry_section_dict["ELEMENT_BLOCKS"] = []
     # iterate over all blocks
     block_ids = cubit.cubit.get_block_id_list()
-    for idx, bid in enumerate(block_ids):
+    for list_index, block_id in enumerate(block_ids):
         # retrieve the data associated with the block
-        data = cubit.blocks[idx]
+        data = cubit.blocks[list_index]
         # retrieve the fourc name for the element
         four_c_element_name = data[0].get_four_c_name()
         # convert the material data from dict to string because 4C currently does not support a dict here
@@ -160,7 +164,7 @@ def add_exodus_geometry_section(cubit, rel_exo_file_path):
         )
         # add block id, fourc element name and element data string to the element block dictionary
         element_block_dict = {
-            "ID": bid,
+            "ID": block_id,
             "ELEMENT_NAME": four_c_element_name,
             "ELEMENT_DATA": element_data_string,
         }
@@ -168,7 +172,7 @@ def add_exodus_geometry_section(cubit, rel_exo_file_path):
         geometry_section_dict["ELEMENT_BLOCKS"].append(element_block_dict)
 
     # at long last, append the geometry section to the input file
-    cubit.fourc_input[problem_key] = geometry_section_dict
+    input_file[problem_key] = geometry_section_dict
 
 
 def get_element_connectivity_list(connectivity):
