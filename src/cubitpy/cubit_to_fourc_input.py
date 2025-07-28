@@ -33,7 +33,7 @@ from cubitpy.conf import cupy
 
 def add_node_sets(cubit, exo, input_file, write_topology_information=True):
     """Add the node sets contained in the cubit session/exo file to the
-    dat_lines."""
+    yaml file."""
 
     # If there are no node sets we can return immediately
     if len(cubit.node_sets) == 0:
@@ -104,8 +104,8 @@ def add_node_sets(cubit, exo, input_file, write_topology_information=True):
                         )
 
 
-def add_problem_geometry_section(cubit, rel_exo_file_path):
-    """Add the problem specific geometry section to the input file.
+def add_exodus_geometry_section(cubit, rel_exo_file_path):
+    """Add the problem specific geometry section to the input file required to directly read the mesh from an exodus file.
 
     This section contains information about all element blocks as well as the
     path to the exo file that contains the mesh.
