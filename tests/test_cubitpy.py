@@ -113,10 +113,10 @@ def compare_yaml(
     out_file = os.path.join(testing_temp, compare_name + ".4C.yaml")
 
     if mesh_in_exo:
-        out_file_stem = out_file.removesuffix(".4C.yaml")
         # dump the input script with the mesh in exodus format
-        cubit.dump(out_file_stem, mesh_in_exo=True)
+        cubit.dump(out_file, mesh_in_exo=True)
         # make sure the directory also contains the exo mesh
+        out_file_stem = out_file.removesuffix(".4C.yaml")
         assert os.path.exists(f"{out_file_stem}.exo")
     else:
         cubit.dump(out_file)
