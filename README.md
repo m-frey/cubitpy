@@ -86,7 +86,7 @@ When debugging, IDEs may try to attach to subprocesses, which can cause issues. 
 
 To prevent the debugger from attaching to subprocesses, add the following to your `.vscode/launch.json`:
 
-```json
+```jsonc
 {
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
