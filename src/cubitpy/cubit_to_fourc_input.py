@@ -122,51 +122,38 @@ def add_exodus_geometry_section(cubit, input_file, rel_exo_file_path):
         The relative path (as seen from the yaml input file) to the exodus
         file that contains the mesh.
     """
+    # Retrieve a list of the block IDs and the corresponding block data of the current session
+    element_block_ids = cubit.cubit.get_block_id_list()
+    element_blocks = cubit.blocks
 
-    # check which 4C sections are currently defined
-    sections = {data[0].get_four_c_section() for data in cubit.blocks}
-    if not len(sections) == 1:
-        raise RuntimeError(
-            "A geometry section can currently only be generated if a single"
-            "element type is defined in the cubit session, but I found "
-            f"{len(sections)} different element types: {', '.join(sections)}. "
-            "Please include the mesh in the .yaml input file by rerunning "
-            "'cubit.dump()' with the 'mesh_in_exo' argument set to False."
-        )
-    problem_key = sections.pop() + " GEOMETRY"
-
-    # create the dictionary for the geometry section
-    geometry_section_dict = {}
-
-    # add the relative path to the exodus file
-    geometry_section_dict["FILE"] = rel_exo_file_path
-    # always show a detailed summary
-    geometry_section_dict["SHOW_INFO"] = "detailed_summary"
-
-    # add the element blocks
-    geometry_section_dict["ELEMENT_BLOCKS"] = []
-    # iterate over all blocks
-    block_ids = cubit.cubit.get_block_id_list()
-    for list_index, block_id in enumerate(block_ids):
-        # retrieve the data associated with the block
-        data = cubit.blocks[list_index]
+    # Iterate over all blocks and add them to the input file
+    for cur_block_id, cur_block_data in zip(element_block_ids, element_blocks):
+        # retrieve the name of the geometry section that this block belongs to
+        cur_geometry_section_key = cur_block_data[0].get_four_c_section() + " GEOMETRY"
+        # If the geometry section for this block does not exist yet, create it
+        if input_file.sections.get(cur_geometry_section_key) is None:
+            # add the geometry section to the input file
+            input_file[cur_geometry_section_key] = {
+                "FILE": rel_exo_file_path,
+                "SHOW_INFO": "detailed_summary",
+                "ELEMENT_BLOCKS": [],
+            }
         # retrieve the fourc name for the element
-        four_c_element_name = data[0].get_four_c_name()
+        four_c_element_name = cur_block_data[0].get_four_c_name()
         # convert the material data from dict to string because 4C currently does not support a dict here
         element_data_string = " ".join(
-            f"{key} {value}" for key, value in data[1].items()
+            f"{key} {value}" for key, value in cur_block_data[1].items()
         )
         # add block id, fourc element name and element data string to the element block dictionary
         element_block_dict = {
-            "ID": block_id,
+            "ID": cur_block_id,
             "ELEMENT_NAME": four_c_element_name,
             "ELEMENT_DATA": element_data_string,
         }
         # append the dictionary with the element block information to the element block list
-        geometry_section_dict["ELEMENT_BLOCKS"].append(element_block_dict)
-
-    # at long last, append the geometry section to the input file
-    input_file[problem_key] = geometry_section_dict
+        input_file[cur_geometry_section_key]["ELEMENT_BLOCKS"].append(
+            element_block_dict
+        )
 
 
 def get_element_connectivity_list(connectivity):
