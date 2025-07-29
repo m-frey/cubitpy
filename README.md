@@ -3,7 +3,7 @@
 Utility functions and 4C related functionality for the Cubit and Coreform python interface,
 Especially for the creation of input files for 4C.
 
-[![Cubit testing](https://github.com/imcs-compsim/cubitpy/actions/workflows/testing.yml/badge.svg)](https://github.com/imcs-compsim/cubitpy/actions/workflows/testing.yml)
+[![CubitPy test suite](https://github.com/imcs-compsim/cubitpy/actions/workflows/cubitpy_test_suite_with_secrets.yml/badge.svg)](https://github.com/imcs-compsim/cubitpy/actions/workflows/cubitpy_test_suite_with_secrets.yml)
 
 ## Usage
 
