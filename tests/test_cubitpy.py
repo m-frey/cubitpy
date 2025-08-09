@@ -1868,3 +1868,116 @@ def test_yaml_with_exo_export():
 
     # Compare the input file created for 4C.
     compare_yaml(cubit, mesh_in_exo=True)
+
+
+def test_yaml_with_exo_export_fsi():
+    """Test if exporting a yaml file with an exodus mesh works, even in fsi
+    cases, where GEOMETRY sections for fluid and solid domains need to be
+    exported."""
+    ##############
+    # PARAMETERS #
+    ##############
+
+    Depth = 0.05
+    Width = 1.0
+    BottomHeight = 0.002
+    CavityHeight = 1.0
+    InflowHeight = 0.1
+    MeshDepth = 1
+    MeshWidth = 32
+    MeshBottomHeight = 1
+    MeshCavityHeight = 32
+    MeshInflowHeight = 7
+
+    cubit = CubitPy()
+
+    ############
+    # GEOMETRY #
+    ############
+
+    # Create Bottom
+    cubit.cmd(f"brick x {Width} y {BottomHeight} z {Depth}")
+    cubit.cmd(f"volume 1 move x {Width/2} y {-BottomHeight/2} z {-Depth/2}")
+
+    # Create Fluid Part
+    cubit.cmd(f"brick x {Width} y {CavityHeight+InflowHeight} z {Depth}")
+    cubit.cmd("align volume 2 surface 9 with surface 5")
+    # $ divide cavity and inflow region
+    cubit.cmd(f"webcut volume 2 with plane yplane offset {CavityHeight} imprint merge")
+
+    ###########
+    # MESHING #
+    ###########
+
+    # Mesh Bottom
+    cubit.cmd(f"curve 3 interval {MeshBottomHeight}")
+    cubit.cmd("curve 3 scheme equal")
+    cubit.cmd("mesh curve 3")
+    cubit.cmd(f"curve 2 interval {MeshWidth}")
+    cubit.cmd("curve 2 scheme equal")
+    cubit.cmd("mesh curve 2")
+    cubit.cmd(f"curve 11 interval {MeshDepth}")
+    cubit.cmd("curve 11 scheme equal")
+    cubit.cmd("mesh curve 11")
+    cubit.cmd("mesh volume 1")
+    # Mesh Cavity
+    cubit.cmd(f"curve 29 interval {MeshCavityHeight}")
+    cubit.cmd("curve 29 scheme equal")
+    cubit.cmd("mesh curve 29")
+    cubit.cmd(f"curve 16 interval {MeshWidth}")
+    cubit.cmd("curve 16 scheme equal")
+    cubit.cmd("mesh curve 16")
+    cubit.cmd(f"curve 21 interval {MeshDepth}")
+    cubit.cmd("curve 21 scheme equal")
+    cubit.cmd("mesh curve 21")
+    cubit.cmd("mesh volume 2")
+    # Mesh Inflow
+    cubit.cmd(f"curve 40 interval {MeshInflowHeight}")
+    cubit.cmd("curve 40 scheme equal")
+    cubit.cmd("mesh curve 40")
+    cubit.cmd("mesh volume 3")
+
+    ##########
+    # GROUPS #
+    ##########
+
+    # Structure
+    cubit.add_element_type(
+        cubit.group(add_value="add volume 1"),
+        name="flexible bottom",
+        el_type=cupy.element_type.hex8,
+        material={
+            "MAT": 1,
+        },
+        bc_description={
+            "KINEM": "nonlinear",
+            "TECH": "eas_full",
+        },
+    )
+
+    # Fluid
+    cubit.add_element_type(
+        cubit.group(add_value="add volume 2 3"),
+        name="fluid",
+        el_type=cupy.element_type.hex8_fluid,
+        material={
+            "MAT": 2,
+        },
+        bc_description={
+            "NA": "ALE",
+        },
+    )
+
+    cubit.fourc_input.combine_sections(
+        {
+            "PROBLEM TYPE": {"PROBLEMTYPE": "Fluid_Structure_Interaction"},
+            "PROBLEM SIZE": {"DIM": 3},
+            "STRUCTURAL DYNAMIC": {
+                "INT_STRATEGY": "Standard",
+                "LINEAR_SOLVER": 3,
+            },
+        }
+    )
+
+    # Compare the input file created for 4C.
+    compare_yaml(cubit, mesh_in_exo=True)

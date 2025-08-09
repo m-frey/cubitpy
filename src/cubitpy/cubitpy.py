@@ -350,9 +350,9 @@ class CubitPy(object):
         """
 
         # Check if output path exists
-        dat_dir = os.path.dirname(os.path.abspath(yaml_path))
-        if not os.path.exists(dat_dir):
-            raise ValueError("Path {} does not exist!".format(dat_dir))
+        yaml_dir = os.path.dirname(os.path.abspath(yaml_path))
+        if not os.path.exists(yaml_dir):
+            raise ValueError("Path {} does not exist!".format(yaml_dir))
 
         if mesh_in_exo:
             # Determine the path stem: Strip the '(.4C).yaml' suffix
@@ -369,7 +369,7 @@ class CubitPy(object):
             # Add the node sets
             add_node_sets(self, exo, input_file, write_topology_information=False)
             # Add the problem geometry section
-            rel_exo_path = os.path.relpath(exo_path, start=dat_dir)
+            rel_exo_path = os.path.relpath(exo_path, start=yaml_dir)
             add_exodus_geometry_section(self, input_file, rel_exo_path)
         else:
             input_file = get_input_file_with_mesh(self)
