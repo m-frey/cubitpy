@@ -1824,6 +1824,7 @@ def test_yaml_with_exo_export():
             "VAL": [0, 0, 0],
             "FUNCT": [None, None, None],
         },
+        node_set_id=17,
     )
     cubit.add_node_set(
         cubit.group(add_value="add surface 12"),
@@ -1835,6 +1836,41 @@ def test_yaml_with_exo_export():
             "VAL": [-1.0, 0.0, 0.0],
             "FUNCT": [1, None, None],
         },
+    )
+
+    cubit.add_node_set(
+        cubit.group(add_value="add curve 1"),
+        name="curve_1",
+        bc_type=cupy.bc_type.neumann,
+        bc_description={
+            "NUMDOF": 3,
+            "ONOFF": [1, 0, 0],
+            "VAL": [1.0, 0.0, 0.0],
+            "FUNCT": [None, None, None],
+        },
+    )
+    cubit.add_node_set(
+        cubit.group(add_value="add curve 2"),
+        name="curve_2",
+        bc_type=cupy.bc_type.neumann,
+        bc_description={
+            "NUMDOF": 3,
+            "ONOFF": [1, 0, 0],
+            "VAL": [1.0, 0.0, 0.0],
+            "FUNCT": [None, None, None],
+        },
+    )
+    cubit.add_node_set(
+        cubit.group(add_value="add curve 3"),
+        name="curve_3",
+        bc_type=cupy.bc_type.neumann,
+        bc_description={
+            "NUMDOF": 3,
+            "ONOFF": [1, 1, 0],
+            "VAL": [1.0, 0.0, 0.0],
+            "FUNCT": [None, None, None],
+        },
+        node_set_id=15,
     )
 
     # Add the element types
@@ -1857,6 +1893,7 @@ def test_yaml_with_exo_export():
         bc_description={
             "KINEM": "nonlinear",
         },
+        block_id=27,
     )
 
     cubit.fourc_input.combine_sections(
@@ -1897,10 +1934,10 @@ def test_yaml_with_exo_export_fsi():
 
     # Create Bottom
     cubit.cmd(f"brick x {Width} y {BottomHeight} z {Depth}")
-    cubit.cmd(f"volume 1 move x {Width/2} y {-BottomHeight/2} z {-Depth/2}")
+    cubit.cmd(f"volume 1 move x {Width / 2} y {-BottomHeight / 2} z {-Depth / 2}")
 
     # Create Fluid Part
-    cubit.cmd(f"brick x {Width} y {CavityHeight+InflowHeight} z {Depth}")
+    cubit.cmd(f"brick x {Width} y {CavityHeight + InflowHeight} z {Depth}")
     cubit.cmd("align volume 2 surface 9 with surface 5")
     # $ divide cavity and inflow region
     cubit.cmd(f"webcut volume 2 with plane yplane offset {CavityHeight} imprint merge")
