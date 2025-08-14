@@ -141,17 +141,16 @@ def add_exodus_geometry_section(cubit, input_file, rel_exo_file_path):
                 "SHOW_INFO": "detailed_summary",
                 "ELEMENT_BLOCKS": [],
             }
-        # retrieve the fourc name for the element
+        # retrieve the fourc name (e.g., SOLID/FLUID/...) and the cubit name
+        # (e.g., HEX8/TET4/...) for the element
         four_c_element_name = cur_block_data[0].get_four_c_name()
-        # convert the material data from dict to string because 4C currently does not support a dict here
-        element_data_string = " ".join(
-            f"{key} {value}" for key, value in cur_block_data[1].items()
-        )
+        _, cubit_element_name = cur_block_data[0].get_cubit_names()
         # add block id, fourc element name and element data string to the element block dictionary
         element_block_dict = {
             "ID": cur_block_id,
-            "ELEMENT_NAME": four_c_element_name,
-            "ELEMENT_DATA": element_data_string,
+            "ELEMENT_DATA": {
+                four_c_element_name: {cubit_element_name: cur_block_data[1]},
+            },
         }
         # append the dictionary with the element block information to the element block list
         input_file[cur_geometry_section_key]["ELEMENT_BLOCKS"].append(
