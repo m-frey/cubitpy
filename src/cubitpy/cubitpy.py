@@ -39,6 +39,26 @@ from cubitpy.cubit_to_fourc_input import (
 from cubitpy.cubit_wrapper.cubit_wrapper_host import CubitConnect
 
 
+def _get_and_check_ids(name, container, id_list, given_id):
+    """Perform checks for the block and node set IDs used in CubitPy."""
+
+    # Check that the IDs stored in container are the same as created with this function.
+    if not set(container.keys()) == set(id_list):
+        raise ValueError(
+            f"The existing {name} ids in CubitPy ({set(container.keys())}) don't match the ones in Cubit ({id_list})"
+        )
+
+    # Get the id of the block to create.
+    if given_id is None:
+        if len(id_list) > 0:
+            given_id = max(id_list) + 1
+        else:
+            given_id = 1
+    elif given_id in id_list:
+        raise ValueError(f"The provided {name} id {given_id} already exists {id_list}")
+    return given_id
+
+
 class CubitPy(object):
     """A wrapper class with additional functionality for cubit."""
 
@@ -69,12 +89,10 @@ class CubitPy(object):
         # Set lists and counters for blocks and sets
         self._default_cubit_variables()
 
-        self.fourc_input = FourCInput()
-
     def _default_cubit_variables(self):
         """Set the default values for the lists and counters used in cubit."""
-        self.blocks = []
-        self.node_sets = []
+        self.blocks = {}
+        self.node_sets = {}
         self.fourc_input = FourCInput()
 
     def __getattr__(self, key, *args, **kwargs):
@@ -128,7 +146,14 @@ class CubitPy(object):
             self.cubit.cmd('{} {} name "{}"'.format(set_type, set_id, rename_name))
 
     def add_element_type(
-        self, item, el_type, *, name=None, material=None, bc_description=None
+        self,
+        item,
+        el_type,
+        *,
+        name=None,
+        material=None,
+        bc_description=None,
+        block_id: int | None = None,
     ):
         """Add a block to cubit that contains the geometry in item. Also set
         the element type of block.
@@ -147,6 +172,9 @@ class CubitPy(object):
         bc_description: dict
             Will be written after the material string. If this is not set, the
             default values for the given element type will be used.
+        block_id:
+            Optionally the block ID can be given by the user. If this ID already exists
+            an error will be raised.
         """
 
         # default values
@@ -155,19 +183,15 @@ class CubitPy(object):
         if bc_description is None:
             bc_description = {}
 
-        # Check that all blocks in cubit are created with this function.
-        n_blocks = len(self.blocks)
-        if not len(self.cubit.get_block_id_list()) == n_blocks:
-            raise ValueError(
-                "The block counter is {1}, but the number of blocks in cubit is {0}, all blocks should be created with this function!".format(
-                    len(self.cubit.get_block_id_list()), n_blocks
-                )
-            )
+        # Check and get the block id for the new block.
+        block_id = _get_and_check_ids(
+            "block", self.blocks, self.cubit.get_block_id_list(), block_id
+        )
 
         # Get element type of item.
         geometry_type = item.get_geometry_type()
 
-        self.cubit.cmd("create block {}".format(n_blocks + 1))
+        self.cubit.cmd("create block {}".format(block_id))
 
         if not isinstance(item, CubitGroup):
             cubit_scheme, cubit_element_type = el_type.get_cubit_names()
@@ -181,30 +205,30 @@ class CubitPy(object):
 
             self.cubit.cmd(
                 "block {} {} {}".format(
-                    n_blocks + 1, geometry_type.get_cubit_string(), item.id()
+                    block_id, geometry_type.get_cubit_string(), item.id()
                 )
             )
             self.cubit.cmd(
-                "block {} element type {}".format(n_blocks + 1, cubit_element_type)
+                "block {} element type {}".format(block_id, cubit_element_type)
             )
         else:
-            item.add_to_block(n_blocks + 1, el_type)
+            item.add_to_block(block_id, el_type)
 
-        self._name_created_set("block", n_blocks + 1, name, item)
+        self._name_created_set("block", block_id, name, item)
 
         # If the user does not give a bc_description, load the default one.
         if not bc_description:
             bc_description = el_type.get_default_four_c_description()
 
         # Add data that will be written to bc file.
-        self.blocks.append([el_type, material | bc_description])
+        self.blocks[block_id] = [el_type, material | bc_description]
 
     def reset_blocks(self):
         """This method deletes all blocks in Cubit and resets the counter in
         this object."""
 
         # Reset the block list of this object.
-        self.blocks = []
+        self.blocks = {}
 
         # Delete all blocks.
         for block_id in self.get_block_id_list():
@@ -219,6 +243,7 @@ class CubitPy(object):
         bc_description=None,
         bc_section=None,
         geometry_type=None,
+        node_set_id: int | None = None,
     ):
         """Add a node set to cubit. This node set can have a boundary
         condition.
@@ -239,34 +264,33 @@ class CubitPy(object):
         geometry_type: cupy.geometry
             Directly set the geometry type, instead of obtaining it from the
             given item.
+        node_set_id:
+            Optionally the node set ID can be given by the user. If this ID
+            already exists an error will be raised.
         """
 
-        # Check that all node sets in cubit are created with this function.
-        n_node_sets = len(self.node_sets)
-        if not len(self.cubit.get_nodeset_id_list()) == n_node_sets:
-            raise ValueError(
-                "The node set counter is {1}, but the number of node sets in cubit is {0}, all node sets should be created with this function!".format(
-                    len(self.cubit.get_nodeset_id_list()), n_node_sets
-                )
-            )
+        # Check and get the node set id for the new node set.
+        node_set_id = _get_and_check_ids(
+            "nodeset", self.node_sets, self.cubit.get_nodeset_id_list(), node_set_id
+        )
 
         # Get element type of item if it was not explicitly given.
         if geometry_type is None:
             geometry_type = item.get_geometry_type()
 
-        self.cubit.cmd("create nodeset {}".format(n_node_sets + 1))
+        self.cubit.cmd("create nodeset {}".format(node_set_id))
         if not isinstance(item, CubitGroup):
             # Add the geometries to the node set in cubit.
             self.cubit.cmd(
                 "nodeset {} {} {}".format(
-                    n_node_sets + 1, geometry_type.get_cubit_string(), item.id()
+                    node_set_id, geometry_type.get_cubit_string(), item.id()
                 )
             )
         else:
             # Add the group to the node set in cubit.
-            item.add_to_nodeset(n_node_sets + 1)
+            item.add_to_nodeset(node_set_id)
 
-        self._name_created_set("nodeset", n_node_sets + 1, name, item)
+        self._name_created_set("nodeset", node_set_id, name, item)
 
         # Add data that will be written to bc file.
         if (
@@ -282,7 +306,7 @@ class CubitPy(object):
             bc_section = bc_type.get_dat_bc_section_header(geometry_type)
         if bc_description is None:
             bc_description = {}
-        self.node_sets.append([bc_section, bc_description, geometry_type])
+        self.node_sets[node_set_id] = [bc_section, bc_description, geometry_type]
 
     def get_ids(self, geometry_type):
         """Get a list with all available ids of a certain geometry type."""
@@ -367,7 +391,13 @@ class CubitPy(object):
             # create a deep copy of the input_file
             input_file = self.fourc_input.copy()
             # Add the node sets
-            add_node_sets(self, exo, input_file, write_topology_information=False)
+            add_node_sets(
+                self,
+                exo,
+                input_file,
+                write_topology_information=False,
+                use_exo_ids=True,
+            )
             # Add the problem geometry section
             rel_exo_path = os.path.relpath(exo_path, start=yaml_dir)
             add_exodus_geometry_section(self, input_file, rel_exo_path)

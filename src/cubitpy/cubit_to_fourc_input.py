@@ -30,7 +30,9 @@ import numpy as np
 from cubitpy.conf import cupy
 
 
-def add_node_sets(cubit, exo, input_file, write_topology_information=True):
+def add_node_sets(
+    cubit, exo, input_file, write_topology_information=True, use_exo_ids=False
+):
     """Add the node sets contained in the cubit session/exo file to the yaml
     file."""
 
@@ -38,14 +40,20 @@ def add_node_sets(cubit, exo, input_file, write_topology_information=True):
     if len(cubit.node_sets) == 0:
         return
 
-    # Get names of the node sets
-    names = []
-    for string_list in exo.variables["ns_names"]:
-        string = ""
-        for char in string_list:
+    # Get a mapping between the node set IDs and the node set names and keys in the exo file.
+    node_set_id_to_exo_name = {}
+    node_set_keys = [key for key in exo.variables.keys() if "node_ns" in key]
+    for i in range(len(exo.variables["ns_prop1"])):
+        node_set_id = int(exo.variables["ns_prop1"][i])
+        node_set_key = node_set_keys[i]
+        node_set_name = ""
+        for char in exo.variables["ns_names"][i]:
             if isinstance(char, np.bytes_):
-                string += char.decode("UTF-8")
-        names.append(string)
+                node_set_name += char.decode("UTF-8")
+        node_set_id_to_exo_name[node_set_id] = {
+            "key": node_set_key,
+            "name": node_set_name,
+        }
 
     # Sort the sets into their geometry type
     node_sets = {
@@ -54,20 +62,18 @@ def add_node_sets(cubit, exo, input_file, write_topology_information=True):
         cupy.geometry.surface: [],
         cupy.geometry.volume: [],
     }
-    boundary_condition_map = {}
-    node_set_keys = [key for key in exo.variables.keys() if "node_ns" in key]
-    for i_set, key in enumerate(node_set_keys):
-        bc_section, bc_description, geometry_type = cubit.node_sets[i_set]
-        node_sets[geometry_type].append(exo.variables[key][:])
-        bc_key = (bc_section, geometry_type)
-        if bc_key not in boundary_condition_map.keys():
-            boundary_condition_map[bc_key] = []
-        boundary_condition_map[bc_key].append(
-            [len(node_sets[geometry_type]), bc_description, names[i_set]]
-        )
+    for node_set_id, node_set_data in cubit.node_sets.items():
+        bc_section, bc_description, geometry_type = node_set_data
+        node_set_key = node_set_id_to_exo_name[node_set_id]["key"]
+        node_sets[geometry_type].append(exo.variables[node_set_key][:])
+
+        if use_exo_ids:
+            bc_description["E"] = node_set_id
+        else:
+            bc_description["E"] = len(node_sets[geometry_type])
+
         if bc_section not in input_file.inlined.keys():
             input_file[bc_section] = []
-        bc_description["E"] = len(node_sets[geometry_type])
 
         if not write_topology_information:
             # when working with external .exo meshes, we do not write the
@@ -122,12 +128,9 @@ def add_exodus_geometry_section(cubit, input_file, rel_exo_file_path):
         The relative path (as seen from the yaml input file) to the exodus
         file that contains the mesh.
     """
-    # Retrieve a list of the block IDs and the corresponding block data of the current session
-    element_block_ids = cubit.cubit.get_block_id_list()
-    element_blocks = cubit.blocks
 
     # Iterate over all blocks and add them to the input file
-    for cur_block_id, cur_block_data in zip(element_block_ids, element_blocks):
+    for cur_block_id, cur_block_data in cubit.blocks.items():
         # retrieve the name of the geometry section that this block belongs to
         cur_geometry_section_key = cur_block_data[0].get_four_c_section() + " GEOMETRY"
         # If the geometry section for this block does not exist yet, create it
@@ -238,8 +241,9 @@ def get_input_file_with_mesh(cubit):
     connectivity_keys = [key for key in exo.variables.keys() if "connect" in key]
     connectivity_keys.sort()
     i_element = 0
-    for i_block, key in enumerate(connectivity_keys):
-        ele_type, block_dict = cubit.blocks[i_block]
+    for key in connectivity_keys:
+        key_id = int(key[7:])
+        ele_type, block_dict = cubit.blocks[key_id]
         block_section = f"{ele_type.get_four_c_section()} ELEMENTS"
         if block_section not in input_file.sections.keys():
             input_file[block_section] = []

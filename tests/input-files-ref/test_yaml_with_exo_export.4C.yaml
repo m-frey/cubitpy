@@ -25,7 +25,7 @@ DESIGN SURF DIRICH CONDITIONS:
       - null
       - null
       - null
-    E: 3
+    E: 17
     ENTITY_TYPE: "node_set_id"
   - NUMDOF: 3
     ONOFF:
@@ -40,7 +40,53 @@ DESIGN SURF DIRICH CONDITIONS:
       - 1
       - null
       - null
-    E: 4
+    E: 18
+    ENTITY_TYPE: "node_set_id"
+DESIGN LINE NEUMANN CONDITIONS:
+  - NUMDOF: 3
+    ONOFF:
+      - 1
+      - 0
+      - 0
+    VAL:
+      - 1.0
+      - 0.0
+      - 0.0
+    FUNCT:
+      - null
+      - null
+      - null
+    E: 19
+    ENTITY_TYPE: "node_set_id"
+  - NUMDOF: 3
+    ONOFF:
+      - 1
+      - 0
+      - 0
+    VAL:
+      - 1.0
+      - 0.0
+      - 0.0
+    FUNCT:
+      - null
+      - null
+      - null
+    E: 20
+    ENTITY_TYPE: "node_set_id"
+  - NUMDOF: 3
+    ONOFF:
+      - 1
+      - 1
+      - 0
+    VAL:
+      - 1.0
+      - 0.0
+      - 0.0
+    FUNCT:
+      - null
+      - null
+      - null
+    E: 15
     ENTITY_TYPE: "node_set_id"
 STRUCTURE GEOMETRY:
   FILE: "test_yaml_with_exo_export.exo"
@@ -49,6 +95,6 @@ STRUCTURE GEOMETRY:
     - ID: 1
       ELEMENT_NAME: "SOLID"
       ELEMENT_DATA: "MAT 1 KINEM nonlinear"
-    - ID: 2
+    - ID: 27
       ELEMENT_NAME: "SOLID"
       ELEMENT_DATA: "MAT 2 KINEM nonlinear"
