@@ -97,10 +97,10 @@ STRUCTURE GEOMETRY:
         SOLID:
           HEX8:
             MAT: 1
-            KINEM: nonlinear
-    - ID: 2
+            KINEM: "nonlinear"
+    - ID: 27
       ELEMENT_DATA:
         SOLID:
           HEX8:
             MAT: 2
-            KINEM: nonlinear
+            KINEM: "nonlinear"
