@@ -29,7 +29,7 @@ import warnings
 import netCDF4
 from fourcipp.fourc_input import FourCInput
 
-from cubitpy.conf import cupy
+from cubitpy.conf import GeometryType, cupy
 from cubitpy.cubit_group import CubitGroup
 from cubitpy.cubit_to_fourc_input import (
     add_exodus_geometry_section,
@@ -420,6 +420,87 @@ class CubitPy(object):
 
         self.cubit.reset()
         self._default_cubit_variables()
+
+    def cmd_return(self, cmd: str, geometry_type: GeometryType, **kwargs):
+        """Run a cubit command and return the created geometry object.
+
+        Args:
+            cmd: The cubit command to run.
+            geometry_type: The geometry type that should be checked for a new geometry.
+            kwargs: Will be passed on to `cmd_return_dict`.
+
+        Returns:
+            If a single geometry object of the given type is created, this object
+            is returned. This function expects that a single geometry item of the given
+            type is created, otherwise an error will be raised. For use cases, where one
+            expects a variable amount of created items or wants to check multiple
+            different geometry types, please refer to `cmd_return_dict`.
+        """
+        geometry_dict = self.cmd_return_dict(cmd, [geometry_type], **kwargs)
+        if len(geometry_dict[geometry_type]) == 1:
+            return geometry_dict[geometry_type][0]
+        else:
+            raise ValueError(
+                f"Expected a single created item of type {geometry_type}, but got {geometry_dict[geometry_type]}"
+            )
+
+    def cmd_return_dict(
+        self,
+        cmd: str,
+        geometry_types: list[GeometryType],
+        *,
+        filter_sheet_bodies: bool = True,
+    ):
+        """Run a cubit command and return created geometry objects.
+
+        Args:
+            cmd: The cubit command to run.
+            geometry_types: The geometry types that should be checked for new geometries.
+            filter_sheet_bodies: If volumes that are sheet bodies should be ignored.
+                Defaults to true.
+
+        Returns:
+            A dictionary of the created geometry objects. The dictionary keys are the
+            geometry types, the values are lists containing the respective objects.
+        """
+
+        # Store the already existing ids for all requested geometry types.
+        geometry_ids_before = {
+            geometry: set(self.get_entities(geometry.get_cubit_string()))
+            for geometry in geometry_types
+        }
+
+        # For CoreForm, we need to check that the volumes are not sheet bodies
+        if cupy.is_coreform() and filter_sheet_bodies:
+            if cupy.geometry.volume in geometry_ids_before:
+                volume_ids_before = geometry_ids_before[cupy.geometry.volume]
+                volume_ids_before_no_sheet_bodies = {
+                    id for id in volume_ids_before if not self.is_sheet_body(id)
+                }
+                geometry_ids_before[cupy.geometry.volume] = (
+                    volume_ids_before_no_sheet_bodies
+                )
+
+        # Run the command.
+        self.cmd(cmd)
+
+        # Get the objects that were created by the command.
+        create_objects = {}
+        for geometry, ids_before in geometry_ids_before.items():
+            ids_after = set(self.get_entities(geometry.get_cubit_string()))
+            ids_new = ids_after - ids_before
+
+            if (
+                cupy.is_coreform()
+                and filter_sheet_bodies
+                and geometry == cupy.geometry.volume
+            ):
+                ids_new = {id for id in ids_new if not self.is_sheet_body(id)}
+
+            geometry_objects = self.get_items(geometry, item_ids=ids_new)
+            create_objects[geometry] = geometry_objects
+
+        return create_objects
 
     def display_in_cubit(self, labels=[], delay=0.5, testing=False):
         """Save the state to a cubit file and open cubit with that file.
