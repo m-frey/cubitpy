@@ -67,6 +67,12 @@ To run CubitPy it is required to set an environment variable with the path to th
 export CUBIT_ROOT=path_to_cubit_root_directory
 ```
 
+If you are using a Cubit version that still runs on python2, you need to specify a path to a valid python2.7 executable
+```bash
+export CUBITPY_PYTHON2=path_to_python2.7
+```
+Note: for IMCS workstations this path is `"/imcs/public/compsim/opt/Python-2.7.18/python"`.
+
 To check if everything worked as expected, run the test suite (from the root directory)
 ```bash
 cd path_to_cubitpy/tests
