@@ -14,9 +14,9 @@ dependencies = [
   "execnet==1.9.0",
   "netCDF4",
   "numpy",
-  "fourcipp @ git+https://github.com/4C-multiphysics/fourcipp.git@main"
+  "fourcipp"
 ]
-version = "0.0.1"
+version = "0.1.0"
 
 [project.urls]
 Repository = "https://github.com/imcs-compsim/cubitpy/"
