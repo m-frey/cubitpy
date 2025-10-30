@@ -148,9 +148,7 @@ def add_exodus_geometry_section(cubit, input_file, rel_exo_file_path):
         # add block id, fourc element name and element data string to the element block dictionary
         element_block_dict = {
             "ID": cur_block_id,
-            "ELEMENT_DATA": {
-                four_c_element_name: {cubit_element_name: cur_block_data[1]},
-            },
+            four_c_element_name: {cubit_element_name: cur_block_data[1]},
         }
         # append the dictionary with the element block information to the element block list
         input_file[cur_geometry_section_key]["ELEMENT_BLOCKS"].append(
