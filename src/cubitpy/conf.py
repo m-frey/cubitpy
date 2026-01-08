@@ -1,3 +1,4 @@
+# coding=utf-8
 # The MIT License (MIT)
 #
 # Copyright (c) 2018-2025 CubitPy Authors
