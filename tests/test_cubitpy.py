@@ -38,6 +38,7 @@ testing_external_geometry = os.path.join(testing_path, "external-geometry")
 
 # CubitPy imports.
 from cubitpy.conf import cupy
+from cubitpy.cubit_to_fourc_input import add_node_sets
 from cubitpy.cubit_utility import get_surface_center, import_fluent_geometry
 from cubitpy.cubitpy import CubitPy
 from cubitpy.geometry_creation_functions import (
@@ -2018,6 +2019,66 @@ def test_yaml_with_exo_export_fsi():
 
     # Compare the input file created for 4C.
     compare_yaml(cubit, mesh_in_exo=True)
+
+
+class _FakeExodus:
+    def __init__(self, variables):
+        self.variables = variables
+
+
+class _FakeCubitNodeSets:
+    def __init__(self, node_sets):
+        self.node_sets = node_sets
+
+
+def _ns_name_bytes(name: str, width: int = 8):
+    return [char.encode("utf-8") for char in name.ljust(width)]
+
+
+def test_add_node_sets_reused_bc_description_keeps_distinct_e():
+    shared_bc_description = {
+        "NUMDOF": 3,
+        "ONOFF": [1, 1, 1],
+        "VAL": [0.0, 0.0, 0.0],
+        "FUNCT": [0, 0, 0],
+    }
+
+    node_sets = {
+        i: [
+            "DESIGN POINT DIRICH CONDITIONS",
+            shared_bc_description,
+            cupy.geometry.vertex,
+        ]
+        for i in [1, 2, 3, 4]
+    }
+
+    fake_cubit = _FakeCubitNodeSets(node_sets=node_sets)
+    fake_exo = _FakeExodus(
+        variables={
+            "ns_prop1": np.array([1, 2, 3, 4], dtype=int),
+            "ns_names": np.array(
+                [
+                    _ns_name_bytes("ns1"),
+                    _ns_name_bytes("ns2"),
+                    _ns_name_bytes("ns3"),
+                    _ns_name_bytes("ns4"),
+                ],
+                dtype="S1",
+            ),
+            "node_ns1": np.array([1, 2], dtype=int),
+            "node_ns2": np.array([3, 4], dtype=int),
+            "node_ns3": np.array([5, 6], dtype=int),
+            "node_ns4": np.array([7, 8], dtype=int),
+        }
+    )
+
+    input_file = FourCInput()
+    add_node_sets(fake_cubit, fake_exo, input_file, use_exo_ids=True)
+
+    e_values = [
+        bc["E"] for bc in input_file["DESIGN POINT DIRICH CONDITIONS"]
+    ]
+    assert e_values == [1, 2, 3, 4]
 
 
 def test_cmd_return():

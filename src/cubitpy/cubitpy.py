@@ -22,6 +22,7 @@
 """Implements a class that helps create meshes with cubit."""
 
 import datetime
+import copy
 import os
 import shlex
 import subprocess  # nosec B404
@@ -351,7 +352,11 @@ class CubitPy(object):
             bc_section = bc_type.get_dat_bc_section_header(geometry_type)
         if bc_description is None:
             bc_description = {}
-        self.node_sets[node_set_id] = [bc_section, bc_description, geometry_type]
+        self.node_sets[node_set_id] = [
+            bc_section,
+            copy.deepcopy(bc_description),
+            geometry_type,
+        ]
 
     def get_ids(self, geometry_type):
         """Get a list with all available ids of a certain geometry type."""
@@ -688,6 +693,38 @@ class CubitPy(object):
 
         print(f"[transfer] Copy OK: {remote_for_scp} → {local_path}")
         return local_path
+
+    def transfer_file_to_remote(
+        self, local_path: str, remote_path: PureWindowsPath
+    ) -> PureWindowsPath:
+        """Copy a file from the local host to the remote machine."""
+        ssh_user, ssh_host, *_ = cupy.get_cubit_remote_config()
+        print(f"[REMOTE PATH] from local upload {remote_path}")
+        # Ensure the path has a drive letter (scp requires C:/… - cubit does not)
+        if not remote_path.drive:
+            remote_path = PureWindowsPath("C:", *remote_path.parts)
+
+        print(f"[REMOTE PATH] with C {remote_path}")
+        remote_for_scp = remote_path.as_posix()
+
+        print(f"[REMOTE PATH] after posix {remote_for_scp}")
+        cmd = ["scp", local_path, f"{ssh_user}@{ssh_host}:{remote_for_scp}"]
+        print(f"[transfer] Running: {' '.join(cmd)}")
+
+        try:
+            subprocess.check_output(cmd, stderr=subprocess.STDOUT)  # nosec B603
+        except subprocess.CalledProcessError as e:
+            output = e.output.decode("utf-8", "replace")
+            raise RuntimeError(
+                "Failed to copy local file to remote:\n"
+                f"  local : {local_path}\n"
+                f"  remote: {remote_for_scp}\n"
+                f"  cmd   : {' '.join(cmd)}\n"
+                f"  error : {output}"
+            ) from e
+
+        print(f"[transfer] Copy OK: {local_path} → {remote_for_scp}")
+        return remote_path
 
     def display_in_cubit_remote(self, labels=None, delay=0.5, testing=False):
         """Display the current state in Cubit on a remote Windows machine."""

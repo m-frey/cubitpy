@@ -64,13 +64,14 @@ def add_node_sets(
     }
     for node_set_id, node_set_data in cubit.node_sets.items():
         bc_section, bc_description, geometry_type = node_set_data
+        bc_description_out = bc_description.copy()
         node_set_key = node_set_id_to_exo_name[node_set_id]["key"]
         node_sets[geometry_type].append(exo.variables[node_set_key][:])
 
         if use_exo_ids:
-            bc_description["E"] = node_set_id
+            bc_description_out["E"] = node_set_id
         else:
-            bc_description["E"] = len(node_sets[geometry_type])
+            bc_description_out["E"] = len(node_sets[geometry_type])
 
         if bc_section not in input_file.inlined.keys():
             input_file[bc_section] = []
@@ -79,9 +80,9 @@ def add_node_sets(
             # when working with external .exo meshes, we do not write the
             # topology information for the node sets explicitly, since 4C will
             # deduce them based on the node set ids, when reading the .exo file
-            bc_description["ENTITY_TYPE"] = "node_set_id"
+            bc_description_out["ENTITY_TYPE"] = "node_set_id"
 
-        input_file[bc_section].append(bc_description)
+        input_file[bc_section].append(bc_description_out)
 
     if write_topology_information:
         # this is the default case: when the mesh is supposed to be contained

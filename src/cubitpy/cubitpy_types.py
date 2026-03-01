@@ -294,6 +294,7 @@ class BoundaryConditionType(Enum):
     solid_to_solid_contact = auto()
     periodic_rve_surface = auto()
     periodic_rve_edge = auto()
+    
 
     # fluid
     flow_rate = auto()
