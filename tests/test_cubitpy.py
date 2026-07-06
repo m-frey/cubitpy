@@ -49,6 +49,7 @@ from cubitpy.geometry_creation_functions import (
     create_spline_interpolation_curve,
 )
 from cubitpy.mesh_creation_functions import create_brick, extrude_mesh_normal_to_surface
+from cubitpy.mesh_screenshot import _get_shaded_exterior_faces
 
 # Define the testing paths.
 testing_path = os.path.abspath(os.path.dirname(__file__))
@@ -2592,3 +2593,35 @@ def test_on_cubit_error_config(tmp_path):
             cupy.load_cubit_config(write_config('on_cubit_error: "bogus"\n'))
     finally:
         cupy._config = saved_config
+
+
+def test_shaded_exterior_faces():
+    """Check exterior face extraction and face color generation."""
+    coordinates = np.array(
+        [[x, y, z] for z in range(3) for y in range(2) for x in range(2)],
+        dtype=float,
+    )
+    connectivity = [[1, 2, 4, 3, 5, 6, 8, 7], [5, 6, 8, 7, 9, 10, 12, 11]]
+
+    quads, facecolors = _get_shaded_exterior_faces(
+        coordinates, connectivity, "#4C72B0", (0.3, 0.35, 0.9)
+    )
+
+    assert quads.shape == (10, 4, 3)
+    assert facecolors.shape == (10, 4)
+    assert not np.any(np.all(quads[:, :, 2] == 1.0, axis=1))
+
+
+def test_cubitpy_mesh_screenshot(tmp_path):
+    """Render a screenshot for a meshed brick."""
+    pytest.importorskip("matplotlib")
+
+    cubit = CubitPy()
+    create_brick(cubit, 1, 2, 3, mesh_interval=[1, 2, 3], name="brick")
+
+    png_path = cubit.mesh_screenshot(tmp_path / "mesh_screenshot.png", title="brick")
+    assert png_path.is_file()
+    assert png_path.stat().st_size > 1000
+
+    with pytest.raises(ValueError):
+        cubit.mesh_screenshot(tmp_path / "empty.png", skip_blocks=("brick",))

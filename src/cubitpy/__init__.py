@@ -24,6 +24,7 @@ interface."""
 
 from cubitpy.conf import cupy
 from cubitpy.cubitpy import CubitPy
+from cubitpy.mesh_screenshot import render_mesh_screenshot
 
 # Define the items that will be exported by default.
 __all__ = [
@@ -31,4 +32,5 @@ __all__ = [
     "cupy",
     # Cubit objects.
     "CubitPy",
+    "render_mesh_screenshot",
 ]

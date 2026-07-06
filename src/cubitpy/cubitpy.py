@@ -445,6 +445,33 @@ class CubitPy(object):
                     )
                 )
 
+    def mesh_screenshot(
+        self,
+        png_path: Path | str,
+        *,
+        skip_blocks: tuple[str | None, ...] = (),
+        **kwargs,
+    ) -> Path:
+        """Render the current mesh to a PNG.
+
+        Keyword arguments are forwarded to
+        :func:`cubitpy.mesh_screenshot.render_mesh_screenshot`.
+
+        Args:
+            png_path: Destination PNG file.
+            skip_blocks: Exodus block names to omit.
+
+        Returns:
+            The written ``png_path`` as a ``Path``.
+        """
+        from cubitpy.mesh_screenshot import render_mesh_screenshot
+
+        exo_path = Path(cupy.temp_dir) / "cubitpy_screenshot.exo"
+        self.export_exo(exo_path, add_node_set_info=False)
+        return render_mesh_screenshot(
+            exo_path, png_path, skip_blocks=skip_blocks, **kwargs
+        )
+
     def dump(
         self,
         yaml_path: Path | str,
